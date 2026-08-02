@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComplyLog Pro - Sistema HACCP & GMP Dual Industria</title>
+    <!-- jsPDF desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Supabase Client v2 integrado directamente -->
+    <script>
+/* ============================================
+   SUPABASE CLIENT - Fetch API directo
+   ============================================ */
+(function(global) {
+    'use strict';
+    
+    function createClient(url, key) {
+        if (!url) throw new Error('supabaseUrl requerida');
+        if (!key) throw new Error('supabaseKey requerida');
+        
+        const headers = {
+            'apikey': key,
+            'Authorization': 'Bearer ' + key,
+            'Content-Type': 'application/json'
+        };
+        
+        async function request(method, path, body) {
+            const fullUrl = url + '/rest/v1' + path;
+            const options = {
+                method: method,
+                headers: headers
+            };
+            
+            if (body) {
+                options.body = JSON.stringify(body);
+                options.headers['Prefer'] = 'return=representation';
+            }
+            
+            const response = await fetch(fullUrl, options);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorData;
+                try {
+                    errorData = JSON.parse(errorText);
+                } catch {
+                    errorData = { message: errorText };
+                }
+                return { data: null, error: errorData, status: response.status };
+            }
+            
+            const text = await response.text();
+            if (!text) return { data: null, error: null, status: response.status };
+            
+            try {
+                return { data: JSON.parse(text), error: null, status: response.status };
+            } catch {
+                return { data: text, error: null, status: response.status };
+            }
+        }
+        
+        function buildQuery(table, options) {
+            let path = '/' + table;
+            let params = [];
+            
+            if (options.select) params.push('select=' + encodeURIComponent(options.select));
+            if (options.order) params.push('order=' + encodeURIComponent(options.order));
+            if (options.limit) params.push('limit=' + options.limit);
+            if (options.offset) params.push('offset=' + options.offset);
+            
+            if (options.filters) {
+                options.filters.forEach(f => {
+                    params.push(encodeURIComponent(f.column) + '=' + encodeURIComponent(f.operator) + '.' + encodeURIComponent(f.value));
+                });
+            }
+            
+            if (params.length > 0) path += '?' + params.join('&');
+            return path;
+        }
+        
+        function createQueryBuilder(table) {
+            const options = { select: '*', filters: [] };
+            
+            const builder = {
+                select: function(cols) {
+                    options.select = cols || '*';
+                    return builder;
+                },
+                eq: function(col, val) {
+                    options.filters.push({ column: col, operator: 'eq', value: val });
+                    return builder;
+                },
+                order: function(col, opts) {
+                    options.order = col + '.' + ((opts && opts.ascending === false) ? 'desc' : 'asc');
+                    return builder;
+                },
+                limit: function(n) {
+                    options.limit = n;
+                    return builder;
+                },
+                range: function(from, to) {
+                    options.offset = from;
+                    options.limit = to - from + 1;
+                    return builder;
+                },
+                single: function() {
+                    options.limit = 1;
+                    return builder.then(function(res) {
+                        if (res.error) return res;
+                        return { data: Array.isArray(res.data) ? res.data[0] || null : res.data, error: null, status: res.status };
+                    });
+                },
+                then: function(resolve, reject) {
+                    const path = buildQuery(table, options);
+                    return request('GET', path).then(resolve, reject);
+                },
+                insert: function(values) {
+                    return request('POST', '/' + table, Array.isArray(values) ? values : [values]);
+                },
+                update: function(values) {
+                    const path = buildQuery(table, options);
+                    return request('PATCH', path, values);
+                },
+                delete: function() {
+                    const path = buildQuery(table, options);
+                    return request('DELETE', path);
+                }
+            };
+            
+            return builder;
+        }
+        
+        return {
+            from: function(table) {
+                return createQueryBuilder(table);
+            },
+            rpc: function(fn, params) {
+                return request('POST', '/rpc/' + fn, params);
+            }
+        };
+    }
+    
+    global.supabaseLib = { createClient: createClient };
+    console.log('✅ Supabase Client cargado (Fetch API)');
+    
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --info: #0284c7;
+            --cannabis: #7c3aed;
+            --cannabis-light: #ede9fe;
+            --food: #059669;
+            --food-light: #dcfce7;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius: 12px;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
+            min-height: 100vh;
+            padding: 24px 16px;
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+        
+        body.cannabis-mode {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #ede9fe 100%);
+        }
+        
+        body.food-mode {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #f0f9ff 100%);
+        }
+        
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .header {
+            background: white;
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            border: 1px solid var(--gray-200);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #059669, #7c3aed, #0284c7);
+        }
+        
+        .header h1 { 
+            font-size: 32px; 
+            font-weight: 700; 
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--gray-900), var(--gray-700));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header .subtitle { 
+            color: var(--gray-500); 
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .industry-selector {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .industry-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--gray-300);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+        
+        .industry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .industry-btn.active-food {
+            border-color: var(--food);
+            background: var(--food-light);
+            color: #166534;
+        }
+        
+        .industry-btn.active-cannabis {
+            border-color: var(--cannabis);
+            background: var(--cannabis-light);
+            color: #6b21a8;
+        }
+        
+        .badge-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        
+        .badge-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .badge-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .badge-info { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+        .badge-purple { background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
+        
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s;
+        }
+        
+        .card:hover { box-shadow: var(--shadow-md); }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--gray-100);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .form-grid-4 { grid-template-columns: repeat(4, 1fr); }
+        
+        .form-group { margin-bottom: 0; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--gray-700);
+        }
+        
+        .form-label .required { color: var(--danger); }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--info);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+        
+        .form-textarea { resize: vertical; min-height: 80px; }
+        
+        .log-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13px;
+        }
+        
+        .log-table th {
+            background: var(--gray-100);
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray-600);
+            border-bottom: 2px solid var(--gray-300);
+        }
+        
+        .log-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .log-table tr:hover td { background: var(--gray-50); }
+        .log-table .deviation-row td { background: #fef2f2; }
+        
+        .deviation-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        .compliant-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .btn:active { transform: scale(0.98); }
+        
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-primary:hover { background: var(--primary-light); }
+        
+        .btn-success { background: var(--success); color: white; }
+        .btn-cannabis { background: var(--cannabis); color: white; }
+        .btn-outline { background: white; color: var(--gray-700); border: 1.5px solid var(--gray-300); }
+        
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn-group .btn { flex: 1; min-width: 200px; }
+        
+        .alert {
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border: 1px solid;
+        }
+        
+        .alert-info { background: #f0f9ff; border-color: #bae6fd; color: #075985; }
+        .alert-success { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+        .alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+        .alert-error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+        .alert-cannabis { background: #faf5ff; border-color: #d8b4fe; color: #6b21a8; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow);
+        }
+        
+        .stat-value { font-size: 28px; font-weight: 700; }
+        .stat-label { font-size: 11px; color: var(--gray-500); font-weight: 600; text-transform: uppercase; margin-top: 4px; }
+        
+        .config-section {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .food-specific { border-left: 4px solid var(--food); }
+        .cannabis-specific { border-left: 4px solid var(--cannabis); }
+        .both-industries { border-left: 4px solid var(--info); }
+        
+        .industry-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        
+        .industry-badge.food { background: #dcfce7; color: #166534; }
+        .industry-badge.cannabis { background: #ede9fe; color: #6b21a8; }
+        
+        @media (max-width: 768px) {
+            .form-grid, .form-grid-3, .form-grid-4 { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .btn-group .btn { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header con Selector de Industria -->
+        <div class="header">
+            <h1>🛡️ ComplyLog Pro</h1>
+            <p class="subtitle">Sistema Profesional de Registro HACCP & GMP</p>
+            <p style="color: var(--gray-400); font-size: 13px; margin-top: 4px;">
+                Alimentos • Cannabis • Suplementos • Farmacéutica
+            </p>
+            
+            <div class="industry-selector">
+                <button class="industry-btn active-food" id="btnFood" onclick="selectIndustry('food')">
+                    <span style="font-size:24px;">🍽️</span>
+                    Industria Alimentaria
+                    <span style="font-size: 10px; opacity: 0.7;">FDA 21 CFR 117</span>
+                </button>
+                <button class="industry-btn" id="btnCannabis" onclick="selectIndustry('cannabis')">
+                    <span style="font-size:24px;">🌿</span>
+                    Industria Cannabis
+                    <span style="font-size: 10px; opacity: 0.7;">GMP EU/GFSI</span>
+                </button>
+            </div>
+            
+            <div class="badge-container">
+                <span class="badge badge-info" id="badgeVersion">v3.0 Dual Industry</span>
+                <span class="badge badge-warning" id="badgeConnection">⏳ Verificando Supabase...</span>
+                <span class="badge badge-success" id="badgeCompliance" style="display:none;">✅ Listo para Auditoría</span>
+                <span class="badge badge-purple" id="badgeIndustry">🍽️ Alimentario</span>
+            </div>
+        </div>
+
+        <!-- Configuración Supabase -->
+        <div class="config-section" id="configSection">
+            <h3 style="margin-bottom: 16px; color: #92400e;">⚙️ Configuración de Conexión a Supabase</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">URL de Supabase</label>
+                    <input type="text" class="form-input" id="sbUrl" 
+                           value="https://smyuylvztkigxruyywhb.supabase.co">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Clave Anónima (Anon Key)</label>
+                    <input type="text" class="form-input" id="sbKey" 
+                           value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNteXV5bHZ6dGtpZ3hydXl5d2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NzA3NzUsImV4cCI6MjEwMTA0Njc3NX0.Rt-VEKGv03XaydxAhxbUkHWr1p0ifviWsKFsU_B-Tao">
+                </div>
+            </div>
+            <div class="btn-group" style="margin-top: 16px;">
+                <button class="btn btn-success" onclick="testAndConnect()">🔄 Probar Conexión</button>
+            </div>
+            <div id="connectionStatus" style="margin-top: 12px;"></div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div id="mainContent">
+            <!-- SECCIÓN 1: Información General -->
+            <div class="card both-industries">
+                <div class="card-header">
+                    <div class="card-title">📋 Información General de Planta y Producción</div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Empresa/Licencia <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="company" value="Salsa Del Sol LLC" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ID/Número de Licencia <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="plantId" value="SDS-001" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Dirección de la Instalación</label>
+                        <input type="text" class="form-input" id="address" value="123 Industrial Blvd, Austin, TX 78701">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" id="labelProduct">Producto <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="product" value="Salsa Picante Premium" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Número de Lote/Cosecha <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="lotNumber" value="LOT-20260731-001" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha de Producción <span class="required">*</span></label>
+                        <input type="date" class="form-input" id="logDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Turno <span class="required">*</span></label>
+                        <select class="form-select" id="shift">
+                            <option value="Mañana">Mañana (06:00-14:00)</option>
+                            <option value="Tarde">Tarde (14:00-22:00)</option>
+                            <option value="Noche">Noche (22:00-06:00)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Supervisor <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="supervisor" value="M. Rodríguez" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Operador/Responsable</label>
+                        <input type="text" class="form-input" id="operator" value="J. Martínez">
+                    </div>
+                </div>
+                
+                <div id="cannabisFields1" style="display:none;">
+                    <div class="form-grid" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Cepa/Variedad</label>
+                            <input type="text" class="form-input" id="strain" value="Blue Dream">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Etapa de Cultivo/Procesamiento</label>
+                            <select class="form-select" id="stage">
+                                <option value="cultivo">Cultivo Vegetativo</option>
+                                <option value="floracion">Floración</option>
+                                <option value="cosecha">Cosecha</option>
+                                <option value="secado">Secado</option>
+                                <option value="curado">Curado</option>
+                                <option value="extraccion">Extracción</option>
+                                <option value="empaque">Empaque</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sala/Cuarto de Cultivo</label>
+                            <input type="text" class="form-input" id="room" value="Sala A-12">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ID de Planta Madre/Clon</label>
+                            <input type="text" class="form-input" id="motherPlantId" value="MP-0042">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info" style="margin-top: 20px;">
+                    <span>📋</span>
+                    <div>
+                        <strong>ID de Registro:</strong> <span id="recordId">HACCP-20260731-0001</span><br>
+                        <small>Identificador único para trazabilidad y auditoría.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: Monitoreo Alimentos -->
+            <div class="card food-specific" id="monitoringFood">
+                <div class="card-header">
+                    <div class="card-title">
+                        🌡️ Registros de Monitoreo HACCP - Alimentos
+                        <span class="industry-badge food">FDA 21 CFR 117</span>
+                    </div>
+                </div>
+                <div class="alert alert-info">
+                    <span>📊</span>
+                    <div>
+                        <strong>Límites Críticos:</strong> Refrigeración: ≤ 40°F (4.4°C) | Cocción: ≥ 160°F (71.1°C) | pH: 4.0 - 4.6
+                    </div>
+                </div>
+                <div id="foodMonitoringTable"></div>
+            </div>
+
+            <!-- SECCIÓN 2B: Monitoreo Cannabis -->
+            <div class="card cannabis-specific" id="monitoringCannabis" style="display:none;">
+                <div class="card-header">
+                    <div class="card-title">
+                        🌿 Registros de Monitoreo GMP - Cannabis
+                        <span class="industry-badge cannabis">GMP EU/ICH Q7</span>
+                    </div>
+                </div>
+                <div class="alert alert-cannabis">
+                    <span>📊</span>
+                    <div>
+                        <strong>Parámetros Críticos Cannabis:</strong><br>
+                        • Temperatura Cultivo: 70-85°F (21-29°C) | • Humedad Vegetativo: 55-70% | • Humedad Floración: 40-50%<br>
+                        • CO2: 800-1500 ppm | • pH Agua: 5.8-6.5 | • EC: 1.2-2.0 mS/cm | • Actividad Agua: &lt;0.65
+                    </div>
+                </div>
+                <div id="cannabisMonitoringTable"></div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card success">
+                    <div class="stat-value" id="statCompliant">0</div>
+                    <div class="stat-label">En Cumplimiento</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-value" id="statDeviations">0</div>
+                    <div class="stat-label">Desviaciones</div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-value" id="statCompliance">0%</div>
+                    <div class="stat-label">Tasa de Cumplimiento</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">Total Registros</div>
+                </div>
+            </div>
+
+            <!-- Verificación y Firmas -->
+            <div class="card both-industries">
+                <div class="card-header">
+                    <div class="card-title">✍️ Verificación, Firmas y Revisión</div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Verificación de Parámetros Críticos</label>
+                        <select class="form-select" id="limitsVerification">
+                            <option value="">Seleccione...</option>
+                            <option value="verified">✅ Todos los parámetros verificados</option>
+                            <option value="deviations_addressed">⚠️ Desviaciones identificadas y corregidas</option>
+                            <option value="pending">⏳ Pendiente de revisión</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Verificación de Acciones Correctivas</label>
+                        <select class="form-select" id="correctiveVerification">
+                            <option value="">Seleccione...</option>
+                            <option value="effective">✅ Acciones correctivas efectivas</option>
+                            <option value="needs_review">⚠️ Requiere revisión adicional</option>
+                            <option value="not_applicable">N/A - Sin desviaciones</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">Comentarios del Supervisor / QA</label>
+                        <textarea class="form-textarea" id="supervisorComments" 
+                                  placeholder="Observaciones, notas de mejora continua, seguimiento requerido..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Revisor QA (si aplica)</label>
+                        <input type="text" class="form-input" id="qaReviewer" placeholder="Nombre del revisor de calidad">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fecha de Revisión</label>
+                        <input type="date" class="form-input" id="reviewDate">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">💾 Acciones del Documento</div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="saveAndGenerate()">
+                        💾 Guardar en Supabase y Generar PDF
+                    </button>
+                    <button class="btn btn-outline" onclick="generatePDFOnly()">
+                        📄 Solo Generar PDF
+                    </button>
+                </div>
+                
+                <div id="actionStatus" style="margin-top: 16px;"></div>
+                
+                <div id="qrContainer" style="display:none; margin-top: 20px; text-align: center;">
+                    <h4>🔍 Código QR de Verificación Digital</h4>
+                    <div id="qrCode"></div>
+                    <p style="font-size: 12px; color: var(--gray-500); margin-top: 8px;">
+                        Escanee para verificar la autenticidad del registro
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== ESTADO GLOBAL ====================
+        let supabaseClient = null;
+        let isConnected = false;
+        let currentIndustry = 'food';
+        let currentRecordId = '';
+        
+        const SUPABASE_URL = 'https://smyuylvztkigxruyywhb.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNteXV5bHZ6dGtpZ3hydXl5d2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NzA3NzUsImV4cCI6MjEwMTA0Njc3NX0.Rt-VEKGv03XaydxAhxbUkHWr1p0ifviWsKFsU_B-Tao';
+        
+        // Datos de monitoreo
+        const foodEntries = [
+            { time: '06:00', area: 'Refrigeración Norte', equipment: 'Enfriador A', limit: '≤ 40°F', unit: '°F', value: 38, min: null, max: 40, type: 'temp' },
+            { time: '06:00', area: 'Refrigeración Sur', equipment: 'Enfriador B', limit: '≤ 40°F', unit: '°F', value: 42, min: null, max: 40, type: 'temp' },
+            { time: '10:00', area: 'Refrigeración Norte', equipment: 'Enfriador A', limit: '≤ 40°F', unit: '°F', value: 37, min: null, max: 40, type: 'temp' },
+            { time: '10:00', area: 'Refrigeración Sur', equipment: 'Enfriador B', limit: '≤ 40°F', unit: '°F', value: 39, min: null, max: 40, type: 'temp' },
+            { time: '14:00', area: 'Cocción', equipment: 'Horno Industrial 1', limit: '≥ 160°F', unit: '°F', value: 165, min: 160, max: null, type: 'temp' },
+            { time: '14:30', area: 'Laboratorio QA', equipment: 'Medidor pH', limit: '4.0 - 4.6', unit: 'pH', value: 4.2, min: 4.0, max: 4.6, type: 'ph' },
+        ];
+        
+        const cannabisEntries = [
+            { time: '06:00', area: 'Sala Vegetativa A', equipment: 'Sensor Temp/Hum', limit: '70-85°F', unit: '°F', value: 78, min: 70, max: 85, type: 'temp' },
+            { time: '06:00', area: 'Sala Vegetativa A', equipment: 'Sensor Humedad', limit: '55-70%', unit: '%HR', value: 65, min: 55, max: 70, type: 'humidity' },
+            { time: '06:00', area: 'Sala Floración B', equipment: 'Sensor Temp/Hum', limit: '68-80°F', unit: '°F', value: 75, min: 68, max: 80, type: 'temp' },
+            { time: '06:00', area: 'Sala Floración B', equipment: 'Sensor Humedad', limit: '40-50%', unit: '%HR', value: 45, min: 40, max: 50, type: 'humidity' },
+            { time: '10:00', area: 'Sala Vegetativa A', equipment: 'Medidor CO2', limit: '800-1500 ppm', unit: 'ppm', value: 1200, min: 800, max: 1500, type: 'co2' },
+            { time: '10:00', area: 'Tanque Nutrientes', equipment: 'Medidor pH', limit: '5.8-6.5', unit: 'pH', value: 6.2, min: 5.8, max: 6.5, type: 'ph' },
+            { time: '10:00', area: 'Tanque Nutrientes', equipment: 'Medidor EC', limit: '1.2-2.0', unit: 'mS/cm', value: 1.6, min: 1.2, max: 2.0, type: 'ec' },
+            { time: '14:00', area: 'Sala Secado', equipment: 'Sensor Temp/Hum', limit: '60-70°F', unit: '°F', value: 65, min: 60, max: 70, type: 'temp' },
+            { time: '14:00', area: 'Sala Secado', equipment: 'Sensor Humedad', limit: '45-55%', unit: '%HR', value: 50, min: 45, max: 55, type: 'humidity' },
+            { time: '14:00', area: 'Laboratorio QA', equipment: 'Medidor Act. Agua', limit: '< 0.65', unit: 'aW', value: 0.55, min: null, max: 0.65, type: 'waterActivity' },
+        ];
+        
+        let currentEntries = foodEntries;
+        
+        // ==================== CONEXIÓN SUPABASE ====================
+        async function initSupabase() {
+            try {
+                if (typeof supabaseLib === 'undefined') {
+                    throw new Error('Librería Supabase no disponible');
+                }
+                
+                supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('✅ Cliente Supabase creado exitosamente');
+                
+                // Probar conexión
+                const result = await supabaseClient.from('logs').select('id').limit(1);
+                
+                if (result.error && result.error.code === '42P01') {
+                    updateBadge('badgeConnection', '⚠️ Tabla no existe', 'badge badge-warning');
+                    showAlert('connectionStatus', 'warning', '✅ Conectado pero la tabla "logs" no existe. Ejecuta el SQL en Supabase.');
+                    isConnected = true;
+                } else if (result.error) {
+                    throw new Error(result.error.message || 'Error de conexión');
+                } else {
+                    updateBadge('badgeConnection', '✅ Conectado', 'badge badge-success');
+                    showAlert('connectionStatus', 'success', '✅ Conexión exitosa con Supabase. ¡Listo para guardar!');
+                    isConnected = true;
+                }
+            } catch (e) {
+                console.error('Error conexión:', e);
+                updateBadge('badgeConnection', '❌ Error', 'badge badge-error');
+                showAlert('connectionStatus', 'error', '❌ Error: ' + e.message);
+                isConnected = false;
+            }
+        }
+        
+        async function testAndConnect() {
+            showAlert('connectionStatus', 'info', '⏳ Probando conexión...');
+            await initSupabase();
+        }
+        
+        function updateBadge(id, text, className) {
+            const badge = document.getElementById(id);
+            if (badge) {
+                badge.textContent = text;
+                badge.className = className;
+            }
+        }
+        
+        function showAlert(containerId, type, message) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = `
+                    <div class="alert alert-${type}">
+                        <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+                        <div>${message}</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // ==================== SELECTOR DE INDUSTRIA ====================
+        function selectIndustry(industry) {
+            currentIndustry = industry;
+            
+            document.getElementById('btnFood').className = industry === 'food' ? 'industry-btn active-food' : 'industry-btn';
+            document.getElementById('btnCannabis').className = industry === 'cannabis' ? 'industry-btn active-cannabis' : 'industry-btn';
+            document.body.className = industry === 'cannabis' ? 'cannabis-mode' : 'food-mode';
+            document.getElementById('badgeIndustry').textContent = industry === 'cannabis' ? '🌿 Cannabis' : '🍽️ Alimentario';
+            
+            document.getElementById('cannabisFields1').style.display = industry === 'cannabis' ? 'block' : 'none';
+            document.getElementById('monitoringFood').style.display = industry === 'food' ? 'block' : 'none';
+            document.getElementById('monitoringCannabis').style.display = industry === 'cannabis' ? 'block' : 'none';
+            document.getElementById('labelProduct').textContent = industry === 'cannabis' ? 'Producto/Extracto' : 'Producto';
+            
+            currentEntries = industry === 'cannabis' ? cannabisEntries : foodEntries;
+            
+            if (industry === 'food') {
+                renderFoodTable();
+            } else {
+                renderCannabisTable();
+            }
+            updateStatistics();
+        }
+        
+        // ==================== RENDERIZADO DE TABLAS ====================
+        function renderFoodTable() {
+            const container = document.getElementById('foodMonitoringTable');
+            container.innerHTML = `
+                <div style="overflow-x: auto;">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Área/Etapa</th>
+                                <th>Equipo</th>
+                                <th>Valor</th>
+                                <th>Unidad</th>
+                                <th>Límite</th>
+                                <th>Iniciales</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${foodEntries.map((entry, i) => {
+                                const val = parseFloat(document.getElementById(`food-val-${i}`)?.value ?? entry.value);
+                                const isDev = (entry.max !== null && val > entry.max) || (entry.min !== null && val < entry.min);
+                                return `
+                                    <tr class="${isDev ? 'deviation-row' : ''}">
+                                        <td><strong>${entry.time}</strong></td>
+                                        <td>${entry.area}</td>
+                                        <td>${entry.equipment}</td>
+                                        <td>
+                                            <input type="number" step="0.1" class="form-input" 
+                                                   id="food-val-${i}" value="${val}" 
+                                                   style="width: 80px; ${isDev ? 'border-color: #dc2626;' : ''}"
+                                                   onchange="updateFoodEntry(${i})">
+                                        </td>
+                                        <td>${entry.unit}</td>
+                                        <td><strong>${entry.limit}</strong></td>
+                                        <td>
+                                            <input type="text" class="form-input" id="food-init-${i}" 
+                                                   value="JM" maxlength="3" style="width: 60px;">
+                                        </td>
+                                        <td>
+                                            ${isDev ? 
+                                                '<span class="deviation-indicator">⚠️ DESVIACIÓN</span>' : 
+                                                '<span class="compliant-indicator">✅ Cumple</span>'
+                                            }
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ${renderCorrectiveActions(foodEntries, 'food')}
+            `;
+        }
+        
+        function renderCannabisTable() {
+            const container = document.getElementById('cannabisMonitoringTable');
+            container.innerHTML = `
+                <div style="overflow-x: auto;">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Área/Sala</th>
+                                <th>Equipo</th>
+                                <th>Parámetro</th>
+                                <th>Valor</th>
+                                <th>Unidad</th>
+                                <th>Límite</th>
+                                <th>Iniciales</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${cannabisEntries.map((entry, i) => {
+                                const val = parseFloat(document.getElementById(`can-val-${i}`)?.value ?? entry.value);
+                                const isDev = (entry.max !== null && val > entry.max) || (entry.min !== null && val < entry.min);
+                                const paramName = entry.type === 'temp' ? 'Temperatura' :
+                                                 entry.type === 'humidity' ? 'Humedad' :
+                                                 entry.type === 'co2' ? 'CO2' :
+                                                 entry.type === 'ph' ? 'pH' :
+                                                 entry.type === 'ec' ? 'Conductividad' :
+                                                 entry.type === 'waterActivity' ? 'Actividad Agua' : '';
+                                return `
+                                    <tr class="${isDev ? 'deviation-row' : ''}">
+                                        <td><strong>${entry.time}</strong></td>
+                                        <td>${entry.area}</td>
+                                        <td>${entry.equipment}</td>
+                                        <td><strong>${paramName}</strong></td>
+                                        <td>
+                                            <input type="number" step="0.1" class="form-input" 
+                                                   id="can-val-${i}" value="${val}" 
+                                                   style="width: 80px; ${isDev ? 'border-color: #dc2626;' : ''}"
+                                                   onchange="updateCannabisEntry(${i})">
+                                        </td>
+                                        <td>${entry.unit}</td>
+                                        <td><strong>${entry.limit}</strong></td>
+                                        <td>
+                                            <input type="text" class="form-input" id="can-init-${i}" 
+                                                   value="JM" maxlength="3" style="width: 60px;">
+                                        </td>
+                                        <td>
+                                            ${isDev ? 
+                                                '<span class="deviation-indicator">⚠️ DESVIACIÓN</span>' : 
+                                                '<span class="compliant-indicator">✅ Cumple</span>'
+                                            }
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ${renderCorrectiveActions(cannabisEntries, 'can')}
+            `;
+        }
+        
+        function renderCorrectiveActions(entries, prefix) {
+            const deviations = entries.map((entry, i) => {
+                const val = parseFloat(document.getElementById(`${prefix}-val-${i}`)?.value ?? entry.value);
+                const isDev = (entry.max !== null && val > entry.max) || (entry.min !== null && val < entry.min);
+                return isDev ? { index: i, entry, val } : null;
+            }).filter(Boolean);
+            
+            if (deviations.length === 0) {
+                return `
+                    <div class="alert alert-success" style="margin-top: 16px;">
+                        <span>✅</span>
+                        <div><strong>Todos los parámetros dentro de límites.</strong></div>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="alert alert-error" style="margin-top: 16px;">
+                    <span>⚠️</span>
+                    <div><strong>Se detectaron ${deviations.length} desviación(es) - Acciones Correctivas Requeridas:</strong></div>
+                </div>
+                ${deviations.map(d => `
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label class="form-label">
+                            Acción Correctiva: ${d.entry.equipment} (${d.entry.time} - ${d.val}${d.entry.unit})
+                        </label>
+                        <textarea class="form-textarea" id="${prefix}-corr-${d.index}" rows="2" 
+                                  placeholder="Describa la acción correctiva tomada...">${d.val > (d.entry.max || 999) ? 'Parámetro ajustado. Verificación adicional realizada.' : ''}</textarea>
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        window.updateFoodEntry = function(index) {
+            renderFoodTable();
+            updateStatistics();
+        };
+        
+        window.updateCannabisEntry = function(index) {
+            renderCannabisTable();
+            updateStatistics();
+        };
+        
+        // ==================== ESTADÍSTICAS ====================
+        function updateStatistics() {
+            const entries = currentIndustry === 'food' ? foodEntries : cannabisEntries;
+            const prefix = currentIndustry === 'food' ? 'food' : 'can';
+            
+            let compliant = 0;
+            let deviations = 0;
+            
+            entries.forEach((entry, i) => {
+                const val = parseFloat(document.getElementById(`${prefix}-val-${i}`)?.value ?? entry.value);
+                const isDev = (entry.max !== null && val > entry.max) || (entry.min !== null && val < entry.min);
+                
+                if (isDev) deviations++;
+                else compliant++;
+            });
+            
+            const total = compliant + deviations;
+            const rate = total > 0 ? Math.round((compliant / total) * 100) : 100;
+            
+            document.getElementById('statCompliant').textContent = compliant;
+            document.getElementById('statDeviations').textContent = deviations;
+            document.getElementById('statCompliance').textContent = rate + '%';
+            document.getElementById('statTotal').textContent = total;
+            
+            const badge = document.getElementById('badgeCompliance');
+            badge.style.display = 'inline-flex';
+            if (deviations === 0) {
+                badge.textContent = '✅ 100% Cumplimiento';
+                badge.className = 'badge badge-success';
+            } else if (rate >= 90) {
+                badge.textContent = `⚠️ ${rate}% Cumplimiento`;
+                badge.className = 'badge badge-warning';
+            } else {
+                badge.textContent = `❌ ${rate}% Cumplimiento`;
+                badge.className = 'badge badge-error';
+            }
+        }
+        
+        // ==================== GUARDADO EN SUPABASE ====================
+        async function saveToSupabase(data) {
+            if (!supabaseClient || !isConnected) return false;
+            
+            const records = data.entries.map(entry => ({
+                record_id: data.recordId,
+                industry: data.industry,
+                company: data.company,
+                plant_id: data.plantId,
+                address: data.address,
+                product: data.product,
+                lot_number: data.lotNumber,
+                log_date: data.logDate,
+                shift: data.shift,
+                supervisor: data.supervisor,
+                operator_name: data.operator,
+                strain: data.strain || null,
+                stage: data.stage || null,
+                room: data.room || null,
+                mother_plant_id: data.motherPlantId || null,
+                entry_time: entry.time,
+                entry_area: entry.area,
+                entry_equipment: entry.equipment,
+                entry_value: entry.value,
+                entry_unit: entry.unit,
+                entry_limit: entry.limit,
+                entry_initials: entry.initials,
+                entry_type: entry.type || null,
+                is_within_limit: !entry.isDeviation,
+                deviation_reason: entry.isDeviation ? 'Fuera del límite crítico' : null,
+                corrective_action: entry.corrective || null,
+                compliance_rate: data.complianceRate,
+                total_entries: data.totalEntries,
+                compliant_entries: data.compliantEntries,
+                deviation_entries: data.deviationEntries,
+                limits_verification: data.limitsVerification || null,
+                corrective_verification: data.correctiveVerification || null,
+                supervisor_comments: data.supervisorComments || null,
+                qa_reviewer: data.qaReviewer || null,
+                review_date: data.reviewDate || null,
+                status: 'completed'
+            }));
+            
+            const result = await supabaseClient.from('logs').insert(records);
+            if (result.error) throw result.error;
+            return true;
+        }
+        
+        // ==================== GENERACIÓN DE PDF ====================
+        function generateDualPDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter', compress: true });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 12;
+            const contentWidth = pageWidth - (margin * 2);
+            let y = 15;
+            
+            const isCannabis = data.industry === 'cannabis';
+            const industryColor = isCannabis ? [124, 58, 237] : [5, 150, 105];
+            const industryName = isCannabis ? 'CANNABIS GMP' : 'ALIMENTOS HACCP';
+            const regulation = isCannabis ? 'GMP EU/ICH Q7 • FDA 21 CFR 111' : 'FDA 21 CFR 117 • FSMA';
+            
+            doc.setFillColor(industryColor[0], industryColor[1], industryColor[2]);
+            doc.rect(0, 0, pageWidth, 3, 'F');
+            
+            doc.setFontSize(16);
+            doc.setTextColor(15, 23, 42);
+            doc.setFont(undefined, 'bold');
+            doc.text(`COMPLYLOG PRO - ${industryName}`, margin, y);
+            
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Documento: ${data.recordId} | Regulación: ${regulation}`, margin, y + 5);
+            doc.text(`Fecha: ${data.logDate} | Turno: ${data.shift}`, margin, y + 9);
+            
+            y += 14;
+            
+            // Información General
+            doc.setFillColor(241, 245, 249);
+            doc.rect(margin, y, contentWidth, 7, 'F');
+            doc.setFontSize(9);
+            doc.setTextColor(15, 23, 42);
+            doc.text('1. INFORMACIÓN GENERAL', margin + 3, y + 5);
+            y += 11;
+            
+            doc.setFontSize(7.5);
+            const infoData = [
+                ['Empresa:', data.company, 'Licencia:', data.plantId],
+                ['Producto:', data.product, 'Lote:', data.lotNumber],
+                ['Supervisor:', data.supervisor, 'Operador:', data.operator],
+            ];
+            
+            if (isCannabis) {
+                infoData.push(['Cepa:', data.strain || '', 'Etapa:', data.stage || '']);
+                infoData.push(['Sala:', data.room || '', 'Planta Madre:', data.motherPlantId || '']);
+            }
+            
+            infoData.forEach(row => {
+                doc.setFont(undefined, 'bold');
+                doc.text(row[0], margin + 2, y);
+                doc.setFont(undefined, 'normal');
+                doc.text(row[1] || '', margin + 22, y);
+                if (row[2]) {
+                    doc.setFont(undefined, 'bold');
+                    doc.text(row[2], margin + contentWidth/2, y);
+                    doc.setFont(undefined, 'normal');
+                    doc.text(row[3] || '', margin + contentWidth/2 + 22, y);
+                }
+                y += 5;
+            });
+            
+            y += 4;
+            
+            // Monitoreo
+            doc.setFillColor(241, 245, 249);
+            doc.rect(margin, y, contentWidth, 7, 'F');
+            doc.text('2. REGISTROS DE MONITOREO', margin + 3, y + 5);
+            y += 11;
+            
+            const headers = isCannabis ? 
+                ['Hora', 'Área', 'Equipo', 'Parámetro', 'Valor', 'Unidad', 'Límite', 'Estado'] :
+                ['Hora', 'Área', 'Equipo', 'Valor', 'Unidad', 'Límite', 'Iniciales', 'Estado'];
+            
+            const colWidths = isCannabis ?
+                [18, 28, 30, 22, 18, 14, 24, 20] :
+                [18, 30, 32, 18, 14, 20, 16, 20];
+            
+            const colX = [];
+            let cx = margin;
+            colWidths.forEach(w => { colX.push(cx); cx += w; });
+            
+            doc.setFillColor(51, 65, 85);
+            doc.rect(margin, y, contentWidth, 6, 'F');
+            doc.setFontSize(6.5);
+            doc.setTextColor(255, 255, 255);
+            headers.forEach((h, i) => doc.text(h, colX[i] + 1, y + 4.5));
+            y += 6;
+            
+            data.entries.forEach((entry, index) => {
+                if (y > pageHeight - 50) {
+                    doc.addPage(); y = 20;
+                    doc.setFillColor(51, 65, 85);
+                    doc.rect(margin, y, contentWidth, 6, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    headers.forEach((h, i) => doc.text(h, colX[i] + 1, y + 4.5));
+                    y += 6;
+                }
+                
+                if (entry.isDeviation) {
+                    doc.setFillColor(254, 226, 226);
+                    doc.rect(margin, y, contentWidth, 5, 'F');
+                }
+                
+                doc.setFontSize(6);
+                doc.setTextColor(entry.isDeviation ? 153 : 15, entry.isDeviation ? 27 : 23, entry.isDeviation ? 27 : 42);
+                
+                const values = isCannabis ? [
+                    entry.time, entry.area, entry.equipment,
+                    entry.type || '', `${entry.value}`, entry.unit,
+                    entry.limit, entry.isDeviation ? 'DESVIACIÓN' : 'Cumple'
+                ] : [
+                    entry.time, entry.area, entry.equipment,
+                    `${entry.value}`, entry.unit, entry.limit,
+                    entry.initials, entry.isDeviation ? 'DESVIACIÓN' : 'Cumple'
+                ];
+                
+                values.forEach((v, i) => doc.text(String(v), colX[i] + 1, y + 4));
+                y += 5;
+            });
+            
+            y += 6;
+            
+            doc.setFontSize(8);
+            doc.setTextColor(15, 23, 42);
+            doc.text(`Cumplimiento: ${data.complianceRate}% | Total: ${data.totalEntries} | Cumplen: ${data.compliantEntries} | Desviaciones: ${data.deviationEntries}`, margin, y);
+            
+            y += 8;
+            
+            doc.setFillColor(241, 245, 249);
+            doc.rect(margin, y, contentWidth, 7, 'F');
+            doc.text('3. FIRMAS Y VERIFICACIÓN', margin + 3, y + 5);
+            y += 12;
+            
+            doc.line(margin + 10, y + 10, margin + 70, y + 10);
+            doc.line(margin + contentWidth/2 + 10, y + 10, margin + contentWidth/2 + 70, y + 10);
+            doc.setFontSize(8);
+            doc.text('Operador', margin + 25, y + 15);
+            doc.text('Supervisor', margin + contentWidth/2 + 25, y + 15);
+            
+            y += 20;
+            
+            doc.setFontSize(6);
+            doc.setTextColor(148, 163, 184);
+            doc.text(`Documento: ${data.recordId} | ${industryName} | Retención: 2 años`, margin, pageHeight - 8);
+            
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin - 20, pageHeight - 8);
+            }
+            
+            return doc.output('blob');
+        }
+        
+        // ==================== RECOLECCIÓN DE DATOS ====================
+        function collectData() {
+    // Generar ID único NUEVO cada vez
+    const newRecordId = 'HACCP-' + 
+        new Date().toISOString().split('T')[0].replace(/-/g, '') + '-' + 
+        Date.now().toString(36).toUpperCase() + '-' + 
+        Math.random().toString(36).substring(2, 8).toUpperCase();
+    
+    // Actualizar el ID visible y la variable global
+    currentRecordId = newRecordId;
+    document.getElementById('recordId').textContent = newRecordId;
+    
+    const entries = currentEntries.map((entry, i) => {
+        const prefix = currentIndustry === 'food' ? 'food' : 'can';
+        const val = parseFloat(document.getElementById(`${prefix}-val-${i}`)?.value ?? entry.value);
+        const isDev = (entry.max !== null && val > entry.max) || (entry.min !== null && val < entry.min);
+        return {
+            ...entry,
+            value: val,
+            initials: document.getElementById(`${prefix}-init-${i}`)?.value || '',
+            corrective: isDev ? (document.getElementById(`${prefix}-corr-${i}`)?.value || '') : '',
+            isDeviation: isDev
+        };
+    });
+    
+    const compliant = entries.filter(e => !e.isDeviation).length;
+    const deviations = entries.filter(e => e.isDeviation).length;
+    const total = entries.length;
+    
+    return {
+        recordId: newRecordId,
+        industry: currentIndustry,
+        company: document.getElementById('company')?.value || '',
+        plantId: document.getElementById('plantId')?.value || '',
+        address: document.getElementById('address')?.value || '',
+        product: document.getElementById('product')?.value || '',
+        lotNumber: document.getElementById('lotNumber')?.value || '',
+        logDate: document.getElementById('logDate')?.value || '',
+        shift: document.getElementById('shift')?.value || '',
+        supervisor: document.getElementById('supervisor')?.value || '',
+        operator: document.getElementById('operator')?.value || '',
+        strain: document.getElementById('strain')?.value || '',
+        stage: document.getElementById('stage')?.value || '',
+        room: document.getElementById('room')?.value || '',
+        motherPlantId: document.getElementById('motherPlantId')?.value || '',
+        entries: entries,
+        complianceRate: total > 0 ? Math.round((compliant / total) * 100) : 100,
+        totalEntries: total,
+        compliantEntries: compliant,
+        deviationEntries: deviations,
+        limitsVerification: document.getElementById('limitsVerification')?.value || '',
+        correctiveVerification: document.getElementById('correctiveVerification')?.value || '',
+        supervisorComments: document.getElementById('supervisorComments')?.value || '',
+        qaReviewer: document.getElementById('qaReviewer')?.value || '',
+        reviewDate: document.getElementById('reviewDate')?.value || ''
+    };
+}
+        
+        // ==================== ACCIONES PRINCIPALES ====================
+        window.saveAndGenerate = async function() {
+    // Generar nuevo ID único cada vez que se guarda
+    currentRecordId = 'HACCP-' + new Date().toISOString().split('T')[0].replace(/-/g, '') + '-' + 
+        Date.now().toString(36).toUpperCase() + '-' + 
+        Math.random().toString(36).substring(2, 6).toUpperCase();
+    document.getElementById('recordId').textContent = currentRecordId;
+    
+    const data = collectData();
+            
+            if (supabaseClient && isConnected) {
+                try {
+                    showAlert('actionStatus', 'info', '💾 Guardando en Supabase...');
+                    const saved = await saveToSupabase(data);
+                    if (saved) {
+                        showAlert('actionStatus', 'success', `✅ ¡${data.totalEntries} registros guardados exitosamente!`);
+                        updateBadge('badgeConnection', '✅ Datos guardados', 'badge badge-success');
+                        document.getElementById('qrContainer').style.display = 'block';
+                        document.getElementById('qrCode').innerHTML = `
+                            <div style="padding:20px; background:#f0fdf4; border-radius:10px; text-align:center;">
+                                <p style="font-size:48px;">🔍</p>
+                                <p style="font-weight:700;">ID: ${data.recordId}</p>
+                                <p style="font-size:12px; color:#64748b;">${new Date().toLocaleString()}</p>
+                            </div>
+                        `;
+                    }
+                } catch (e) {
+                    showAlert('actionStatus', 'error', '❌ Error al guardar: ' + e.message);
+                }
+            } else {
+                showAlert('actionStatus', 'warning', '⚠️ Sin conexión a Supabase - Solo PDF generado');
+            }
+            
+            // Generar PDF siempre
+            try {
+                const blob = generateDualPDF(data);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${data.industry.toUpperCase()}_${data.recordId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                showAlert('actionStatus', 'error', '❌ Error al generar PDF: ' + e.message);
+            }
+        };
+        
+        window.generatePDFOnly = function() {
+            try {
+                const data = collectData();
+                const blob = generateDualPDF(data);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${data.industry.toUpperCase()}_${data.recordId}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showAlert('actionStatus', 'success', '✅ PDF generado exitosamente');
+            } catch (e) {
+                showAlert('actionStatus', 'error', '❌ Error: ' + e.message);
+            }
+        };
+        
+        // ==================== INICIALIZACIÓN ====================
+        window.addEventListener('DOMContentLoaded', () => {
+            currentRecordId = 'HACCP-' + new Date().toISOString().split('T')[0].replace(/-/g, '') + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+            document.getElementById('recordId').textContent = currentRecordId;
+            document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('reviewDate').value = new Date().toISOString().split('T')[0];
+            
+            selectIndustry('food');
+            
+            // Verificar que la librería está cargada
+            console.log('✅ jsPDF:', typeof window.jspdf !== 'undefined' ? 'Cargado' : 'No cargado');
+            console.log('✅ Supabase:', typeof supabaseLib !== 'undefined' ? 'Cargado' : 'No cargado');
+            
+            setTimeout(() => initSupabase(), 500);
+        });
+        
+        // Exponer funciones globalmente
+        window.selectIndustry = selectIndustry;
+        window.testAndConnect = testAndConnect;
+    </script>
+</body>
+</html>
