@@ -1,1445 +1,839 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ComplyLog Pro - Sistema HACCP & GMP Dual Industria</title>
-    <!-- jsPDF desde CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Supabase Client v2 integrado directamente -->
-    <script>
-/* ============================================
-   SUPABASE CLIENT - Fetch API directo
-   ============================================ */
-(function(global) {
-    'use strict';
-    
-    function createClient(url, key) {
-        if (!url) throw new Error('supabaseUrl requerida');
-        if (!key) throw new Error('supabaseKey requerida');
-        
-        const headers = {
-            'apikey': key,
-            'Authorization': 'Bearer ' + key,
-            'Content-Type': 'application/json'
-        };
-        
-        async function request(method, path, body) {
-            const fullUrl = url + '/rest/v1' + path;
-            const options = {
-                method: method,
-                headers: headers
-            };
-            
-            if (body) {
-                options.body = JSON.stringify(body);
-                options.headers['Prefer'] = 'return=representation';
-            }
-            
-            const response = await fetch(fullUrl, options);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                let errorData;
-                try {
-                    errorData = JSON.parse(errorText);
-                } catch {
-                    errorData = { message: errorText };
-                }
-                return { data: null, error: errorData, status: response.status };
-            }
-            
-            const text = await response.text();
-            if (!text) return { data: null, error: null, status: response.status };
-            
-            try {
-                return { data: JSON.parse(text), error: null, status: response.status };
-            } catch {
-                return { data: text, error: null, status: response.status };
-            }
-        }
-        
-        function buildQuery(table, options) {
-            let path = '/' + table;
-            let params = [];
-            
-            if (options.select) params.push('select=' + encodeURIComponent(options.select));
-            if (options.order) params.push('order=' + encodeURIComponent(options.order));
-            if (options.limit) params.push('limit=' + options.limit);
-            if (options.offset) params.push('offset=' + options.offset);
-            
-            if (options.filters) {
-                options.filters.forEach(f => {
-                    params.push(encodeURIComponent(f.column) + '=' + encodeURIComponent(f.operator) + '.' + encodeURIComponent(f.value));
-                });
-            }
-            
-            if (params.length > 0) path += '?' + params.join('&');
-            return path;
-        }
-        
-        function createQueryBuilder(table) {
-            const options = { select: '*', filters: [] };
-            
-            const builder = {
-                select: function(cols) {
-                    options.select = cols || '*';
-                    return builder;
-                },
-                eq: function(col, val) {
-                    options.filters.push({ column: col, operator: 'eq', value: val });
-                    return builder;
-                },
-                order: function(col, opts) {
-                    options.order = col + '.' + ((opts && opts.ascending === false) ? 'desc' : 'asc');
-                    return builder;
-                },
-                limit: function(n) {
-                    options.limit = n;
-                    return builder;
-                },
-                range: function(from, to) {
-                    options.offset = from;
-                    options.limit = to - from + 1;
-                    return builder;
-                },
-                single: function() {
-                    options.limit = 1;
-                    return builder.then(function(res) {
-                        if (res.error) return res;
-                        return { data: Array.isArray(res.data) ? res.data[0] || null : res.data, error: null, status: res.status };
-                    });
-                },
-                then: function(resolve, reject) {
-                    const path = buildQuery(table, options);
-                    return request('GET', path).then(resolve, reject);
-                },
-                insert: function(values) {
-                    return request('POST', '/' + table, Array.isArray(values) ? values : [values]);
-                },
-                update: function(values) {
-                    const path = buildQuery(table, options);
-                    return request('PATCH', path, values);
-                },
-                delete: function() {
-                    const path = buildQuery(table, options);
-                    return request('DELETE', path);
-                }
-            };
-            
-            return builder;
-        }
-        
-        return {
-            from: function(table) {
-                return createQueryBuilder(table);
-            },
-            rpc: function(fn, params) {
-                return request('POST', '/rpc/' + fn, params);
-            }
-        };
-    }
-    
-    global.supabaseLib = { createClient: createClient };
-    console.log('✅ Supabase Client cargado (Fetch API)');
-    
-})(typeof window !== 'undefined' ? window : globalThis);
-</script>
+    <title>ComplyLog Pro - Compliance Management for Small Businesses</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         :root {
-            --primary: #0f172a;
-            --primary-light: #1e293b;
-            --success: #059669;
-            --warning: #d97706;
-            --danger: #dc2626;
-            --info: #0284c7;
-            --cannabis: #7c3aed;
-            --cannabis-light: #ede9fe;
-            --food: #059669;
-            --food-light: #dcfce7;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-400: #94a3b8;
-            --gray-500: #64748b;
-            --gray-600: #475569;
-            --gray-700: #334155;
-            --gray-800: #1e293b;
-            --gray-900: #0f172a;
-            --radius: 12px;
-            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --primary: #1a365d;
+            --primary-light: #3182ce;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --danger: #e53e3e;
+            --google: #4285f4;
+            --gray-50: #f7fafc;
+            --gray-100: #edf2f7;
+            --gray-700: #2d3748;
+            --gray-900: #1a202c;
         }
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e2e8f0 100%);
             min-height: 100vh;
-            padding: 24px 16px;
             color: var(--gray-900);
             line-height: 1.6;
         }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
         
-        body.cannabis-mode {
-            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #ede9fe 100%);
+        /* Language Switcher */
+        .lang-switcher {
+            display: flex;
+            gap: 4px;
+            background: var(--gray-100);
+            border-radius: 8px;
+            padding: 2px;
         }
-        
-        body.food-mode {
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #f0f9ff 100%);
+        .lang-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-700);
+            transition: all 0.2s;
+            font-family: inherit;
         }
-        
-        .container { max-width: 1000px; margin: 0 auto; }
-        
-        .header {
+        .lang-btn.active {
             background: white;
-            border-radius: var(--radius);
-            padding: 32px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-lg);
-            text-align: center;
-            border: 1px solid var(--gray-200);
-            position: relative;
-            overflow: hidden;
+            color: var(--primary);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         
-        .header::before {
-            content: '';
-            position: absolute;
+        /* Header */
+        header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 16px 0;
+            position: sticky;
             top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #059669, #7c3aed, #0284c7);
+            z-index: 100;
         }
-        
-        .header h1 { 
-            font-size: 32px; 
-            font-weight: 700; 
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--gray-900), var(--gray-700));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
         }
-        
-        .header .subtitle { 
-            color: var(--gray-500); 
-            font-size: 16px;
-            font-weight: 500;
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        
-        .industry-selector {
+        .header-actions {
             display: flex;
             gap: 12px;
-            justify-content: center;
-            margin-top: 20px;
+            align-items: center;
             flex-wrap: wrap;
         }
-        
-        .industry-btn {
-            padding: 12px 24px;
-            border: 2px solid var(--gray-300);
-            border-radius: 12px;
-            background: white;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-family: inherit;
-        }
-        
-        .industry-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        
-        .industry-btn.active-food {
-            border-color: var(--food);
-            background: var(--food-light);
-            color: #166534;
-        }
-        
-        .industry-btn.active-cannabis {
-            border-color: var(--cannabis);
-            background: var(--cannabis-light);
-            color: #6b21a8;
-        }
-        
-        .badge-container {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-        
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-        
-        .badge-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-        .badge-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-        .badge-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-        .badge-info { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
-        .badge-purple { background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
-        
-        .card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-200);
-            transition: all 0.2s;
-        }
-        
-        .card:hover { box-shadow: var(--shadow-md); }
-        
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--gray-100);
-        }
-        
-        .card-title {
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        
-        .form-grid-3 { grid-template-columns: repeat(3, 1fr); }
-        .form-grid-4 { grid-template-columns: repeat(4, 1fr); }
-        
-        .form-group { margin-bottom: 0; }
-        .form-group.full-width { grid-column: 1 / -1; }
-        
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--gray-700);
-        }
-        
-        .form-label .required { color: var(--danger); }
-        
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1.5px solid var(--gray-300);
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-        
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--info);
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
-        }
-        
-        .form-textarea { resize: vertical; min-height: 80px; }
-        
-        .log-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            font-size: 13px;
-        }
-        
-        .log-table th {
-            background: var(--gray-100);
-            padding: 12px 8px;
-            text-align: left;
-            font-weight: 700;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--gray-600);
-            border-bottom: 2px solid var(--gray-300);
-        }
-        
-        .log-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid var(--gray-200);
-        }
-        
-        .log-table tr:hover td { background: var(--gray-50); }
-        .log-table .deviation-row td { background: #fef2f2; }
-        
-        .deviation-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            background: #fee2e2;
-            color: #991b1b;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-        
-        .compliant-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            background: #dcfce7;
-            color: #166534;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-        
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 12px 24px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            text-decoration: none;
             font-family: inherit;
+            white-space: nowrap;
         }
-        
-        .btn:active { transform: scale(0.98); }
-        
-        .btn-primary { background: var(--primary); color: white; width: 100%; }
-        .btn-primary:hover { background: var(--primary-light); }
-        
-        .btn-success { background: var(--success); color: white; }
-        .btn-cannabis { background: var(--cannabis); color: white; }
-        .btn-outline { background: white; color: var(--gray-700); border: 1.5px solid var(--gray-300); }
-        
-        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
-        .btn-group .btn { flex: 1; min-width: 200px; }
-        
-        .alert {
-            padding: 14px 18px;
-            border-radius: 10px;
-            font-size: 14px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            border: 1px solid;
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
-        
-        .alert-info { background: #f0f9ff; border-color: #bae6fd; color: #075985; }
-        .alert-success { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
-        .alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
-        .alert-error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
-        .alert-cannabis { background: #faf5ff; border-color: #d8b4fe; color: #6b21a8; }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-card {
+        .btn-primary:hover { background: #2a4a7f; transform: translateY(-1px); }
+        .btn-outline {
             background: white;
-            border-radius: 10px;
-            padding: 16px;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .btn-outline:hover { background: var(--gray-50); }
+        .btn-google {
+            background: white;
+            color: #444;
+            border: 2px solid #dadce0;
+        }
+        .btn-google:hover { background: #f8f9fa; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .btn-lg { padding: 16px 32px; font-size: 16px; }
+        
+        /* Hero */
+        .hero {
+            padding: 80px 0;
             text-align: center;
-            border: 1px solid var(--gray-200);
-            box-shadow: var(--shadow);
         }
-        
-        .stat-value { font-size: 28px; font-weight: 700; }
-        .stat-label { font-size: 11px; color: var(--gray-500); font-weight: 600; text-transform: uppercase; margin-top: 4px; }
-        
-        .config-section {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 20px;
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+            line-height: 1.2;
         }
+        .hero p {
+            font-size: 20px;
+            color: var(--gray-700);
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .trust-badges {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: var(--gray-700);
+        }
+        .trust-badges span { display: flex; align-items: center; gap: 6px; }
         
-        .food-specific { border-left: 4px solid var(--food); }
-        .cannabis-specific { border-left: 4px solid var(--cannabis); }
-        .both-industries { border-left: 4px solid var(--info); }
-        
-        .industry-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
+        /* Features */
+        .features {
+            padding: 80px 0;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 32px;
             font-weight: 700;
-            margin-left: 8px;
+            margin-bottom: 16px;
         }
+        .section-subtitle {
+            text-align: center;
+            color: var(--gray-700);
+            margin-bottom: 48px;
+            font-size: 18px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .feature-card:hover { transform: translateY(-4px); }
+        .feature-icon { font-size: 48px; margin-bottom: 16px; }
+        .feature-card h3 { font-size: 20px; margin-bottom: 8px; }
+        .feature-card p { color: var(--gray-700); font-size: 14px; }
         
-        .industry-badge.food { background: #dcfce7; color: #166534; }
-        .industry-badge.cannabis { background: #ede9fe; color: #6b21a8; }
+        /* Pricing */
+        .pricing {
+            padding: 80px 0;
+        }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .pricing-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .pricing-card.featured {
+            border-color: var(--primary-light);
+            transform: scale(1.05);
+        }
+        .pricing-card h3 { font-size: 24px; margin-bottom: 8px; }
+        .price { font-size: 48px; font-weight: 800; margin: 16px 0; color: var(--primary); }
+        .price span { font-size: 16px; color: var(--gray-700); font-weight: 400; }
+        .pricing-card ul {
+            list-style: none;
+            margin: 24px 0;
+            text-align: left;
+            padding: 0;
+        }
+        .pricing-card ul li {
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .pricing-card ul li::before { content: '✅ '; }
+        
+        /* Auth Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-content h2 { font-size: 24px; margin-bottom: 8px; text-align: center; }
+        .modal-content .subtitle { text-align: center; color: var(--gray-700); font-size: 14px; margin-bottom: 24px; }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: var(--gray-700);
+            font-size: 13px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .divider span { padding: 0 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--gray-700);
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        .alert.show { display: block; }
+        .alert-error { background: #fed7d7; color: #9b2c2c; border: 1px solid #feb2b2; }
+        .alert-success { background: #c6f6d5; color: #276749; border: 1px solid #9ae6b4; }
+        .alert-info { background: #bee3f8; color: #2a4365; border: 1px solid #90cdf4; }
+        .text-link { color: var(--primary-light); cursor: pointer; text-decoration: none; font-weight: 600; }
+        .text-link:hover { text-decoration: underline; }
+        
+        /* Footer */
+        footer {
+            background: var(--gray-900);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+        footer a { color: #90cdf4; text-decoration: none; }
         
         @media (max-width: 768px) {
-            .form-grid, .form-grid-3, .form-grid-4 { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .btn-group .btn { min-width: 100%; }
+            .hero h1 { font-size: 28px; }
+            .hero p { font-size: 16px; }
+            .pricing-card.featured { transform: none; }
+            .header-content { flex-direction: column; }
+            .header-actions { justify-content: center; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header con Selector de Industria -->
-        <div class="header">
-            <h1>🛡️ ComplyLog Pro</h1>
-            <p class="subtitle">Sistema Profesional de Registro HACCP & GMP</p>
-            <p style="color: var(--gray-400); font-size: 13px; margin-top: 4px;">
-                Alimentos • Cannabis • Suplementos • Farmacéutica
+    <header>
+        <div class="container header-content">
+            <a href="/" class="logo">🛡️ <span data-i18n="brand">ComplyLog Pro</span></a>
+            <div class="header-actions">
+                <div class="lang-switcher">
+                    <button class="lang-btn active" onclick="switchLang('en')">🇺🇸 EN</button>
+                    <button class="lang-btn" onclick="switchLang('es')">🇪🇸 ES</button>
+                </div>
+                <button class="btn btn-outline" onclick="showModal('login')" data-i18n="loginBtn">Sign In</button>
+                <button class="btn btn-primary" onclick="showModal('register')" data-i18n="registerBtn">Start Free</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1 data-i18n="heroTitle">Compliance Management Simplified for SMBs</h1>
+            <p data-i18n="heroSubtitle">Track your legal, tax, and regulatory obligations in one place. Built for US small businesses that need to stay compliant without the complexity.</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary btn-lg" onclick="showModal('register')" data-i18n="heroCTA">🚀 Start Free Today</button>
+                <button class="btn btn-outline btn-lg" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})" data-i18n="heroFeatures">See Features</button>
+            </div>
+            <div class="trust-badges">
+                <span>🔒 SOC 2 Compliant</span>
+                <span>✅ GDPR Ready</span>
+                <span>🇺🇸 US-Based Servers</span>
+                <span>📊 99.9% Uptime</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title" data-i18n="featuresTitle">Everything You Need to Stay Compliant</h2>
+            <p class="section-subtitle" data-i18n="featuresSubtitle">Powerful tools designed for US small businesses</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3 data-i18n="feature1Title">Task Management</h3>
+                    <p data-i18n="feature1Desc">Create, assign and track compliance tasks with deadlines and priorities. Never miss a regulatory deadline again.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📅</div>
+                    <h3 data-i18n="feature2Title">Regulatory Calendar</h3>
+                    <p data-i18n="feature2Desc">View all your obligations in an interactive calendar. Automatic reminders 7, 3, and 1 day before due dates.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 data-i18n="feature3Title">Professional Reports</h3>
+                    <p data-i18n="feature3Desc">Generate compliance reports in PDF and Excel. Complete audit trail for regulators and stakeholders.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📁</div>
+                    <h3 data-i18n="feature4Title">Document Library</h3>
+                    <p data-i18n="feature4Desc">Store and organize regulatory documents with version control and advanced search capabilities.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h3 data-i18n="feature5Title">Smart Notifications</h3>
+                    <p data-i18n="feature5Desc">Automatic email alerts for upcoming deadlines. Stay ahead of compliance requirements effortlessly.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌡️</div>
+                    <h3 data-i18n="feature6Title">HACCP/GMP Monitoring</h3>
+                    <p data-i18n="feature6Desc">Temperature, pH, and critical parameter logs. FDA, USDA, and GMP compliance ready for food & cannabis industries.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing">
+        <div class="container">
+            <h2 class="section-title" data-i18n="pricingTitle">Plans That Grow With You</h2>
+            <p class="section-subtitle" data-i18n="pricingSubtitle">Start free, upgrade when you need more</p>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <h3>🆓 <span data-i18n="plan1Name">Starter</span></h3>
+                    <p style="color:var(--gray-700);margin-bottom:8px;" data-i18n="plan1Desc">For getting started</p>
+                    <div class="price">$0<span>/mo</span></div>
+                    <ul>
+                        <li data-i18n="plan1Feature1">10 active tasks</li>
+                        <li data-i18n="plan1Feature2">1 user</li>
+                        <li data-i18n="plan1Feature3">Basic reminders</li>
+                        <li data-i18n="plan1Feature4">Email support</li>
+                        <li data-i18n="plan1Feature5">Basic dashboard</li>
+                    </ul>
+                    <button class="btn btn-outline" style="width:100%" onclick="showModal('register')" data-i18n="plan1CTA">Start Free</button>
+                </div>
+                <div class="pricing-card featured">
+                    <h3>⭐ <span data-i18n="plan2Name">Professional</span></h3>
+                    <p style="color:var(--primary-light);margin-bottom:8px;" data-i18n="plan2Desc">Most popular</p>
+                    <div class="price">$29<span>/mo</span></div>
+                    <ul>
+                        <li data-i18n="plan2Feature1">100 active tasks</li>
+                        <li data-i18n="plan2Feature2">5 users</li>
+                        <li data-i18n="plan2Feature3">PDF/Excel reports</li>
+                        <li data-i18n="plan2Feature4">Document library</li>
+                        <li data-i18n="plan2Feature5">Advanced notifications</li>
+                        <li data-i18n="plan2Feature6">Priority support</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width:100%" onclick="showModal('register')" data-i18n="plan2CTA">Start Pro</button>
+                </div>
+                <div class="pricing-card">
+                    <h3>🏢 <span data-i18n="plan3Name">Enterprise</span></h3>
+                    <p style="color:var(--gray-700);margin-bottom:8px;" data-i18n="plan3Desc">Unlimited everything</p>
+                    <div class="price">$79<span>/mo</span></div>
+                    <ul>
+                        <li data-i18n="plan3Feature1">Unlimited tasks</li>
+                        <li data-i18n="plan3Feature2">Unlimited users</li>
+                        <li data-i18n="plan3Feature3">Advanced audit</li>
+                        <li data-i18n="plan3Feature4">Custom API</li>
+                        <li data-i18n="plan3Feature5">HACCP/GMP included</li>
+                        <li data-i18n="plan3Feature6">24/7 support</li>
+                    </ul>
+                    <button class="btn btn-outline" style="width:100%" onclick="showModal('register')" data-i18n="plan3CTA">Contact Us</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p style="font-size:20px;font-weight:700;margin-bottom:8px;">🛡️ <span data-i18n="brand">ComplyLog Pro</span></p>
+            <p data-i18n="footerCopyright">&copy; 2026 ComplyLog Pro. All rights reserved.</p>
+            <p style="margin-top:8px;font-size:14px;opacity:0.7;">
+                <a href="https://declarcloudeployed.top">declarcloudeployed.top</a> | 
+                <a href="#" data-i18n="footerPrivacy">Privacy Policy</a> | 
+                <a href="#" data-i18n="footerTerms">Terms of Service</a>
             </p>
-            
-            <div class="industry-selector">
-                <button class="industry-btn active-food" id="btnFood" onclick="selectIndustry('food')">
-                    <span style="font-size:24px;">🍽️</span>
-                    Industria Alimentaria
-                    <span style="font-size: 10px; opacity: 0.7;">FDA 21 CFR 117</span>
-                </button>
-                <button class="industry-btn" id="btnCannabis" onclick="selectIndustry('cannabis')">
-                    <span style="font-size:24px;">🌿</span>
-                    Industria Cannabis
-                    <span style="font-size: 10px; opacity: 0.7;">GMP EU/GFSI</span>
-                </button>
-            </div>
-            
-            <div class="badge-container">
-                <span class="badge badge-info" id="badgeVersion">v3.0 Dual Industry</span>
-                <span class="badge badge-warning" id="badgeConnection">⏳ Verificando Supabase...</span>
-                <span class="badge badge-success" id="badgeCompliance" style="display:none;">✅ Listo para Auditoría</span>
-                <span class="badge badge-purple" id="badgeIndustry">🍽️ Alimentario</span>
-            </div>
         </div>
+    </footer>
 
-        <!-- Configuración Supabase -->
-        <div class="config-section" id="configSection">
-            <h3 style="margin-bottom: 16px; color: #92400e;">⚙️ Configuración de Conexión a Supabase</h3>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label">URL de Supabase</label>
-                    <input type="text" class="form-input" id="sbUrl" 
-                           value="https://smyuylvztkigxruyywhb.supabase.co">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Clave Anónima (Anon Key)</label>
-                    <input type="text" class="form-input" id="sbKey" 
-                           value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNteXV5bHZ6dGtpZ3hydXl5d2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NzA3NzUsImV4cCI6MjEwMTA0Njc3NX0.Rt-VEKGv03XaydxAhxbUkHWr1p0ifviWsKFsU_B-Tao">
-                </div>
-            </div>
-            <div class="btn-group" style="margin-top: 16px;">
-                <button class="btn btn-success" onclick="testAndConnect()">🔄 Probar Conexión</button>
-            </div>
-            <div id="connectionStatus" style="margin-top: 12px;"></div>
-        </div>
-
-        <!-- Contenido Principal -->
-        <div id="mainContent">
-            <!-- SECCIÓN 1: Información General -->
-            <div class="card both-industries">
-                <div class="card-header">
-                    <div class="card-title">📋 Información General de Planta y Producción</div>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Empresa/Licencia <span class="required">*</span></label>
-                        <input type="text" class="form-input" id="company" value="Salsa Del Sol LLC" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">ID/Número de Licencia <span class="required">*</span></label>
-                        <input type="text" class="form-input" id="plantId" value="SDS-001" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label class="form-label">Dirección de la Instalación</label>
-                        <input type="text" class="form-input" id="address" value="123 Industrial Blvd, Austin, TX 78701">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" id="labelProduct">Producto <span class="required">*</span></label>
-                        <input type="text" class="form-input" id="product" value="Salsa Picante Premium" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Número de Lote/Cosecha <span class="required">*</span></label>
-                        <input type="text" class="form-input" id="lotNumber" value="LOT-20260731-001" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Fecha de Producción <span class="required">*</span></label>
-                        <input type="date" class="form-input" id="logDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Turno <span class="required">*</span></label>
-                        <select class="form-select" id="shift">
-                            <option value="Mañana">Mañana (06:00-14:00)</option>
-                            <option value="Tarde">Tarde (14:00-22:00)</option>
-                            <option value="Noche">Noche (22:00-06:00)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Supervisor <span class="required">*</span></label>
-                        <input type="text" class="form-input" id="supervisor" value="M. Rodríguez" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Operador/Responsable</label>
-                        <input type="text" class="form-input" id="operator" value="J. Martínez">
-                    </div>
-                </div>
-                
-                <div id="cannabisFields1" style="display:none;">
-                    <div class="form-grid" style="margin-top: 20px;">
-                        <div class="form-group">
-                            <label class="form-label">Cepa/Variedad</label>
-                            <input type="text" class="form-input" id="strain" value="Blue Dream">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Etapa de Cultivo/Procesamiento</label>
-                            <select class="form-select" id="stage">
-                                <option value="cultivo">Cultivo Vegetativo</option>
-                                <option value="floracion">Floración</option>
-                                <option value="cosecha">Cosecha</option>
-                                <option value="secado">Secado</option>
-                                <option value="curado">Curado</option>
-                                <option value="extraccion">Extracción</option>
-                                <option value="empaque">Empaque</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Sala/Cuarto de Cultivo</label>
-                            <input type="text" class="form-input" id="room" value="Sala A-12">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">ID de Planta Madre/Clon</label>
-                            <input type="text" class="form-input" id="motherPlantId" value="MP-0042">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="alert alert-info" style="margin-top: 20px;">
-                    <span>📋</span>
-                    <div>
-                        <strong>ID de Registro:</strong> <span id="recordId">HACCP-20260731-0001</span><br>
-                        <small>Identificador único para trazabilidad y auditoría.</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SECCIÓN 2: Monitoreo Alimentos -->
-            <div class="card food-specific" id="monitoringFood">
-                <div class="card-header">
-                    <div class="card-title">
-                        🌡️ Registros de Monitoreo HACCP - Alimentos
-                        <span class="industry-badge food">FDA 21 CFR 117</span>
-                    </div>
-                </div>
-                <div class="alert alert-info">
-                    <span>📊</span>
-                    <div>
-                        <strong>Límites Críticos:</strong> Refrigeración: ≤ 40°F (4.4°C) | Cocción: ≥ 160°F (71.1°C) | pH: 4.0 - 4.6
-                    </div>
-                </div>
-                <div id="foodMonitoringTable"></div>
-            </div>
-
-            <!-- SECCIÓN 2B: Monitoreo Cannabis -->
-            <div class="card cannabis-specific" id="monitoringCannabis" style="display:none;">
-                <div class="card-header">
-                    <div class="card-title">
-                        🌿 Registros de Monitoreo GMP - Cannabis
-                        <span class="industry-badge cannabis">GMP EU/ICH Q7</span>
-                    </div>
-                </div>
-                <div class="alert alert-cannabis">
-                    <span>📊</span>
-                    <div>
-                        <strong>Parámetros Críticos Cannabis:</strong><br>
-                        • Temperatura Cultivo: 70-85°F (21-29°C) | • Humedad Vegetativo: 55-70% | • Humedad Floración: 40-50%<br>
-                        • CO2: 800-1500 ppm | • pH Agua: 5.8-6.5 | • EC: 1.2-2.0 mS/cm | • Actividad Agua: &lt;0.65
-                    </div>
-                </div>
-                <div id="cannabisMonitoringTable"></div>
-            </div>
-
-            <!-- Estadísticas -->
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card success">
-                    <div class="stat-value" id="statCompliant">0</div>
-                    <div class="stat-label">En Cumplimiento</div>
-                </div>
-                <div class="stat-card danger">
-                    <div class="stat-value" id="statDeviations">0</div>
-                    <div class="stat-label">Desviaciones</div>
-                </div>
-                <div class="stat-card info">
-                    <div class="stat-value" id="statCompliance">0%</div>
-                    <div class="stat-label">Tasa de Cumplimiento</div>
-                </div>
-                <div class="stat-card warning">
-                    <div class="stat-value" id="statTotal">0</div>
-                    <div class="stat-label">Total Registros</div>
-                </div>
-            </div>
-
-            <!-- Verificación y Firmas -->
-            <div class="card both-industries">
-                <div class="card-header">
-                    <div class="card-title">✍️ Verificación, Firmas y Revisión</div>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Verificación de Parámetros Críticos</label>
-                        <select class="form-select" id="limitsVerification">
-                            <option value="">Seleccione...</option>
-                            <option value="verified">✅ Todos los parámetros verificados</option>
-                            <option value="deviations_addressed">⚠️ Desviaciones identificadas y corregidas</option>
-                            <option value="pending">⏳ Pendiente de revisión</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Verificación de Acciones Correctivas</label>
-                        <select class="form-select" id="correctiveVerification">
-                            <option value="">Seleccione...</option>
-                            <option value="effective">✅ Acciones correctivas efectivas</option>
-                            <option value="needs_review">⚠️ Requiere revisión adicional</option>
-                            <option value="not_applicable">N/A - Sin desviaciones</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label class="form-label">Comentarios del Supervisor / QA</label>
-                        <textarea class="form-textarea" id="supervisorComments" 
-                                  placeholder="Observaciones, notas de mejora continua, seguimiento requerido..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Revisor QA (si aplica)</label>
-                        <input type="text" class="form-input" id="qaReviewer" placeholder="Nombre del revisor de calidad">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Fecha de Revisión</label>
-                        <input type="date" class="form-input" id="reviewDate">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Acciones -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">💾 Acciones del Documento</div>
-                </div>
-                
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="saveAndGenerate()">
-                        💾 Guardar en Supabase y Generar PDF
-                    </button>
-                    <button class="btn btn-outline" onclick="generatePDFOnly()">
-                        📄 Solo Generar PDF
-                    </button>
-                </div>
-                
-                <div id="actionStatus" style="margin-top: 16px;"></div>
-                
-                <div id="qrContainer" style="display:none; margin-top: 20px; text-align: center;">
-                    <h4>🔍 Código QR de Verificación Digital</h4>
-                    <div id="qrCode"></div>
-                    <p style="font-size: 12px; color: var(--gray-500); margin-top: 8px;">
-                        Escanee para verificar la autenticidad del registro
-                    </p>
-                </div>
-            </div>
-        </div>
+    <div class="modal" id="authModal">
+        <div class="modal-content" id="authContent"></div>
     </div>
 
     <script>
-        // ==================== ESTADO GLOBAL ====================
-        let supabaseClient = null;
-        let isConnected = false;
-        let currentIndustry = 'food';
-        let currentRecordId = '';
-        
+        // ==================== TRADUCCIONES ====================
+        const translations = {
+            en: {
+                brand: 'ComplyLog Pro',
+                loginBtn: 'Sign In',
+                registerBtn: 'Start Free',
+                heroTitle: 'Compliance Management Simplified for SMBs',
+                heroSubtitle: 'Track your legal, tax, and regulatory obligations in one place. Built for US small businesses that need to stay compliant without the complexity.',
+                heroCTA: '🚀 Start Free Today',
+                heroFeatures: 'See Features',
+                featuresTitle: 'Everything You Need to Stay Compliant',
+                featuresSubtitle: 'Powerful tools designed for US small businesses',
+                feature1Title: 'Task Management',
+                feature1Desc: 'Create, assign and track compliance tasks with deadlines and priorities. Never miss a regulatory deadline again.',
+                feature2Title: 'Regulatory Calendar',
+                feature2Desc: 'View all your obligations in an interactive calendar. Automatic reminders 7, 3, and 1 day before due dates.',
+                feature3Title: 'Professional Reports',
+                feature3Desc: 'Generate compliance reports in PDF and Excel. Complete audit trail for regulators and stakeholders.',
+                feature4Title: 'Document Library',
+                feature4Desc: 'Store and organize regulatory documents with version control and advanced search capabilities.',
+                feature5Title: 'Smart Notifications',
+                feature5Desc: 'Automatic email alerts for upcoming deadlines. Stay ahead of compliance requirements effortlessly.',
+                feature6Title: 'HACCP/GMP Monitoring',
+                feature6Desc: 'Temperature, pH, and critical parameter logs. FDA, USDA, and GMP compliance ready for food & cannabis industries.',
+                pricingTitle: 'Plans That Grow With You',
+                pricingSubtitle: 'Start free, upgrade when you need more',
+                plan1Name: 'Starter',
+                plan1Desc: 'For getting started',
+                plan1Feature1: '10 active tasks',
+                plan1Feature2: '1 user',
+                plan1Feature3: 'Basic reminders',
+                plan1Feature4: 'Email support',
+                plan1Feature5: 'Basic dashboard',
+                plan1CTA: 'Start Free',
+                plan2Name: 'Professional',
+                plan2Desc: 'Most popular',
+                plan2Feature1: '100 active tasks',
+                plan2Feature2: '5 users',
+                plan2Feature3: 'PDF/Excel reports',
+                plan2Feature4: 'Document library',
+                plan2Feature5: 'Advanced notifications',
+                plan2Feature6: 'Priority support',
+                plan2CTA: 'Start Pro',
+                plan3Name: 'Enterprise',
+                plan3Desc: 'Unlimited everything',
+                plan3Feature1: 'Unlimited tasks',
+                plan3Feature2: 'Unlimited users',
+                plan3Feature3: 'Advanced audit',
+                plan3Feature4: 'Custom API',
+                plan3Feature5: 'HACCP/GMP included',
+                plan3Feature6: '24/7 support',
+                plan3CTA: 'Contact Us',
+                footerCopyright: '© 2026 ComplyLog Pro. All rights reserved.',
+                footerPrivacy: 'Privacy Policy',
+                footerTerms: 'Terms of Service',
+                // Modal translations
+                welcomeBack: '👋 Welcome Back',
+                loginSubtitle: 'Sign in to your account',
+                createAccount: '🚀 Create Free Account',
+                registerSubtitle: 'Get started in under 1 minute',
+                forgotPassword: '🔑 Reset Password',
+                forgotSubtitle: 'We\'ll send you a reset link',
+                googleContinue: 'Continue with Google',
+                googleRegister: 'Sign up with Google',
+                orWithEmail: 'or with email',
+                emailLabel: 'Email',
+                passwordLabel: 'Password',
+                companyLabel: 'Company Name',
+                loginAction: 'Sign In',
+                registerAction: 'Create Free Account',
+                sendLink: 'Send Reset Link',
+                noAccount: 'Don\'t have an account?',
+                hasAccount: 'Already have an account?',
+                signUpFree: 'Sign up free',
+                signIn: 'Sign in',
+                forgotLink: 'Forgot password?',
+                backToLogin: '← Back to sign in',
+                fillAllFields: 'Please fill in all fields',
+                passwordMin: 'Password must be at least 6 characters',
+                loggingIn: '⏳ Signing in...',
+                creatingAccount: '⏳ Creating account...',
+                sendingLink: '⏳ Sending link...',
+                loginSuccess: '✅ Signed in! Redirecting...',
+                accountCreated: '✅ Account created! Check your email to verify.',
+                linkSent: '✅ Link sent. Check your email.',
+                connectingGoogle: '⏳ Connecting with Google...'
+            },
+            es: {
+                brand: 'ComplyLog Pro',
+                loginBtn: 'Iniciar Sesión',
+                registerBtn: 'Comenzar Gratis',
+                heroTitle: 'Gestión de Cumplimiento Simplificada para PYMES',
+                heroSubtitle: 'Controla tus obligaciones legales, fiscales y regulatorias en un solo lugar. Diseñado para pequeñas empresas que necesitan estar al día sin complicaciones.',
+                heroCTA: '🚀 Comenzar Gratis Hoy',
+                heroFeatures: 'Ver Funcionalidades',
+                featuresTitle: 'Todo lo que Necesitas para Cumplir',
+                featuresSubtitle: 'Herramientas poderosas diseñadas para pequeñas empresas',
+                feature1Title: 'Gestión de Tareas',
+                feature1Desc: 'Crea, asigna y haz seguimiento de tareas de cumplimiento con fechas límite y prioridades.',
+                feature2Title: 'Calendario Regulatorio',
+                feature2Desc: 'Visualiza todas tus obligaciones en un calendario interactivo. Recordatorios automáticos.',
+                feature3Title: 'Reportes Profesionales',
+                feature3Desc: 'Genera reportes de cumplimiento en PDF y Excel. Registro completo de auditoría.',
+                feature4Title: 'Biblioteca Documental',
+                feature4Desc: 'Almacena y organiza documentos normativos con control de versiones.',
+                feature5Title: 'Notificaciones Inteligentes',
+                feature5Desc: 'Alertas automáticas por email. Adelántate a los requisitos de cumplimiento.',
+                feature6Title: 'Monitoreo HACCP/GMP',
+                feature6Desc: 'Registros de temperatura, pH y parámetros críticos. Cumplimiento FDA y GMP.',
+                pricingTitle: 'Planes que Crecen Contigo',
+                pricingSubtitle: 'Comienza gratis, actualiza cuando necesites más',
+                plan1Name: 'Inicial',
+                plan1Desc: 'Para empezar',
+                plan1Feature1: '10 tareas activas',
+                plan1Feature2: '1 usuario',
+                plan1Feature3: 'Recordatorios básicos',
+                plan1Feature4: 'Soporte por email',
+                plan1Feature5: 'Panel básico',
+                plan1CTA: 'Comenzar Gratis',
+                plan2Name: 'Profesional',
+                plan2Desc: 'Más popular',
+                plan2Feature1: '100 tareas activas',
+                plan2Feature2: '5 usuarios',
+                plan2Feature3: 'Reportes PDF/Excel',
+                plan2Feature4: 'Biblioteca documentos',
+                plan2Feature5: 'Notificaciones avanzadas',
+                plan2Feature6: 'Soporte prioritario',
+                plan2CTA: 'Comenzar Pro',
+                plan3Name: 'Empresarial',
+                plan3Desc: 'Ilimitado',
+                plan3Feature1: 'Tareas ilimitadas',
+                plan3Feature2: 'Usuarios ilimitados',
+                plan3Feature3: 'Auditoría avanzada',
+                plan3Feature4: 'API personalizada',
+                plan3Feature5: 'HACCP/GMP incluido',
+                plan3Feature6: 'Soporte 24/7',
+                plan3CTA: 'Contactar',
+                footerCopyright: '© 2026 ComplyLog Pro. Todos los derechos reservados.',
+                footerPrivacy: 'Política de Privacidad',
+                footerTerms: 'Términos de Servicio',
+                // Modal translations
+                welcomeBack: '👋 Bienvenido de Nuevo',
+                loginSubtitle: 'Inicia sesión en tu cuenta',
+                createAccount: '🚀 Crear Cuenta Gratis',
+                registerSubtitle: 'Comienza en menos de 1 minuto',
+                forgotPassword: '🔑 Recuperar Contraseña',
+                forgotSubtitle: 'Te enviaremos un enlace de recuperación',
+                googleContinue: 'Continuar con Google',
+                googleRegister: 'Registrarse con Google',
+                orWithEmail: 'o con email',
+                emailLabel: 'Email',
+                passwordLabel: 'Contraseña',
+                companyLabel: 'Nombre de Empresa',
+                loginAction: 'Iniciar Sesión',
+                registerAction: 'Crear Cuenta Gratis',
+                sendLink: 'Enviar Enlace',
+                noAccount: '¿No tienes cuenta?',
+                hasAccount: '¿Ya tienes cuenta?',
+                signUpFree: 'Regístrate gratis',
+                signIn: 'Inicia sesión',
+                forgotLink: '¿Olvidaste tu contraseña?',
+                backToLogin: '← Volver al inicio',
+                fillAllFields: 'Por favor completa todos los campos',
+                passwordMin: 'La contraseña debe tener al menos 6 caracteres',
+                loggingIn: '⏳ Iniciando sesión...',
+                creatingAccount: '⏳ Creando cuenta...',
+                sendingLink: '⏳ Enviando enlace...',
+                loginSuccess: '✅ ¡Sesión iniciada! Redirigiendo...',
+                accountCreated: '✅ ¡Cuenta creada! Revisa tu email para verificar.',
+                linkSent: '✅ Enlace enviado. Revisa tu email.',
+                connectingGoogle: '⏳ Conectando con Google...'
+            }
+        };
+
+        let currentLang = 'en';
+
+        // Detectar idioma del navegador
+        function detectLanguage() {
+            const browserLang = navigator.language || navigator.userLanguage;
+            if (browserLang.startsWith('es')) return 'es';
+            return 'en'; // Default: English
+        }
+
+        // Cambiar idioma
+        function switchLang(lang) {
+            currentLang = lang;
+            
+            // Actualizar botones
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(lang.toUpperCase())) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Actualizar todos los elementos con data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            
+            // Actualizar el modal si está abierto
+            const modal = document.getElementById('authModal');
+            if (modal.classList.contains('active')) {
+                const modalType = document.getElementById('authContent').getAttribute('data-type');
+                if (modalType) showModal(modalType);
+            }
+            
+            // Guardar preferencia
+            localStorage.setItem('complylog_lang', lang);
+        }
+
+        // Obtener texto traducido
+        function t(key) {
+            return translations[currentLang]?.[key] || translations['en'][key] || key;
+        }
+
+        // ==================== SUPABASE ====================
         const SUPABASE_URL = 'https://smyuylvztkigxruyywhb.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNteXV5bHZ6dGtpZ3hydXl5d2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NzA3NzUsImV4cCI6MjEwMTA0Njc3NX0.Rt-VEKGv03XaydxAhxbUkHWr1p0ifviWsKFsU_B-Tao';
-        
-        // Datos de monitoreo
-        const foodEntries = [
-            { time: '06:00', area: 'Refrigeración Norte', equipment: 'Enfriador A', limit: '≤ 40°F', unit: '°F', value: 38, min: null, max: 40, type: 'temp' },
-            { time: '06:00', area: 'Refrigeración Sur', equipment: 'Enfriador B', limit: '≤ 40°F', unit: '°F', value: 42, min: null, max: 40, type: 'temp' },
-            { time: '10:00', area: 'Refrigeración Norte', equipment: 'Enfriador A', limit: '≤ 40°F', unit: '°F', value: 37, min: null, max: 40, type: 'temp' },
-            { time: '10:00', area: 'Refrigeración Sur', equipment: 'Enfriador B', limit: '≤ 40°F', unit: '°F', value: 39, min: null, max: 40, type: 'temp' },
-            { time: '14:00', area: 'Cocción', equipment: 'Horno Industrial 1', limit: '≥ 160°F', unit: '°F', value: 165, min: 160, max: null, type: 'temp' },
-            { time: '14:30', area: 'Laboratorio QA', equipment: 'Medidor pH', limit: '4.0 - 4.6', unit: 'pH', value: 4.2, min: 4.0, max: 4.6, type: 'ph' },
-        ];
-        
-        const cannabisEntries = [
-            { time: '06:00', area: 'Sala Vegetativa A', equipment: 'Sensor Temp/Hum', limit: '70-85°F', unit: '°F', value: 78, min: 70, max: 85, type: 'temp' },
-            { time: '06:00', area: 'Sala Vegetativa A', equipment: 'Sensor Humedad', limit: '55-70%', unit: '%HR', value: 65, min: 55, max: 70, type: 'humidity' },
-            { time: '06:00', area: 'Sala Floración B', equipment: 'Sensor Temp/Hum', limit: '68-80°F', unit: '°F', value: 75, min: 68, max: 80, type: 'temp' },
-            { time: '06:00', area: 'Sala Floración B', equipment: 'Sensor Humedad', limit: '40-50%', unit: '%HR', value: 45, min: 40, max: 50, type: 'humidity' },
-            { time: '10:00', area: 'Sala Vegetativa A', equipment: 'Medidor CO2', limit: '800-1500 ppm', unit: 'ppm', value: 1200, min: 800, max: 1500, type: 'co2' },
-            { time: '10:00', area: 'Tanque Nutrientes', equipment: 'Medidor pH', limit: '5.8-6.5', unit: 'pH', value: 6.2, min: 5.8, max: 6.5, type: 'ph' },
-            { time: '10:00', area: 'Tanque Nutrientes', equipment: 'Medidor EC', limit: '1.2-2.0', unit: 'mS/cm', value: 1.6, min: 1.2, max: 2.0, type: 'ec' },
-            { time: '14:00', area: 'Sala Secado', equipment: 'Sensor Temp/Hum', limit: '60-70°F', unit: '°F', value: 65, min: 60, max: 70, type: 'temp' },
-            { time: '14:00', area: 'Sala Secado', equipment: 'Sensor Humedad', limit: '45-55%', unit: '%HR', value: 50, min: 45, max: 55, type: 'humidity' },
-            { time: '14:00', area: 'Laboratorio QA', equipment: 'Medidor Act. Agua', limit: '< 0.65', unit: 'aW', value: 0.55, min: null, max: 0.65, type: 'waterActivity' },
-        ];
-        
-        let currentEntries = foodEntries;
-        
-        // ==================== CONEXIÓN SUPABASE ====================
-        async function initSupabase() {
-            try {
-                if (typeof supabaseLib === 'undefined') {
-                    throw new Error('Librería Supabase no disponible');
-                }
-                
-                supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY);
-                console.log('✅ Cliente Supabase creado exitosamente');
-                
-                // Probar conexión
-                const result = await supabaseClient.from('logs').select('id').limit(1);
-                
-                if (result.error && result.error.code === '42P01') {
-                    updateBadge('badgeConnection', '⚠️ Tabla no existe', 'badge badge-warning');
-                    showAlert('connectionStatus', 'warning', '✅ Conectado pero la tabla "logs" no existe. Ejecuta el SQL en Supabase.');
-                    isConnected = true;
-                } else if (result.error) {
-                    throw new Error(result.error.message || 'Error de conexión');
-                } else {
-                    updateBadge('badgeConnection', '✅ Conectado', 'badge badge-success');
-                    showAlert('connectionStatus', 'success', '✅ Conexión exitosa con Supabase. ¡Listo para guardar!');
-                    isConnected = true;
-                }
-            } catch (e) {
-                console.error('Error conexión:', e);
-                updateBadge('badgeConnection', '❌ Error', 'badge badge-error');
-                showAlert('connectionStatus', 'error', '❌ Error: ' + e.message);
-                isConnected = false;
+        let supabase = null;
+
+        function initSupabase() {
+            if (typeof supabaseLib !== 'undefined') {
+                supabase = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('✅ Supabase initialized');
+                checkSession();
             }
         }
-        
-        async function testAndConnect() {
-            showAlert('connectionStatus', 'info', '⏳ Probando conexión...');
-            await initSupabase();
+
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) window.location.href = '/app.html';
         }
-        
-        function updateBadge(id, text, className) {
-            const badge = document.getElementById(id);
-            if (badge) {
-                badge.textContent = text;
-                badge.className = className;
-            }
-        }
-        
-        function showAlert(containerId, type, message) {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = `
-                    <div class="alert alert-${type}">
-                        <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
-                        <div>${message}</div>
-                    </div>
+
+        // ==================== MODAL ====================
+        function showModal(type) {
+            const modal = document.getElementById('authModal');
+            const content = document.getElementById('authContent');
+            
+            content.setAttribute('data-type', type);
+            
+            if (type === 'login') {
+                content.innerHTML = `
+                    <h2>${t('welcomeBack')}</h2>
+                    <p class="subtitle">${t('loginSubtitle')}</p>
+                    <div id="authAlert" class="alert"></div>
+                    <button class="btn btn-google" style="width:100%;margin-bottom:16px;" onclick="loginWithGoogle()">
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        ${t('googleContinue')}
+                    </button>
+                    <div class="divider"><span>${t('orWithEmail')}</span></div>
+                    <div class="form-group"><label>${t('emailLabel')}</label><input type="email" id="email" placeholder="you@company.com"></div>
+                    <div class="form-group"><label>${t('passwordLabel')}</label><input type="password" id="password" placeholder="••••••••"></div>
+                    <button class="btn btn-primary" style="width:100%" onclick="login()">${t('loginAction')}</button>
+                    <p style="text-align:center;margin-top:16px;font-size:14px;">${t('noAccount')} <span class="text-link" onclick="showModal('register')">${t('signUpFree')}</span></p>
+                    <p style="text-align:center;margin-top:8px;font-size:13px;"><span class="text-link" onclick="showModal('forgot')">${t('forgotLink')}</span></p>
                 `;
-            }
-        }
-        
-        // ==================== SELECTOR DE INDUSTRIA ====================
-        function selectIndustry(industry) {
-            currentIndustry = industry;
-            
-            document.getElementById('btnFood').className = industry === 'food' ? 'industry-btn active-food' : 'industry-btn';
-            document.getElementById('btnCannabis').className = industry === 'cannabis' ? 'industry-btn active-cannabis' : 'industry-btn';
-            document.body.className = industry === 'cannabis' ? 'cannabis-mode' : 'food-mode';
-            document.getElementById('badgeIndustry').textContent = industry === 'cannabis' ? '🌿 Cannabis' : '🍽️ Alimentario';
-            
-            document.getElementById('cannabisFields1').style.display = industry === 'cannabis' ? 'block' : 'none';
-            document.getElementById('monitoringFood').style.display = industry === 'food' ? 'block' : 'none';
-            document.getElementById('monitoringCannabis').style.display = industry === 'cannabis' ? 'block' : 'none';
-            document.getElementById('labelProduct').textContent = industry === 'cannabis' ? 'Producto/Extracto' : 'Producto';
-            
-            currentEntries = industry === 'cannabis' ? cannabisEntries : foodEntries;
-            
-            if (industry === 'food') {
-                renderFoodTable();
-            } else {
-                renderCannabisTable();
-            }
-            updateStatistics();
-        }
-        
-        // ==================== RENDERIZADO DE TABLAS ====================
-        function renderFoodTable() {
-            const container = document.getElementById('foodMonitoringTable');
-            container.innerHTML = `
-                <div style="overflow-x: auto;">
-                    <table class="log-table">
-                        <thead>
-                            <tr>
-                                <th>Hora</th>
-                                <th>Área/Etapa</th>
-                                <th>Equipo</th>
-                                <th>Valor</th>
-                                <th>Unidad</th>
-                                <th>Límite</th>
-                                <th>Iniciales</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${foodEntries.map((entry, i) => {
-                                const val = parseFloat(document.getElementById(`food-val-${i}`)?.value ?? entry.value);
-                                const isDev = (entry.max !== null && val > entry.max) || (entry.min !== null && val < entry.min);
-                                return `
-                                    <tr class="${isDev ? 'deviation-row' : ''}">
-                                        <td><strong>${entry.time}</strong></td>
-                                        <td>${entry.area}</td>
-                                        <td>${entry.equipment}</td>
-                                        <td>
-                                            <input type="number" step="0.1" class="form-input" 
-                                                   id="food-val-${i}" value="${val}" 
-                                                   style="width: 80px; ${isDev ? 'border-color: #dc2626;' : ''}"
-                                                   onchange="updateFoodEntry(${i})">
-                                        </td>
-                                        <td>${entry.unit}</td>
-                                        <td><strong>${entry.limit}</strong></td>
-                                        <td>
-                                            <input type="text" class="form-input" id="food-init-${i}" 
-                                                   value="JM" maxlength="3" style="width: 60px;">
-                                        </td>
-                                        <td>
-                                            ${isDev ? 
-                                                '<span class="deviation-indicator">⚠️ DESVIACIÓN</span>' : 
-                                                '<span class="compliant-indicator">✅ Cumple</span>'
-                                            }
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-                ${renderCorrectiveActions(foodEntries, 'food')}
-            `;
-        }
-        
-        function renderCannabisTable() {
-            const container = document.getElementById('cannabisMonitoringTable');
-            container.innerHTML = `
-                <div style="overflow-x: auto;">
-                    <table class="log-table">
-                        <thead>
-                            <tr>
-                                <th>Hora</th>
-                                <th>Área/Sala</th>
-                                <th>Equipo</th>
-                                <th>Parámetro</th>
-                                <th>Valor</th>
-                                <th>Unidad</th>
-                                <th>Límite</th>
-                                <th>Iniciales</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${cannabisEntries.map((entry, i) => {
-                                const val = parseFloat(document.getElementById(`can-val-${i}`)?.value ?? entry.value);
-                                const isDev = (entry.max !== null && val > entry.max) || (entry.min !== null && val < entry.min);
-                                const paramName = entry.type === 'temp' ? 'Temperatura' :
-                                                 entry.type === 'humidity' ? 'Humedad' :
-                                                 entry.type === 'co2' ? 'CO2' :
-                                                 entry.type === 'ph' ? 'pH' :
-                                                 entry.type === 'ec' ? 'Conductividad' :
-                                                 entry.type === 'waterActivity' ? 'Actividad Agua' : '';
-                                return `
-                                    <tr class="${isDev ? 'deviation-row' : ''}">
-                                        <td><strong>${entry.time}</strong></td>
-                                        <td>${entry.area}</td>
-                                        <td>${entry.equipment}</td>
-                                        <td><strong>${paramName}</strong></td>
-                                        <td>
-                                            <input type="number" step="0.1" class="form-input" 
-                                                   id="can-val-${i}" value="${val}" 
-                                                   style="width: 80px; ${isDev ? 'border-color: #dc2626;' : ''}"
-                                                   onchange="updateCannabisEntry(${i})">
-                                        </td>
-                                        <td>${entry.unit}</td>
-                                        <td><strong>${entry.limit}</strong></td>
-                                        <td>
-                                            <input type="text" class="form-input" id="can-init-${i}" 
-                                                   value="JM" maxlength="3" style="width: 60px;">
-                                        </td>
-                                        <td>
-                                            ${isDev ? 
-                                                '<span class="deviation-indicator">⚠️ DESVIACIÓN</span>' : 
-                                                '<span class="compliant-indicator">✅ Cumple</span>'
-                                            }
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-                ${renderCorrectiveActions(cannabisEntries, 'can')}
-            `;
-        }
-        
-        function renderCorrectiveActions(entries, prefix) {
-            const deviations = entries.map((entry, i) => {
-                const val = parseFloat(document.getElementById(`${prefix}-val-${i}`)?.value ?? entry.value);
-                const isDev = (entry.max !== null && val > entry.max) || (entry.min !== null && val < entry.min);
-                return isDev ? { index: i, entry, val } : null;
-            }).filter(Boolean);
-            
-            if (deviations.length === 0) {
-                return `
-                    <div class="alert alert-success" style="margin-top: 16px;">
-                        <span>✅</span>
-                        <div><strong>Todos los parámetros dentro de límites.</strong></div>
-                    </div>
+            } else if (type === 'register') {
+                content.innerHTML = `
+                    <h2>${t('createAccount')}</h2>
+                    <p class="subtitle">${t('registerSubtitle')}</p>
+                    <div id="authAlert" class="alert"></div>
+                    <button class="btn btn-google" style="width:100%;margin-bottom:16px;" onclick="loginWithGoogle()">
+                        <svg width="20" height="20" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        ${t('googleRegister')}
+                    </button>
+                    <div class="divider"><span>${t('orWithEmail')}</span></div>
+                    <div class="form-group"><label>${t('companyLabel')}</label><input type="text" id="companyName" placeholder="Your Company LLC"></div>
+                    <div class="form-group"><label>${t('emailLabel')}</label><input type="email" id="email" placeholder="you@company.com"></div>
+                    <div class="form-group"><label>${t('passwordLabel')}</label><input type="password" id="password" placeholder="Min 6 characters"></div>
+                    <button class="btn btn-primary" style="width:100%" onclick="register()">${t('registerAction')}</button>
+                    <p style="text-align:center;margin-top:16px;font-size:14px;">${t('hasAccount')} <span class="text-link" onclick="showModal('login')">${t('signIn')}</span></p>
+                `;
+            } else if (type === 'forgot') {
+                content.innerHTML = `
+                    <h2>${t('forgotPassword')}</h2>
+                    <p class="subtitle">${t('forgotSubtitle')}</p>
+                    <div id="authAlert" class="alert"></div>
+                    <div class="form-group"><label>${t('emailLabel')}</label><input type="email" id="email" placeholder="you@company.com"></div>
+                    <button class="btn btn-primary" style="width:100%" onclick="resetPassword()">${t('sendLink')}</button>
+                    <p style="text-align:center;margin-top:16px;font-size:14px;"><span class="text-link" onclick="showModal('login')">${t('backToLogin')}</span></p>
                 `;
             }
             
-            return `
-                <div class="alert alert-error" style="margin-top: 16px;">
-                    <span>⚠️</span>
-                    <div><strong>Se detectaron ${deviations.length} desviación(es) - Acciones Correctivas Requeridas:</strong></div>
-                </div>
-                ${deviations.map(d => `
-                    <div class="form-group" style="margin-top: 12px;">
-                        <label class="form-label">
-                            Acción Correctiva: ${d.entry.equipment} (${d.entry.time} - ${d.val}${d.entry.unit})
-                        </label>
-                        <textarea class="form-textarea" id="${prefix}-corr-${d.index}" rows="2" 
-                                  placeholder="Describa la acción correctiva tomada...">${d.val > (d.entry.max || 999) ? 'Parámetro ajustado. Verificación adicional realizada.' : ''}</textarea>
-                    </div>
-                `).join('')}
-            `;
+            modal.classList.add('active');
         }
-        
-        window.updateFoodEntry = function(index) {
-            renderFoodTable();
-            updateStatistics();
-        };
-        
-        window.updateCannabisEntry = function(index) {
-            renderCannabisTable();
-            updateStatistics();
-        };
-        
-        // ==================== ESTADÍSTICAS ====================
-        function updateStatistics() {
-            const entries = currentIndustry === 'food' ? foodEntries : cannabisEntries;
-            const prefix = currentIndustry === 'food' ? 'food' : 'can';
-            
-            let compliant = 0;
-            let deviations = 0;
-            
-            entries.forEach((entry, i) => {
-                const val = parseFloat(document.getElementById(`${prefix}-val-${i}`)?.value ?? entry.value);
-                const isDev = (entry.max !== null && val > entry.max) || (entry.min !== null && val < entry.min);
-                
-                if (isDev) deviations++;
-                else compliant++;
-            });
-            
-            const total = compliant + deviations;
-            const rate = total > 0 ? Math.round((compliant / total) * 100) : 100;
-            
-            document.getElementById('statCompliant').textContent = compliant;
-            document.getElementById('statDeviations').textContent = deviations;
-            document.getElementById('statCompliance').textContent = rate + '%';
-            document.getElementById('statTotal').textContent = total;
-            
-            const badge = document.getElementById('badgeCompliance');
-            badge.style.display = 'inline-flex';
-            if (deviations === 0) {
-                badge.textContent = '✅ 100% Cumplimiento';
-                badge.className = 'badge badge-success';
-            } else if (rate >= 90) {
-                badge.textContent = `⚠️ ${rate}% Cumplimiento`;
-                badge.className = 'badge badge-warning';
-            } else {
-                badge.textContent = `❌ ${rate}% Cumplimiento`;
-                badge.className = 'badge badge-error';
-            }
-        }
-        
-        // ==================== GUARDADO EN SUPABASE ====================
-        async function saveToSupabase(data) {
-            if (!supabaseClient || !isConnected) return false;
-            
-            const records = data.entries.map(entry => ({
-                record_id: data.recordId,
-                industry: data.industry,
-                company: data.company,
-                plant_id: data.plantId,
-                address: data.address,
-                product: data.product,
-                lot_number: data.lotNumber,
-                log_date: data.logDate,
-                shift: data.shift,
-                supervisor: data.supervisor,
-                operator_name: data.operator,
-                strain: data.strain || null,
-                stage: data.stage || null,
-                room: data.room || null,
-                mother_plant_id: data.motherPlantId || null,
-                entry_time: entry.time,
-                entry_area: entry.area,
-                entry_equipment: entry.equipment,
-                entry_value: entry.value,
-                entry_unit: entry.unit,
-                entry_limit: entry.limit,
-                entry_initials: entry.initials,
-                entry_type: entry.type || null,
-                is_within_limit: !entry.isDeviation,
-                deviation_reason: entry.isDeviation ? 'Fuera del límite crítico' : null,
-                corrective_action: entry.corrective || null,
-                compliance_rate: data.complianceRate,
-                total_entries: data.totalEntries,
-                compliant_entries: data.compliantEntries,
-                deviation_entries: data.deviationEntries,
-                limits_verification: data.limitsVerification || null,
-                corrective_verification: data.correctiveVerification || null,
-                supervisor_comments: data.supervisorComments || null,
-                qa_reviewer: data.qaReviewer || null,
-                review_date: data.reviewDate || null,
-                status: 'completed'
-            }));
-            
-            const result = await supabaseClient.from('logs').insert(records);
-            if (result.error) throw result.error;
-            return true;
-        }
-        
-        // ==================== GENERACIÓN DE PDF ====================
-        function generateDualPDF(data) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter', compress: true });
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
-            const margin = 12;
-            const contentWidth = pageWidth - (margin * 2);
-            let y = 15;
-            
-            const isCannabis = data.industry === 'cannabis';
-            const industryColor = isCannabis ? [124, 58, 237] : [5, 150, 105];
-            const industryName = isCannabis ? 'CANNABIS GMP' : 'ALIMENTOS HACCP';
-            const regulation = isCannabis ? 'GMP EU/ICH Q7 • FDA 21 CFR 111' : 'FDA 21 CFR 117 • FSMA';
-            
-            doc.setFillColor(industryColor[0], industryColor[1], industryColor[2]);
-            doc.rect(0, 0, pageWidth, 3, 'F');
-            
-            doc.setFontSize(16);
-            doc.setTextColor(15, 23, 42);
-            doc.setFont(undefined, 'bold');
-            doc.text(`COMPLYLOG PRO - ${industryName}`, margin, y);
-            
-            doc.setFontSize(8);
-            doc.setTextColor(100, 116, 139);
-            doc.text(`Documento: ${data.recordId} | Regulación: ${regulation}`, margin, y + 5);
-            doc.text(`Fecha: ${data.logDate} | Turno: ${data.shift}`, margin, y + 9);
-            
-            y += 14;
-            
-            // Información General
-            doc.setFillColor(241, 245, 249);
-            doc.rect(margin, y, contentWidth, 7, 'F');
-            doc.setFontSize(9);
-            doc.setTextColor(15, 23, 42);
-            doc.text('1. INFORMACIÓN GENERAL', margin + 3, y + 5);
-            y += 11;
-            
-            doc.setFontSize(7.5);
-            const infoData = [
-                ['Empresa:', data.company, 'Licencia:', data.plantId],
-                ['Producto:', data.product, 'Lote:', data.lotNumber],
-                ['Supervisor:', data.supervisor, 'Operador:', data.operator],
-            ];
-            
-            if (isCannabis) {
-                infoData.push(['Cepa:', data.strain || '', 'Etapa:', data.stage || '']);
-                infoData.push(['Sala:', data.room || '', 'Planta Madre:', data.motherPlantId || '']);
-            }
-            
-            infoData.forEach(row => {
-                doc.setFont(undefined, 'bold');
-                doc.text(row[0], margin + 2, y);
-                doc.setFont(undefined, 'normal');
-                doc.text(row[1] || '', margin + 22, y);
-                if (row[2]) {
-                    doc.setFont(undefined, 'bold');
-                    doc.text(row[2], margin + contentWidth/2, y);
-                    doc.setFont(undefined, 'normal');
-                    doc.text(row[3] || '', margin + contentWidth/2 + 22, y);
-                }
-                y += 5;
-            });
-            
-            y += 4;
-            
-            // Monitoreo
-            doc.setFillColor(241, 245, 249);
-            doc.rect(margin, y, contentWidth, 7, 'F');
-            doc.text('2. REGISTROS DE MONITOREO', margin + 3, y + 5);
-            y += 11;
-            
-            const headers = isCannabis ? 
-                ['Hora', 'Área', 'Equipo', 'Parámetro', 'Valor', 'Unidad', 'Límite', 'Estado'] :
-                ['Hora', 'Área', 'Equipo', 'Valor', 'Unidad', 'Límite', 'Iniciales', 'Estado'];
-            
-            const colWidths = isCannabis ?
-                [18, 28, 30, 22, 18, 14, 24, 20] :
-                [18, 30, 32, 18, 14, 20, 16, 20];
-            
-            const colX = [];
-            let cx = margin;
-            colWidths.forEach(w => { colX.push(cx); cx += w; });
-            
-            doc.setFillColor(51, 65, 85);
-            doc.rect(margin, y, contentWidth, 6, 'F');
-            doc.setFontSize(6.5);
-            doc.setTextColor(255, 255, 255);
-            headers.forEach((h, i) => doc.text(h, colX[i] + 1, y + 4.5));
-            y += 6;
-            
-            data.entries.forEach((entry, index) => {
-                if (y > pageHeight - 50) {
-                    doc.addPage(); y = 20;
-                    doc.setFillColor(51, 65, 85);
-                    doc.rect(margin, y, contentWidth, 6, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    headers.forEach((h, i) => doc.text(h, colX[i] + 1, y + 4.5));
-                    y += 6;
-                }
-                
-                if (entry.isDeviation) {
-                    doc.setFillColor(254, 226, 226);
-                    doc.rect(margin, y, contentWidth, 5, 'F');
-                }
-                
-                doc.setFontSize(6);
-                doc.setTextColor(entry.isDeviation ? 153 : 15, entry.isDeviation ? 27 : 23, entry.isDeviation ? 27 : 42);
-                
-                const values = isCannabis ? [
-                    entry.time, entry.area, entry.equipment,
-                    entry.type || '', `${entry.value}`, entry.unit,
-                    entry.limit, entry.isDeviation ? 'DESVIACIÓN' : 'Cumple'
-                ] : [
-                    entry.time, entry.area, entry.equipment,
-                    `${entry.value}`, entry.unit, entry.limit,
-                    entry.initials, entry.isDeviation ? 'DESVIACIÓN' : 'Cumple'
-                ];
-                
-                values.forEach((v, i) => doc.text(String(v), colX[i] + 1, y + 4));
-                y += 5;
-            });
-            
-            y += 6;
-            
-            doc.setFontSize(8);
-            doc.setTextColor(15, 23, 42);
-            doc.text(`Cumplimiento: ${data.complianceRate}% | Total: ${data.totalEntries} | Cumplen: ${data.compliantEntries} | Desviaciones: ${data.deviationEntries}`, margin, y);
-            
-            y += 8;
-            
-            doc.setFillColor(241, 245, 249);
-            doc.rect(margin, y, contentWidth, 7, 'F');
-            doc.text('3. FIRMAS Y VERIFICACIÓN', margin + 3, y + 5);
-            y += 12;
-            
-            doc.line(margin + 10, y + 10, margin + 70, y + 10);
-            doc.line(margin + contentWidth/2 + 10, y + 10, margin + contentWidth/2 + 70, y + 10);
-            doc.setFontSize(8);
-            doc.text('Operador', margin + 25, y + 15);
-            doc.text('Supervisor', margin + contentWidth/2 + 25, y + 15);
-            
-            y += 20;
-            
-            doc.setFontSize(6);
-            doc.setTextColor(148, 163, 184);
-            doc.text(`Documento: ${data.recordId} | ${industryName} | Retención: 2 años`, margin, pageHeight - 8);
-            
-            const totalPages = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= totalPages; i++) {
-                doc.setPage(i);
-                doc.text(`Página ${i} de ${totalPages}`, pageWidth - margin - 20, pageHeight - 8);
-            }
-            
-            return doc.output('blob');
-        }
-        
-        // ==================== RECOLECCIÓN DE DATOS ====================
-        function collectData() {
-    // Generar ID único NUEVO cada vez
-    const newRecordId = 'HACCP-' + 
-        new Date().toISOString().split('T')[0].replace(/-/g, '') + '-' + 
-        Date.now().toString(36).toUpperCase() + '-' + 
-        Math.random().toString(36).substring(2, 8).toUpperCase();
-    
-    // Actualizar el ID visible y la variable global
-    currentRecordId = newRecordId;
-    document.getElementById('recordId').textContent = newRecordId;
-    
-    const entries = currentEntries.map((entry, i) => {
-        const prefix = currentIndustry === 'food' ? 'food' : 'can';
-        const val = parseFloat(document.getElementById(`${prefix}-val-${i}`)?.value ?? entry.value);
-        const isDev = (entry.max !== null && val > entry.max) || (entry.min !== null && val < entry.min);
-        return {
-            ...entry,
-            value: val,
-            initials: document.getElementById(`${prefix}-init-${i}`)?.value || '',
-            corrective: isDev ? (document.getElementById(`${prefix}-corr-${i}`)?.value || '') : '',
-            isDeviation: isDev
-        };
-    });
-    
-    const compliant = entries.filter(e => !e.isDeviation).length;
-    const deviations = entries.filter(e => e.isDeviation).length;
-    const total = entries.length;
-    
-    return {
-        recordId: newRecordId,
-        industry: currentIndustry,
-        company: document.getElementById('company')?.value || '',
-        plantId: document.getElementById('plantId')?.value || '',
-        address: document.getElementById('address')?.value || '',
-        product: document.getElementById('product')?.value || '',
-        lotNumber: document.getElementById('lotNumber')?.value || '',
-        logDate: document.getElementById('logDate')?.value || '',
-        shift: document.getElementById('shift')?.value || '',
-        supervisor: document.getElementById('supervisor')?.value || '',
-        operator: document.getElementById('operator')?.value || '',
-        strain: document.getElementById('strain')?.value || '',
-        stage: document.getElementById('stage')?.value || '',
-        room: document.getElementById('room')?.value || '',
-        motherPlantId: document.getElementById('motherPlantId')?.value || '',
-        entries: entries,
-        complianceRate: total > 0 ? Math.round((compliant / total) * 100) : 100,
-        totalEntries: total,
-        compliantEntries: compliant,
-        deviationEntries: deviations,
-        limitsVerification: document.getElementById('limitsVerification')?.value || '',
-        correctiveVerification: document.getElementById('correctiveVerification')?.value || '',
-        supervisorComments: document.getElementById('supervisorComments')?.value || '',
-        qaReviewer: document.getElementById('qaReviewer')?.value || '',
-        reviewDate: document.getElementById('reviewDate')?.value || ''
-    };
-}
-        
-        // ==================== ACCIONES PRINCIPALES ====================
-        window.saveAndGenerate = async function() {
-    // Generar nuevo ID único cada vez que se guarda
-    currentRecordId = 'HACCP-' + new Date().toISOString().split('T')[0].replace(/-/g, '') + '-' + 
-        Date.now().toString(36).toUpperCase() + '-' + 
-        Math.random().toString(36).substring(2, 6).toUpperCase();
-    document.getElementById('recordId').textContent = currentRecordId;
-    
-    const data = collectData();
-            
-            if (supabaseClient && isConnected) {
-                try {
-                    showAlert('actionStatus', 'info', '💾 Guardando en Supabase...');
-                    const saved = await saveToSupabase(data);
-                    if (saved) {
-                        showAlert('actionStatus', 'success', `✅ ¡${data.totalEntries} registros guardados exitosamente!`);
-                        updateBadge('badgeConnection', '✅ Datos guardados', 'badge badge-success');
-                        document.getElementById('qrContainer').style.display = 'block';
-                        document.getElementById('qrCode').innerHTML = `
-                            <div style="padding:20px; background:#f0fdf4; border-radius:10px; text-align:center;">
-                                <p style="font-size:48px;">🔍</p>
-                                <p style="font-weight:700;">ID: ${data.recordId}</p>
-                                <p style="font-size:12px; color:#64748b;">${new Date().toLocaleString()}</p>
-                            </div>
-                        `;
-                    }
-                } catch (e) {
-                    showAlert('actionStatus', 'error', '❌ Error al guardar: ' + e.message);
-                }
-            } else {
-                showAlert('actionStatus', 'warning', '⚠️ Sin conexión a Supabase - Solo PDF generado');
-            }
-            
-            // Generar PDF siempre
-            try {
-                const blob = generateDualPDF(data);
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${data.industry.toUpperCase()}_${data.recordId}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            } catch (e) {
-                showAlert('actionStatus', 'error', '❌ Error al generar PDF: ' + e.message);
-            }
-        };
-        
-        window.generatePDFOnly = function() {
-            try {
-                const data = collectData();
-                const blob = generateDualPDF(data);
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${data.industry.toUpperCase()}_${data.recordId}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showAlert('actionStatus', 'success', '✅ PDF generado exitosamente');
-            } catch (e) {
-                showAlert('actionStatus', 'error', '❌ Error: ' + e.message);
-            }
-        };
-        
-        // ==================== INICIALIZACIÓN ====================
-        window.addEventListener('DOMContentLoaded', () => {
-            currentRecordId = 'HACCP-' + new Date().toISOString().split('T')[0].replace(/-/g, '') + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
-            document.getElementById('recordId').textContent = currentRecordId;
-            document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('reviewDate').value = new Date().toISOString().split('T')[0];
-            
-            selectIndustry('food');
-            
-            // Verificar que la librería está cargada
-            console.log('✅ jsPDF:', typeof window.jspdf !== 'undefined' ? 'Cargado' : 'No cargado');
-            console.log('✅ Supabase:', typeof supabaseLib !== 'undefined' ? 'Cargado' : 'No cargado');
-            
-            setTimeout(() => initSupabase(), 500);
+
+        document.getElementById('authModal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('active');
         });
-        
-        // Exponer funciones globalmente
-        window.selectIndustry = selectIndustry;
-        window.testAndConnect = testAndConnect;
+
+        function showAuthAlert(message, type) {
+            const alert = document.getElementById('authAlert');
+            if (alert) {
+                alert.textContent = message;
+                alert.className = 'alert alert-' + type + ' show';
+            }
+        }
+
+        // ==================== AUTH FUNCTIONS ====================
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (!email || !password) { showAuthAlert(t('fillAllFields'), 'error'); return; }
+            showAuthAlert(t('loggingIn'), 'info');
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) { showAuthAlert('❌ ' + error.message, 'error'); }
+            else { showAuthAlert(t('loginSuccess'), 'success'); setTimeout(() => window.location.href = '/app.html', 500); }
+        }
+
+        async function loginWithGoogle() {
+            showAuthAlert(t('connectingGoogle'), 'info');
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: 'https://declarcloudeployed.top/app.html', queryParams: { access_type: 'offline', prompt: 'consent' } }
+            });
+            if (error) showAuthAlert('❌ ' + error.message, 'error');
+        }
+
+        async function register() {
+            const companyName = document.getElementById('companyName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (!companyName || !email || !password) { showAuthAlert(t('fillAllFields'), 'error'); return; }
+            if (password.length < 6) { showAuthAlert(t('passwordMin'), 'error'); return; }
+            showAuthAlert(t('creatingAccount'), 'info');
+            const { data, error } = await supabase.auth.signUp({
+                email, password,
+                options: { data: { company_name: companyName, plan: 'free' }, emailRedirectTo: 'https://declarcloudeployed.top/app.html' }
+            });
+            if (error) { showAuthAlert('❌ ' + error.message, 'error'); }
+            else {
+                showAuthAlert(t('accountCreated'), 'success');
+                if (data.user) { await supabase.from('companies').insert({ user_id: data.user.id, company_name: companyName, plan: 'free' }); }
+            }
+        }
+
+        async function resetPassword() {
+            const email = document.getElementById('email').value;
+            if (!email) { showAuthAlert(t('fillAllFields'), 'error'); return; }
+            showAuthAlert(t('sendingLink'), 'info');
+            const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://declarcloudeployed.top/app.html#reset-password' });
+            if (error) { showAuthAlert('❌ ' + error.message, 'error'); }
+            else { showAuthAlert(t('linkSent'), 'success'); }
+        }
+
+        // ==================== INIT ====================
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('complylog_lang');
+            currentLang = savedLang || detectLanguage();
+            switchLang(currentLang);
+            initSupabase();
+        });
+
+        window.showModal = showModal;
+        window.login = login;
+        window.register = register;
+        window.loginWithGoogle = loginWithGoogle;
+        window.resetPassword = resetPassword;
+        window.switchLang = switchLang;
     </script>
 </body>
 </html>
