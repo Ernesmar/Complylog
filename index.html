@@ -329,9 +329,9 @@
             <a href="/" class="logo">🛡️ <span data-i18n="brand">ComplyLog Pro</span></a>
             <div class="header-actions">
                 <div class="lang-switcher">
-                    <button class="lang-btn active" onclick="switchLang('en')">🇺🇸 EN</button>
-                    <button class="lang-btn" onclick="switchLang('es')">🇪🇸 ES</button>
-                </div>
+    <button class="lang-btn active" id="btnEN" onclick="switchLang('en')">🇺🇸 EN</button>
+    <button class="lang-btn" id="btnES" onclick="switchLang('es')">🇪🇸 ES</button>
+</div>
                 <button class="btn btn-outline" onclick="showModal('login')" data-i18n="loginBtn">Sign In</button>
                 <button class="btn btn-primary" onclick="showModal('register')" data-i18n="registerBtn">Start Free</button>
             </div>
@@ -683,7 +683,7 @@
         // ==================== SUPABASE ====================
         const SUPABASE_URL = 'https://smyuylvztkigxruyywhb.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNteXV5bHZ6dGtpZ3hydXl5d2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NzA3NzUsImV4cCI6MjEwMTA0Njc3NX0.Rt-VEKGv03XaydxAhxbUkHWr1p0ifviWsKFsU_B-Tao';
-        let supabase = null;
+        
 
         function initSupabase() {
             if (typeof supabaseLib !== 'undefined') {
@@ -694,7 +694,7 @@
         }
 
         async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) window.location.href = '/app.html';
         }
 
@@ -779,14 +779,14 @@
             const password = document.getElementById('password').value;
             if (!email || !password) { showAuthAlert(t('fillAllFields'), 'error'); return; }
             showAuthAlert(t('loggingIn'), 'info');
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabaseClient.signInWithPassword({ email, password });
             if (error) { showAuthAlert('❌ ' + error.message, 'error'); }
             else { showAuthAlert(t('loginSuccess'), 'success'); setTimeout(() => window.location.href = '/app.html', 500); }
         }
 
         async function loginWithGoogle() {
             showAuthAlert(t('connectingGoogle'), 'info');
-            const { error } = await supabase.auth.signInWithOAuth({
+            const { error } = await supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
                 options: { redirectTo: 'https://declarcloudeployed.top/app.html', queryParams: { access_type: 'offline', prompt: 'consent' } }
             });
@@ -800,14 +800,14 @@
             if (!companyName || !email || !password) { showAuthAlert(t('fillAllFields'), 'error'); return; }
             if (password.length < 6) { showAuthAlert(t('passwordMin'), 'error'); return; }
             showAuthAlert(t('creatingAccount'), 'info');
-            const { data, error } = await supabase.auth.signUp({
+            const { data, error } = await supabaseClient.auth.signUp({
                 email, password,
                 options: { data: { company_name: companyName, plan: 'free' }, emailRedirectTo: 'https://declarcloudeployed.top/app.html' }
             });
             if (error) { showAuthAlert('❌ ' + error.message, 'error'); }
             else {
                 showAuthAlert(t('accountCreated'), 'success');
-                if (data.user) { await supabase.from('companies').insert({ user_id: data.user.id, company_name: companyName, plan: 'free' }); }
+                if (data.user) { await supabaseClient.from('companies').insert({ user_id: data.user.id, company_name: companyName, plan: 'free' }); }
             }
         }
 
@@ -815,7 +815,7 @@
             const email = document.getElementById('email').value;
             if (!email) { showAuthAlert(t('fillAllFields'), 'error'); return; }
             showAuthAlert(t('sendingLink'), 'info');
-            const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://declarcloudeployed.top/app.html#reset-password' });
+            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: 'https://declarcloudeployed.top/app.html#reset-password' });
             if (error) { showAuthAlert('❌ ' + error.message, 'error'); }
             else { showAuthAlert(t('linkSent'), 'success'); }
         }
@@ -834,6 +834,37 @@
         window.loginWithGoogle = loginWithGoogle;
         window.resetPassword = resetPassword;
         window.switchLang = switchLang;
+
+        // ==================== FUNCIONES DE IDIOMA ====================
+function switchLang(lang) {
+    currentLang = lang;
+    console.log('🌐 Switching to:', lang);
+    
+    // Actualizar botones
+    const btnEN = document.getElementById('btnEN');
+    const btnES = document.getElementById('btnES');
+    if (btnEN) btnEN.classList.remove('active');
+    if (btnES) btnES.classList.remove('active');
+    if (lang === 'en' && btnEN) btnEN.classList.add('active');
+    if (lang === 'es' && btnES) btnES.classList.add('active');
+    
+    // Actualizar textos
+    let count = 0;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+            count++;
+        }
+    });
+    console.log('✅ Updated', count, 'elements');
+    
+    // Guardar preferencia
+    localStorage.setItem('complylog_lang', lang);
+}
+
+// Hacerla global
+window.switchLang = switchLang;
     </script>
 </body>
 </html>
