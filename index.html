@@ -549,23 +549,19 @@
         }
 
         // ==================== PWA ====================
-        if ('serviceWorker' in navigator) {
-           window.addEventListener('DOMContentLoaded', () => {
-    initSupabase();
-    renderAuth('login');
-});
-        }
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js');
+    });
+}
 
-        // ==================== START ====================
+// ==================== START ====================
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ DOM cargado');
+    if (typeof supabaseLib !== 'undefined') {
+        console.log('✅ supabaseLib disponible');
         init();
-        window.navigate = navigate;
-        window.showTaskModal = showTaskModal;
-        window.closeModal = closeModal;
-        window.createTask = createTask;
-        window.updateTaskStatus = updateTaskStatus;
-        window.deleteTask = deleteTask;
-        window.generateHACCPPDF = generateHACCPPDF;
-        window.logout = logout;
-    </script>
-</body>
-</html>
+    } else {
+        console.error('❌ supabaseLib no disponible');
+    }
+});
