@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComplyLog Pro - Dashboard</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a0a0b">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* ========== DESIGN SYSTEM (DARK MODE) ========== */
+        :root {
+            --bg: #0a0a0b;
+            --bg-card: #141416;
+            --bg-input: #1c1c1f;
+            --border: #2a2a2e;
+            --text: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --text-tertiary: #71717a;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --radius: 16px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.2);
+            --sidebar-width: 220px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top:0; left:0; bottom:0;
+            z-index: 100;
+        }
+        .sidebar-logo {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            padding: 0 8px;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.15s;
+            margin-bottom: 4px;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+        }
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 32px;
+        }
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .stat-value { font-size: 28px; font-weight: 700; }
+        .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn-primary { background: var(--accent); color: white; box-shadow: 0 1px 2px rgba(59,130,246,0.3); }
+        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(59,130,246,0.4); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
+        .btn-danger { background: var(--danger); color: white; }
+        .task-list { display: flex; flex-direction: column; gap: 12px; }
+        .task-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.15s;
+        }
+        .task-card:hover { border-color: rgba(59,130,246,0.3); }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .badge-pendiente { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .badge-en_progreso { background: rgba(234,179,8,0.2); color: #fbbf24; }
+        .badge-completado { background: rgba(34,197,94,0.2); color: #4ade80; }
+        .badge-vencido { background: rgba(239,68,68,0.2); color: #f87171; }
+        .modal {
+            display: none;
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.6);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar-logo { display: none; }
+            .sidebar-nav a span { display: none; }
+            .main { margin-left: 60px; padding: 16px; }
+            .stats-grid { grid-template-columns: repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo">🛡️ ComplyLog</div>
+        <nav class="sidebar-nav">
+            <a href="#" class="active" data-page="dashboard"><span>📊</span> <span>Dashboard</span></a>
+            <a href="#" data-page="tasks"><span>📋</span> <span>Tasks</span></a>
+            <a href="#" data-page="haccp"><span>🌡️</span> <span>HACCP</span></a>
+            <a href="#" data-page="settings"><span>⚙️</span> <span>Settings</span></a>
+            <a href="#" data-page="admin" id="adminLink" style="display:none"><span>🔒</span> <span>Admin</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn btn-outline" onclick="logout()" style="width:100%">🚪 Sign Out</button>
+        </div>
+    </aside>
+
+    <main class="main" id="mainContent">
+        <!-- Content loaded dynamically -->
+    </main>
+
+    <!-- Modal for tasks -->
+    <div class="modal" id="taskModal">
+        <div class="modal-content" id="taskModalContent"></div>
+    </div>
+
+    <script>
+        // ==================== CONFIG ====================
+        const SUPABASE_URL = 'https://smyuylvztkigxruyywhb.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNteXV5bHZ6dGtpZ3hydXl5d2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NzA3NzUsImV4cCI6MjEwMTA0Njc3NX0.Rt-VEKGv03XaydxAhxbUkHWr1p0ifviWsKFsU_B-Tao';
+        const DEEPSEEK_KEY = 'sk-204376161e814e62ab5c50a84b35d494';
+        let supabaseClient;
+        let currentUser;
+        let company;
+
+        // ==================== INIT ====================
+        async function init() {
+            supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY);
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = '/index.html'; return; }
+            currentUser = session.user;
+            const { data: comp } = await supabaseClient.from('companies').select('*').eq('user_id', currentUser.id).single();
+            company = comp;
+            if (company && company.plan === 'enterprise') document.getElementById('adminLink').style.display = 'block';
+            navigate('dashboard');
+        }
+
+        // ==================== NAVIGATION ====================
+        function navigate(page) {
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+            switch(page) {
+                case 'dashboard': renderDashboard(); break;
+                case 'tasks': renderTasks(); break;
+                case 'haccp': renderHACCP(); break;
+                case 'settings': renderSettings(); break;
+                case 'admin': renderAdmin(); break;
+            }
+        }
+
+        // ==================== DASHBOARD ====================
+        async function renderDashboard() {
+            const { data: tasks } = await supabaseClient.from('tasks').select('*').eq('company_id', company.id);
+            const total = tasks?.length || 0;
+            const pending = tasks?.filter(t => t.status === 'pendiente').length || 0;
+            const completed = tasks?.filter(t => t.status === 'completado').length || 0;
+            const overdue = tasks?.filter(t => t.status === 'vencido').length || 0;
+            document.getElementById('mainContent').innerHTML = `
+                <h1 style="margin-bottom:24px;">📊 Dashboard</h1>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total Tasks</div></div>
+                    <div class="stat-card"><div class="stat-value" style="color:var(--warning)">${pending}</div><div class="stat-label">Pending</div></div>
+                    <div class="stat-card"><div class="stat-value" style="color:var(--success)">${completed}</div><div class="stat-label">Completed</div></div>
+                    <div class="stat-card"><div class="stat-value" style="color:var(--danger)">${overdue}</div><div class="stat-label">Overdue</div></div>
+                </div>
+                <div class="card">
+                    <h2>📋 Recent Tasks</h2>
+                    <div id="recentTasks"></div>
+                </div>
+            `;
+            renderRecentTasks();
+        }
+
+        async function renderRecentTasks() {
+            const { data: tasks } = await supabaseClient.from('tasks').select('*').eq('company_id', company.id).order('due_date', { ascending: true }).limit(5);
+            const html = tasks?.map(t => `
+                <div class="task-card">
+                    <strong>${t.title}</strong>
+                    <span class="badge badge-${t.status}">${t.status}</span>
+                    <div style="color:var(--text-secondary); font-size:13px;">Due: ${t.due_date}</div>
+                </div>
+            `).join('') || '<p>No tasks yet.</p>';
+            document.getElementById('recentTasks').innerHTML = html;
+        }
+
+        // ==================== TASKS ====================
+        async function renderTasks() {
+            const { data: tasks } = await supabaseClient.from('tasks').select('*').eq('company_id', company.id).order('due_date', { ascending: true });
+            const html = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                    <h1>📋 Tasks</h1>
+                    <button class="btn btn-primary" onclick="showTaskModal()">+ New Task</button>
+                </div>
+                <div class="task-list" id="taskList">
+                    ${tasks?.map(t => `
+                        <div class="task-card">
+                            <div style="display:flex; justify-content:space-between;">
+                                <strong>${t.title}</strong>
+                                <span class="badge badge-${t.status}">${t.status}</span>
+                            </div>
+                            <div style="color:var(--text-secondary); font-size:13px; margin-top:8px;">
+                                📅 Due: ${t.due_date} | 🏷️ ${t.category} | ⚡ ${t.priority}
+                            </div>
+                            <div style="margin-top:12px; display:flex; gap:8px;">
+                                ${t.status !== 'completado' ? `<button class="btn btn-outline btn-sm" onclick="updateTaskStatus('${t.id}', 'completado')">✅ Complete</button>` : ''}
+                                <button class="btn btn-outline btn-sm" onclick="editTask('${t.id}')">✏️ Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteTask('${t.id}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `).join('') || '<p>No tasks yet.</p>'}
+                </div>
+            `;
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        function showTaskModal(taskId = null) {
+            const modal = document.getElementById('taskModal');
+            const isEdit = !!taskId;
+            let task = null;
+            if (isEdit) {
+                // fetch task and fill
+            }
+            document.getElementById('taskModalContent').innerHTML = `
+                <h2>${isEdit ? 'Edit Task' : 'New Task'}</h2>
+                <div class="form-group"><label>Title</label><input id="taskTitle" value="${task?.title || ''}"></div>
+                <div class="form-group"><label>Description</label><textarea id="taskDesc">${task?.description || ''}</textarea></div>
+                <div class="form-group"><label>Category</label><select id="taskCat">
+                    <option value="legal">Legal</option><option value="fiscal">Fiscal</option><option value="laboral">Laboral</option><option value="seguridad">Safety</option><option value="ambiental">Environmental</option>
+                </select></div>
+                <div class="form-group"><label>Priority</label><select id="taskPriority">
+                    <option value="alta">High</option><option value="media" selected>Medium</option><option value="baja">Low</option>
+                </select></div>
+                <div class="form-group"><label>Due Date</label><input type="date" id="taskDue" value="${task?.due_date || ''}"></div>
+                <button class="btn btn-primary" onclick="${isEdit ? `updateTask('${taskId}')` : 'createTask()'}">💾 Save</button>
+                <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+            `;
+            modal.classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('taskModal').classList.remove('active'); }
+
+        async function createTask() {
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDesc').value;
+            const category = document.getElementById('taskCat').value;
+            const priority = document.getElementById('taskPriority').value;
+            const due_date = document.getElementById('taskDue').value;
+            const { error } = await supabaseClient.from('tasks').insert({
+                company_id: company.id,
+                created_by: currentUser.id,
+                title, description, category, priority, due_date,
+                status: 'pendiente'
+            });
+            if (error) alert(error.message);
+            else { closeModal(); renderTasks(); }
+        }
+
+        async function updateTaskStatus(id, status) {
+            await supabaseClient.from('tasks').update({ status }).eq('id', id);
+            renderTasks();
+        }
+
+        async function deleteTask(id) {
+            await supabaseClient.from('tasks').delete().eq('id', id);
+            renderTasks();
+        }
+
+        // ==================== HACCP ====================
+        function renderHACCP() {
+            document.getElementById('mainContent').innerHTML = `
+                <h1>🌡️ HACCP Monitoring</h1>
+                <div class="card">
+                    <p>Select country and industry to generate your compliance log.</p>
+                    <button class="btn btn-primary" onclick="generateHACCPPDF()">📄 Generate HACCP PDF</button>
+                </div>
+                <div id="haccpResult"></div>
+            `;
+        }
+
+        function generateHACCPPDF() {
+            // Simplified: generate PDF using jsPDF (loaded via CDN)
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text('HACCP Monitoring Log - ComplyLog Pro', 10, 10);
+            doc.save('haccp_log.pdf');
+        }
+
+        // ==================== SETTINGS ====================
+        function renderSettings() {
+            document.getElementById('mainContent').innerHTML = `
+                <h1>⚙️ Settings</h1>
+                <div class="card">
+                    <h2>Company Profile</h2>
+                    <p>Logo and signature upload will be here.</p>
+                </div>
+            `;
+        }
+
+        // ==================== ADMIN DASHBOARD ====================
+        async function renderAdmin() {
+            if (!company || company.plan !== 'enterprise') return navigate('dashboard');
+            const { count: users } = await supabaseClient.from('companies').select('*', { count: 'exact', head: true });
+            document.getElementById('mainContent').innerHTML = `
+                <h1>🔒 Founder Dashboard</h1>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-value">${users}</div><div class="stat-label">Total Users</div></div>
+                </div>
+            `;
+        }
+
+        // ==================== AUTH ====================
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = '/index.html';
+        }
+
+        // ==================== PWA ====================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+
+        // ==================== START ====================
+        init();
+        window.navigate = navigate;
+        window.showTaskModal = showTaskModal;
+        window.closeModal = closeModal;
+        window.createTask = createTask;
+        window.updateTaskStatus = updateTaskStatus;
+        window.deleteTask = deleteTask;
+        window.generateHACCPPDF = generateHACCPPDF;
+        window.logout = logout;
+    </script>
+</body>
+</html>
