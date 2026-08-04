@@ -6,7 +6,145 @@
     <title>ComplyLog Pro - Dashboard</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0a0a0b">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+/* ============================================
+   SUPABASE CLIENT - Fetch API directo
+   ============================================ */
+(function(global) {
+    'use strict';
+    
+    function createClient(url, key) {
+        if (!url) throw new Error('supabaseUrl requerida');
+        if (!key) throw new Error('supabaseKey requerida');
+        
+        const headers = {
+            'apikey': key,
+            'Authorization': 'Bearer ' + key,
+            'Content-Type': 'application/json'
+        };
+        
+        async function request(method, path, body) {
+            const fullUrl = url + '/rest/v1' + path;
+            const options = { method: method, headers: headers };
+            
+            if (body) {
+                options.body = JSON.stringify(body);
+                options.headers['Prefer'] = 'return=representation';
+            }
+            
+            const response = await fetch(fullUrl, options);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorData;
+                try { errorData = JSON.parse(errorText); } 
+                catch { errorData = { message: errorText }; }
+                return { data: null, error: errorData, status: response.status };
+            }
+            
+            const text = await response.text();
+            if (!text) return { data: null, error: null, status: response.status };
+            
+            try { return { data: JSON.parse(text), error: null, status: response.status }; } 
+            catch { return { data: text, error: null, status: response.status }; }
+        }
+        
+        return {
+            auth: {
+                getSession: function() {
+                    return request('GET', '/auth/v1/user').then(r => {
+                        if (r.error) return { data: { session: null } };
+                        return { data: { session: { user: r.data } } };
+                    });
+                },
+                signInWithPassword: function(creds) {
+                    return fetch(url + '/auth/v1/token?grant_type=password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'apikey': key },
+                        body: JSON.stringify({ email: creds.email, password: creds.password })
+                    }).then(r => r.json()).then(d => {
+                        if (d.error) return { error: d };
+                        return { data: { user: d.user, session: d } };
+                    });
+                },
+                signUp: function(creds) {
+                    return fetch(url + '/auth/v1/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'apikey': key },
+                        body: JSON.stringify({ email: creds.email, password: creds.password })
+                    }).then(r => r.json()).then(d => {
+                        if (d.error) return { error: d };
+                        return { data: { user: d } };
+                    });
+                },
+                signInWithOAuth: function(opts) {
+                    window.location.href = url + '/auth/v1/authorize?provider=' + opts.provider + '&redirect_to=' + encodeURIComponent(opts.options.redirectTo);
+                    return { error: null };
+                },
+                signOut: function() {
+                    localStorage.clear();
+                    return { error: null };
+                },
+                resetPasswordForEmail: function(email, opts) {
+                    return fetch(url + '/auth/v1/recover', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'apikey': key },
+                        body: JSON.stringify({ email: email, redirect_to: opts.redirectTo })
+                    }).then(r => r.json()).then(d => ({ error: d.error ? d : null }));
+                }
+            },
+            from: function(table) {
+                return {
+                    select: function(cols) {
+                        const select = cols || '*';
+                        let path = '/' + table + '?select=' + encodeURIComponent(select);
+                        
+                        const builder = {
+                            eq: function(col, val) {
+                                path += '&' + encodeURIComponent(col) + '=eq.' + encodeURIComponent(val);
+                                return builder;
+                            },
+                            order: function(col, opts) {
+                                path += '&order=' + encodeURIComponent(col) + '.' + ((opts && opts.ascending === false) ? 'desc' : 'asc');
+                                return builder;
+                            },
+                            limit: function(n) {
+                                path += '&limit=' + n;
+                                return builder;
+                            },
+                            single: function() {
+                                path += '&limit=1';
+                                return builder.then(function(res) {
+                                    if (res.error) return res;
+                                    return { data: Array.isArray(res.data) ? res.data[0] || null : res.data, error: null };
+                                });
+                            },
+                            then: function(resolve, reject) {
+                                return request('GET', path).then(resolve, reject);
+                            },
+                            insert: function(values) {
+                                return request('POST', '/' + table, values);
+                            },
+                            update: function(values) {
+                                return request('PATCH', path, values);
+                            },
+                            delete: function() {
+                                return request('DELETE', path);
+                            }
+                        };
+                        
+                        return builder;
+                    }
+                };
+            }
+        };
+    }
+    
+    global.supabaseLib = { createClient: createClient };
+    console.log('✅ Supabase Client cargado (Fetch API)');
+    
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
     <style>
         /* ========== DESIGN SYSTEM (DARK MODE) ========== */
         :root {
