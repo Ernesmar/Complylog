@@ -3,565 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ComplyLog Pro - Dashboard</title>
-    <link rel="manifest" href="/manifest.json">
+    <title>ComplyLog Pro - Compliance Management</title>
     <meta name="theme-color" content="#0a0a0b">
     <script>
-/* ============================================
-   SUPABASE CLIENT - Fetch API directo
-   ============================================ */
-(function(global) {
-    'use strict';
-    
-    function createClient(url, key) {
-        if (!url) throw new Error('supabaseUrl requerida');
-        if (!key) throw new Error('supabaseKey requerida');
-        
-        const headers = {
-            'apikey': key,
-            'Authorization': 'Bearer ' + key,
-            'Content-Type': 'application/json'
-        };
-        
-        async function request(method, path, body) {
-            const fullUrl = url + '/rest/v1' + path;
-            const options = { method: method, headers: headers };
-            
-            if (body) {
-                options.body = JSON.stringify(body);
-                options.headers['Prefer'] = 'return=representation';
-            }
-            
-            const response = await fetch(fullUrl, options);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                let errorData;
-                try { errorData = JSON.parse(errorText); } 
-                catch { errorData = { message: errorText }; }
-                return { data: null, error: errorData, status: response.status };
-            }
-            
-            const text = await response.text();
-            if (!text) return { data: null, error: null, status: response.status };
-            
-            try { return { data: JSON.parse(text), error: null, status: response.status }; } 
-            catch { return { data: text, error: null, status: response.status }; }
-        }
-        
-        return {
-            auth: {
-                getSession: function() {
-                    return request('GET', '/auth/v1/user').then(r => {
-                        if (r.error) return { data: { session: null } };
-                        return { data: { session: { user: r.data } } };
-                    });
-                },
-                signInWithPassword: function(creds) {
-                    return fetch(url + '/auth/v1/token?grant_type=password', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'apikey': key },
-                        body: JSON.stringify({ email: creds.email, password: creds.password })
-                    }).then(r => r.json()).then(d => {
-                        if (d.error) return { error: d };
-                        return { data: { user: d.user, session: d } };
-                    });
-                },
-                signUp: function(creds) {
-                    return fetch(url + '/auth/v1/signup', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'apikey': key },
-                        body: JSON.stringify({ email: creds.email, password: creds.password })
-                    }).then(r => r.json()).then(d => {
-                        if (d.error) return { error: d };
-                        return { data: { user: d } };
-                    });
-                },
-                signInWithOAuth: function(opts) {
-                    window.location.href = url + '/auth/v1/authorize?provider=' + opts.provider + '&redirect_to=' + encodeURIComponent(opts.options.redirectTo);
-                    return { error: null };
-                },
-                signOut: function() {
-                    localStorage.clear();
-                    return { error: null };
-                },
-                resetPasswordForEmail: function(email, opts) {
-                    return fetch(url + '/auth/v1/recover', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'apikey': key },
-                        body: JSON.stringify({ email: email, redirect_to: opts.redirectTo })
-                    }).then(r => r.json()).then(d => ({ error: d.error ? d : null }));
-                }
-            },
-            from: function(table) {
-                return {
-                    select: function(cols) {
-                        const select = cols || '*';
-                        let path = '/' + table + '?select=' + encodeURIComponent(select);
-                        
-                        const builder = {
-                            eq: function(col, val) {
-                                path += '&' + encodeURIComponent(col) + '=eq.' + encodeURIComponent(val);
-                                return builder;
-                            },
-                            order: function(col, opts) {
-                                path += '&order=' + encodeURIComponent(col) + '.' + ((opts && opts.ascending === false) ? 'desc' : 'asc');
-                                return builder;
-                            },
-                            limit: function(n) {
-                                path += '&limit=' + n;
-                                return builder;
-                            },
-                            single: function() {
-                                path += '&limit=1';
-                                return builder.then(function(res) {
-                                    if (res.error) return res;
-                                    return { data: Array.isArray(res.data) ? res.data[0] || null : res.data, error: null };
-                                });
-                            },
-                            then: function(resolve, reject) {
-                                return request('GET', path).then(resolve, reject);
-                            },
-                            insert: function(values) {
-                                return request('POST', '/' + table, values);
-                            },
-                            update: function(values) {
-                                return request('PATCH', path, values);
-                            },
-                            delete: function() {
-                                return request('DELETE', path);
-                            }
-                        };
-                        
-                        return builder;
-                    }
-                };
-            }
-        };
-    }
-    
-    global.supabaseLib = { createClient: createClient };
-    console.log('✅ Supabase Client cargado (Fetch API)');
-    
-})(typeof window !== 'undefined' ? window : globalThis);
+(function(g){'use strict';
+function createClient(url,key){
+var h={'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'};
+async function req(m,p,b){var u=url+'/rest/v1'+p;var o={method:m,headers:h};if(b){o.body=JSON.stringify(b);o.headers['Prefer']='return=representation';}
+var r=await fetch(u,o);if(!r.ok){var t=await r.text();var e;try{e=JSON.parse(t)}catch(e){e={message:t}}return{data:null,error:e,status:r.status}}
+var t=await r.text();if(!t)return{data:null,error:null,status:r.status};try{return{data:JSON.parse(t),error:null,status:r.status}}catch(e){return{data:t,error:null,status:r.status}}}
+return{auth:{getSession:function(){return req('GET','/auth/v1/user').then(function(r){if(r.error)return{data:{session:null}};return{data:{session:{user:r.data}}}})},
+signInWithPassword:function(c){return fetch(url+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'Content-Type':'application/json','apikey':key},body:JSON.stringify({email:c.email,password:c.password})}).then(function(r){return r.json()}).then(function(d){if(d.error)return{error:d};return{data:{user:d.user,session:d}}})},
+signUp:function(c){return fetch(url+'/auth/v1/signup',{method:'POST',headers:{'Content-Type':'application/json','apikey':key},body:JSON.stringify({email:c.email,password:c.password})}).then(function(r){return r.json()}).then(function(d){if(d.error)return{error:d};return{data:{user:d}}})},
+signInWithOAuth:function(o){window.location.href=url+'/auth/v1/authorize?provider='+o.provider+'&redirect_to='+encodeURIComponent(o.options.redirectTo);return{error:null}},
+signOut:function(){localStorage.clear();return{error:null}}},
+from:function(t){return{select:function(c){var p='/'+t+'?select='+encodeURIComponent(c||'*');var b={eq:function(col,val){p+='&'+encodeURIComponent(col)+'=eq.'+encodeURIComponent(val);return b},single:function(){p+='&limit=1';return b.then(function(r){if(r.error)return r;return{data:Array.isArray(r.data)?r.data[0]||null:r.data,error:null}})},then:function(res,rej){return req('GET',p).then(res,rej)},insert:function(v){return req('POST','/'+t,v)}};return b}}}}
+g.supabaseLib={createClient:createClient}})(window);
 </script>
     <style>
-        /* ========== DESIGN SYSTEM (DARK MODE) ========== */
-        :root {
-            --bg: #0a0a0b;
-            --bg-card: #141416;
-            --bg-input: #1c1c1f;
-            --border: #2a2a2e;
-            --text: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-tertiary: #71717a;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --success: #22c55e;
-            --warning: #eab308;
-            --danger: #ef4444;
-            --radius: 16px;
-            --shadow: 0 1px 3px rgba(0,0,0,0.2);
-            --sidebar-width: 220px;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            display: flex;
-            min-height: 100vh;
-        }
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--bg-card);
-            border-right: 1px solid var(--border);
-            padding: 24px 16px;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top:0; left:0; bottom:0;
-            z-index: 100;
-        }
-        .sidebar-logo {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 32px;
-            padding: 0 8px;
-        }
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: 8px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.15s;
-            margin-bottom: 4px;
-        }
-        .sidebar-nav a:hover, .sidebar-nav a.active {
-            background: rgba(255,255,255,0.05);
-            color: var(--text);
-        }
-        .sidebar-footer {
-            margin-top: auto;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
-        }
-        .main {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            padding: 32px;
-        }
-        /* Cards */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow);
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-        }
-        .stat-value { font-size: 28px; font-weight: 700; }
-        .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: inherit;
-        }
-        .btn-primary { background: var(--accent); color: white; box-shadow: 0 1px 2px rgba(59,130,246,0.3); }
-        .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 12px rgba(59,130,246,0.4); transform: translateY(-1px); }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-secondary); }
-        .btn-danger { background: var(--danger); color: white; }
-        .task-list { display: flex; flex-direction: column; gap: 12px; }
-        .task-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            transition: border-color 0.15s;
-        }
-        .task-card:hover { border-color: rgba(59,130,246,0.3); }
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-        .badge-pendiente { background: rgba(59,130,246,0.2); color: #60a5fa; }
-        .badge-en_progreso { background: rgba(234,179,8,0.2); color: #fbbf24; }
-        .badge-completado { background: rgba(34,197,94,0.2); color: #4ade80; }
-        .badge-vencido { background: rgba(239,68,68,0.2); color: #f87171; }
-        .modal {
-            display: none;
-            position: fixed;
-            top:0; left:0; right:0; bottom:0;
-            background: rgba(0,0,0,0.6);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 32px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px 14px;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 14px;
-            font-family: inherit;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-        }
-        @media (max-width: 768px) {
-            .sidebar { width: 60px; }
-            .sidebar-logo { display: none; }
-            .sidebar-nav a span { display: none; }
-            .main { margin-left: 60px; padding: 16px; }
-            .stats-grid { grid-template-columns: repeat(2,1fr); }
-        }
+        :root{--bg:#0a0a0b;--bg-card:#141416;--bg-input:#1c1c1f;--border:#2a2a2e;--text:#f4f4f5;--text-secondary:#a1a1aa;--accent:#3b82f6;--radius:16px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+        .container{max-width:400px;width:100%}
+        .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:32px}
+        .logo{text-align:center;font-size:24px;font-weight:700;margin-bottom:32px}
+        .btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border:none;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;margin-bottom:12px;font-family:inherit;transition:all 0.15s}
+        .btn-google{background:white;color:#1f2937;border:1px solid #d1d5db}
+        .btn-primary{background:var(--accent);color:white}
+        .divider{display:flex;align-items:center;margin:20px 0;color:var(--text-secondary);font-size:13px}
+        .divider::before,.divider::after{content:'';flex:1;border-bottom:1px solid var(--border)}
+        .divider span{padding:0 16px}
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text-secondary)}
+        .form-group input{width:100%;padding:10px 14px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit}
+        .form-group input:focus{outline:none;border-color:var(--accent)}
+        .text-link{color:var(--accent);cursor:pointer;font-weight:500}
+        .alert{padding:12px;border-radius:8px;margin-bottom:16px;font-size:14px;display:none}
+        .alert-success{background:rgba(34,197,94,0.2);color:#4ade80;display:block}
+        .alert-error{background:rgba(239,68,68,0.2);color:#f87171;display:block}
     </style>
 </head>
 <body>
-    <aside class="sidebar">
-        <div class="sidebar-logo">🛡️ ComplyLog</div>
-        <nav class="sidebar-nav">
-            <a href="#" class="active" data-page="dashboard"><span>📊</span> <span>Dashboard</span></a>
-            <a href="#" data-page="tasks"><span>📋</span> <span>Tasks</span></a>
-            <a href="#" data-page="haccp"><span>🌡️</span> <span>HACCP</span></a>
-            <a href="#" data-page="settings"><span>⚙️</span> <span>Settings</span></a>
-            <a href="#" data-page="admin" id="adminLink" style="display:none"><span>🔒</span> <span>Admin</span></a>
-        </nav>
-        <div class="sidebar-footer">
-            <button class="btn btn-outline" onclick="logout()" style="width:100%">🚪 Sign Out</button>
+    <div class="container">
+        <div class="logo">🛡️ ComplyLog Pro</div>
+        <div class="card">
+            <h2 style="text-align:center;margin-bottom:24px;" id="authTitle">Sign In</h2>
+            <div id="authAlert" class="alert"></div>
+            <button class="btn btn-google" onclick="googleAuth()">
+                <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Continue with Google
+            </button>
+            <div class="divider"><span>or with email</span></div>
+            <div id="extraFields"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="email" placeholder="you@company.com"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="password" placeholder="••••••••"></div>
+            <button class="btn btn-primary" id="authBtn" onclick="handleAuth()">Sign In</button>
+            <p style="text-align:center;margin-top:16px;font-size:14px;color:var(--text-secondary);">
+                <span id="switchText">Don't have an account?</span> <span class="text-link" onclick="toggleMode()" id="switchLink">Sign up free</span>
+            </p>
         </div>
-    </aside>
-
-    <main class="main" id="mainContent">
-        <!-- Content loaded dynamically -->
-    </main>
-
-    <!-- Modal for tasks -->
-    <div class="modal" id="taskModal">
-        <div class="modal-content" id="taskModalContent"></div>
     </div>
-
     <script>
-        // ==================== CONFIG ====================
-        const SUPABASE_URL = 'https://smyuylvztkigxruyywhb.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNteXV5bHZ6dGtpZ3hydXl5d2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NzA3NzUsImV4cCI6MjEwMTA0Njc3NX0.Rt-VEKGv03XaydxAhxbUkHWr1p0ifviWsKFsU_B-Tao';
-        const DEEPSEEK_KEY = 'sk-204376161e814e62ab5c50a84b35d494';
-        let supabaseClient;
-        let currentUser;
-        let company;
+        var SUPABASE_URL='https://smyuylvztkigxruyywhb.supabase.co';
+        var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNteXV5bHZ6dGtpZ3hydXl5d2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NzA3NzUsImV4cCI6MjEwMTA0Njc3NX0.Rt-VEKGv03XaydxAhxbUkHWr1p0ifviWsKFsU_B-Tao';
+        var supabaseClient;
+        var isLogin=true;
 
-        // ==================== INIT ====================
-        async function init() {
-            supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY);
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) { window.location.href = '/index.html'; return; }
-            currentUser = session.user;
-            const { data: comp } = await supabaseClient.from('companies').select('*').eq('user_id', currentUser.id).single();
-            company = comp;
-            if (company && company.plan === 'enterprise') document.getElementById('adminLink').style.display = 'block';
-            navigate('dashboard');
+        function toggleMode(){
+            isLogin=!isLogin;
+            document.getElementById('authTitle').textContent=isLogin?'Sign In':'Create Account';
+            document.getElementById('authBtn').textContent=isLogin?'Sign In':'Create Account';
+            document.getElementById('switchText').textContent=isLogin?"Don't have an account?":"Already have an account?";
+            document.getElementById('switchLink').textContent=isLogin?'Sign up free':'Sign in';
+            document.getElementById('extraFields').innerHTML=isLogin?'':'<div class="form-group"><label>Company Name</label><input id="companyName" placeholder="Your Company LLC"></div>';
+            document.getElementById('authAlert').className='alert';
         }
 
-        // ==================== NAVIGATION ====================
-        function navigate(page) {
-            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-            document.querySelector(`[data-page="${page}"]`).classList.add('active');
-            switch(page) {
-                case 'dashboard': renderDashboard(); break;
-                case 'tasks': renderTasks(); break;
-                case 'haccp': renderHACCP(); break;
-                case 'settings': renderSettings(); break;
-                case 'admin': renderAdmin(); break;
+        function showAlert(msg,type){
+            var el=document.getElementById('authAlert');
+            el.textContent=msg;el.className='alert alert-'+type;
+        }
+
+        async function init(){
+            supabaseClient=supabaseLib.createClient(SUPABASE_URL,SUPABASE_KEY);
+            var res=await supabaseClient.auth.getSession();
+            if(res.data&&res.data.session)window.location.href='/app.html';
+        }
+
+        async function googleAuth(){
+            await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://declarcloudeployed.top/app.html'}});
+        }
+
+        async function handleAuth(){
+            var email=document.getElementById('email').value;
+            var password=document.getElementById('password').value;
+            if(!email||!password)return showAlert('Please fill all fields','error');
+            if(isLogin){
+                var res=await supabaseClient.auth.signInWithPassword({email:email,password:password});
+                if(res.error)showAlert(res.error.message,'error');
+                else{showAlert('✅ Signed in!','success');setTimeout(function(){location.href='/app.html'},500);}
+            }else{
+                var company=document.getElementById('companyName')?.value;
+                if(!company)return showAlert('Please enter company name','error');
+                if(password.length<6)return showAlert('Password min 6 characters','error');
+                var res=await supabaseClient.auth.signUp({email:email,password:password,options:{data:{company_name:company},emailRedirectTo:'https://declarcloudeployed.top/app.html'}});
+                if(res.error)showAlert(res.error.message,'error');
+                else{showAlert('✅ Account created! Check your email.','success');if(res.data.user)await supabaseClient.from('companies').insert({user_id:res.data.user.id,company_name:company,plan:'free'});}
             }
         }
 
-        // ==================== DASHBOARD ====================
-        async function renderDashboard() {
-            const { data: tasks } = await supabaseClient.from('tasks').select('*').eq('company_id', company.id);
-            const total = tasks?.length || 0;
-            const pending = tasks?.filter(t => t.status === 'pendiente').length || 0;
-            const completed = tasks?.filter(t => t.status === 'completado').length || 0;
-            const overdue = tasks?.filter(t => t.status === 'vencido').length || 0;
-            document.getElementById('mainContent').innerHTML = `
-                <h1 style="margin-bottom:24px;">📊 Dashboard</h1>
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total Tasks</div></div>
-                    <div class="stat-card"><div class="stat-value" style="color:var(--warning)">${pending}</div><div class="stat-label">Pending</div></div>
-                    <div class="stat-card"><div class="stat-value" style="color:var(--success)">${completed}</div><div class="stat-label">Completed</div></div>
-                    <div class="stat-card"><div class="stat-value" style="color:var(--danger)">${overdue}</div><div class="stat-label">Overdue</div></div>
-                </div>
-                <div class="card">
-                    <h2>📋 Recent Tasks</h2>
-                    <div id="recentTasks"></div>
-                </div>
-            `;
-            renderRecentTasks();
-        }
-
-        async function renderRecentTasks() {
-            const { data: tasks } = await supabaseClient.from('tasks').select('*').eq('company_id', company.id).order('due_date', { ascending: true }).limit(5);
-            const html = tasks?.map(t => `
-                <div class="task-card">
-                    <strong>${t.title}</strong>
-                    <span class="badge badge-${t.status}">${t.status}</span>
-                    <div style="color:var(--text-secondary); font-size:13px;">Due: ${t.due_date}</div>
-                </div>
-            `).join('') || '<p>No tasks yet.</p>';
-            document.getElementById('recentTasks').innerHTML = html;
-        }
-
-        // ==================== TASKS ====================
-        async function renderTasks() {
-            const { data: tasks } = await supabaseClient.from('tasks').select('*').eq('company_id', company.id).order('due_date', { ascending: true });
-            const html = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-                    <h1>📋 Tasks</h1>
-                    <button class="btn btn-primary" onclick="showTaskModal()">+ New Task</button>
-                </div>
-                <div class="task-list" id="taskList">
-                    ${tasks?.map(t => `
-                        <div class="task-card">
-                            <div style="display:flex; justify-content:space-between;">
-                                <strong>${t.title}</strong>
-                                <span class="badge badge-${t.status}">${t.status}</span>
-                            </div>
-                            <div style="color:var(--text-secondary); font-size:13px; margin-top:8px;">
-                                📅 Due: ${t.due_date} | 🏷️ ${t.category} | ⚡ ${t.priority}
-                            </div>
-                            <div style="margin-top:12px; display:flex; gap:8px;">
-                                ${t.status !== 'completado' ? `<button class="btn btn-outline btn-sm" onclick="updateTaskStatus('${t.id}', 'completado')">✅ Complete</button>` : ''}
-                                <button class="btn btn-outline btn-sm" onclick="editTask('${t.id}')">✏️ Edit</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteTask('${t.id}')">🗑️ Delete</button>
-                            </div>
-                        </div>
-                    `).join('') || '<p>No tasks yet.</p>'}
-                </div>
-            `;
-            document.getElementById('mainContent').innerHTML = html;
-        }
-
-        function showTaskModal(taskId = null) {
-            const modal = document.getElementById('taskModal');
-            const isEdit = !!taskId;
-            let task = null;
-            if (isEdit) {
-                // fetch task and fill
-            }
-            document.getElementById('taskModalContent').innerHTML = `
-                <h2>${isEdit ? 'Edit Task' : 'New Task'}</h2>
-                <div class="form-group"><label>Title</label><input id="taskTitle" value="${task?.title || ''}"></div>
-                <div class="form-group"><label>Description</label><textarea id="taskDesc">${task?.description || ''}</textarea></div>
-                <div class="form-group"><label>Category</label><select id="taskCat">
-                    <option value="legal">Legal</option><option value="fiscal">Fiscal</option><option value="laboral">Laboral</option><option value="seguridad">Safety</option><option value="ambiental">Environmental</option>
-                </select></div>
-                <div class="form-group"><label>Priority</label><select id="taskPriority">
-                    <option value="alta">High</option><option value="media" selected>Medium</option><option value="baja">Low</option>
-                </select></div>
-                <div class="form-group"><label>Due Date</label><input type="date" id="taskDue" value="${task?.due_date || ''}"></div>
-                <button class="btn btn-primary" onclick="${isEdit ? `updateTask('${taskId}')` : 'createTask()'}">💾 Save</button>
-                <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-            `;
-            modal.classList.add('active');
-        }
-
-        function closeModal() { document.getElementById('taskModal').classList.remove('active'); }
-
-        async function createTask() {
-            const title = document.getElementById('taskTitle').value;
-            const description = document.getElementById('taskDesc').value;
-            const category = document.getElementById('taskCat').value;
-            const priority = document.getElementById('taskPriority').value;
-            const due_date = document.getElementById('taskDue').value;
-            const { error } = await supabaseClient.from('tasks').insert({
-                company_id: company.id,
-                created_by: currentUser.id,
-                title, description, category, priority, due_date,
-                status: 'pendiente'
-            });
-            if (error) alert(error.message);
-            else { closeModal(); renderTasks(); }
-        }
-
-        async function updateTaskStatus(id, status) {
-            await supabaseClient.from('tasks').update({ status }).eq('id', id);
-            renderTasks();
-        }
-
-        async function deleteTask(id) {
-            await supabaseClient.from('tasks').delete().eq('id', id);
-            renderTasks();
-        }
-
-        // ==================== HACCP ====================
-        function renderHACCP() {
-            document.getElementById('mainContent').innerHTML = `
-                <h1>🌡️ HACCP Monitoring</h1>
-                <div class="card">
-                    <p>Select country and industry to generate your compliance log.</p>
-                    <button class="btn btn-primary" onclick="generateHACCPPDF()">📄 Generate HACCP PDF</button>
-                </div>
-                <div id="haccpResult"></div>
-            `;
-        }
-
-        function generateHACCPPDF() {
-            // Simplified: generate PDF using jsPDF (loaded via CDN)
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text('HACCP Monitoring Log - ComplyLog Pro', 10, 10);
-            doc.save('haccp_log.pdf');
-        }
-
-        // ==================== SETTINGS ====================
-        function renderSettings() {
-            document.getElementById('mainContent').innerHTML = `
-                <h1>⚙️ Settings</h1>
-                <div class="card">
-                    <h2>Company Profile</h2>
-                    <p>Logo and signature upload will be here.</p>
-                </div>
-            `;
-        }
-
-        // ==================== ADMIN DASHBOARD ====================
-        async function renderAdmin() {
-            if (!company || company.plan !== 'enterprise') return navigate('dashboard');
-            const { count: users } = await supabaseClient.from('companies').select('*', { count: 'exact', head: true });
-            document.getElementById('mainContent').innerHTML = `
-                <h1>🔒 Founder Dashboard</h1>
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-value">${users}</div><div class="stat-label">Total Users</div></div>
-                </div>
-            `;
-        }
-
-        // ==================== AUTH ====================
-        async function logout() {
-            await supabaseClient.auth.signOut();
-            window.location.href = '/index.html';
-        }
-
-        // ==================== PWA ====================
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js');
-    });
-}
-
-// ==================== START ====================
-window.addEventListener('DOMContentLoaded', () => {
-    console.log('✅ DOM cargado');
-    if (typeof supabaseLib !== 'undefined') {
-        console.log('✅ supabaseLib disponible');
-        init();
-    } else {
-        console.error('❌ supabaseLib no disponible');
-    }
-});
+        window.addEventListener('DOMContentLoaded',function(){init();});
+        window.toggleMode=toggleMode;window.googleAuth=googleAuth;window.handleAuth=handleAuth;
+    </script>
+</body>
+</html>
