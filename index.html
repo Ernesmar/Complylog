@@ -589,20 +589,14 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNteXV5bHZ6dGtpZ3hydXl5d2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NzA3NzUsImV4cCI6MjEwMTA0Njc3NX0.Rt-VEKGv03XaydxAhxbUkHWr1p0ifviWsKFsU_B-Tao';
         let supabaseClient = null;
 
-                async function initSupabase() {
-            // Ahora usamos supabase.createClient en lugar de supabaseLib.createClient
+                    async function initSupabase() {
+            // Usamos el objeto global 'supabase' que carga el CDN
             if (typeof supabase !== 'undefined') {
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                 console.log('✅ Supabase CDN cargado correctamente');
                 checkSession();
             } else {
-                console.error('❌ La librería de Supabase no cargó desde el CDN. Revisa tu conexión a internet.');
-                document.getElementById('authContent').innerHTML = `
-                    <div class="alert alert-error show">
-                        Error de conexión: No se pudo cargar la librería de Supabase. 
-                        <br>Verifica tu conexión a internet y recarga la página.
-                    </div>
-                `;
+                console.error('❌ Error: La librería de Supabase no cargó.');
             }
         }
 
