@@ -14,7 +14,59 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+/* Supabase Client - Fetch API directo (sin CDN) */
+(function(w){
+    w.supabaseLib={createClient:function(e,t){
+        var h={'apikey':t,'Authorization':'Bearer '+t,'Content-Type':'application/json'};
+        async function r(m,p,b){
+            var o={method:m,headers:h};
+            if(b){o.body=JSON.stringify(b);o.headers['Prefer']='return=representation'}
+            try{
+                var f=await fetch(e+'/rest/v1'+p,o);
+                var d=await f.text();
+                if(!f.ok){var j;try{j=JSON.parse(d)}catch(ex){j={message:d}};return{data:null,error:j}}
+                if(!d)return{data:null,error:null};
+                try{return{data:JSON.parse(d),error:null}}catch(ex){return{data:d,error:null}}
+            }catch(ex){return{data:null,error:{message:ex.message}}}
+        }
+        return{
+            from:function(t){
+                var filters=[],sel='*',lim=null,ord=null;
+                var builder={
+                    select:function(c){sel=c||'*';return builder},
+                    eq:function(c,v){filters.push(c+'=eq.'+encodeURIComponent(v));return builder},
+                    ilike:function(c,v){filters.push(c+'=ilike.'+encodeURIComponent(v));return builder},
+                    limit:function(n){lim=n;return builder},
+                    order:function(c,o){ord=c+'.'+((o&&o.ascending===false)?'desc':'asc');return builder},
+                    range:function(a,b){lim=(b-a+1);filters.push('offset='+a);return builder},
+                    single:function(){lim=1;return builder.then(function(res){if(res.error)return res;return{data:Array.isArray(res.data)?res.data[0]||null:res.data,error:null}})},
+                    then:function(resolve,reject){
+                        var path='/'+t+'?select='+encodeURIComponent(sel);
+                        filters.forEach(function(f){path+='&'+f});
+                        if(lim!==null&&!filters.some(f=>f.startsWith('offset=')))path+='&limit='+lim;
+                        if(ord!==null)path+='&order='+ord;
+                        return r('GET',path).then(resolve,reject)
+                    },
+                    insert:function(v){return r('POST','/'+t,Array.isArray(v)?v:[v])},
+                    update:function(v){var path='/'+t;if(filters.length>0)path+='?'+filters.join('&');return r('PATCH',path,v)},
+                    delete:function(){var path='/'+t;if(filters.length>0)path+='?'+filters.join('&');return r('DELETE',path)}
+                };
+                return builder;
+            },
+            auth:{
+                getSession:function(){return r('GET','/auth/v1/user').then(function(d){return{data:{session:d.data?{user:d.data}:null}}})},
+                signInWithPassword:function(d){return r('POST','/auth/v1/token?grant_type=password',d).then(function(res){return res.data?{data:{user:res.data.user,session:res.data.session},error:null}:{data:null,error:res.error}})},
+                signUp:function(d){return r('POST','/auth/v1/signup',d).then(function(res){return res.data?{data:{user:res.data.user,session:res.data.session},error:null}:{data:null,error:res.error}})},
+                signInWithOAuth:function(d){var url=e+'/auth/v1/authorize?provider='+d.provider+'&redirect_to='+encodeURIComponent(d.options?.redirectTo||'');window.location.href=url;return Promise.resolve({data:{},error:null})},
+                resetPasswordForEmail:function(em,opts){return r('POST','/auth/v1/recover',{email:em,redirect_to:opts?.redirectTo||''}).then(function(res){return{data:{},error:res.error}})},
+                signOut:function(){return r('POST','/auth/v1/logout').then(function(){return{error:null}})}
+            }
+        }
+    }};
+    console.log('✅ Supabase Client inline listo');
+})(window);
+</script>
 
     <style>
         :root {
@@ -321,11 +373,11 @@
         // INIT
         // ============================================
         async function init() {
-            if (typeof supabase === 'undefined') {
+            if (typeof supabaseLib === 'undefined') {
                 document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh"><p>Error loading. Check connection.</p></div>';
                 return;
             }
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY);
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) { window.location.href = '/index.html'; return; }
             currentUser = session.user;
@@ -600,33 +652,74 @@
         }
 
         async function saveHACCPToDB() {
-            if (!currentCompany) return;
-            const today = new Date().toISOString().split('T')[0];
-            
-            // Delete today's entries first
-            await supabaseClient.from('haccp_logs').delete().eq('company_id', currentCompany.id).eq('log_date', today);
-            
-            // Insert current entries
-            const records = haccpEntries.map((e, i) => {
-                const val = parseFloat(document.getElementById(`haccp-val-${i}`)?.value) || e.value;
-                const isDev = (e.max !== null && val > e.max) || (e.min !== null && val < e.min);
-                return {
-                    company_id: currentCompany.id,
-                    user_id: currentUser.id,
-                    country_id: document.getElementById('settingsCountry')?.value === 'ES' ? 
-                        (await supabaseClient.from('countries').select('id').eq('code', 'ES').single())?.data?.id : null,
-                    log_date: today,
-                    entry_time: e.time,
-                    area: e.area,
-                    equipment: e.equipment,
-                    value_numeric: val,
-                    unit: e.unit,
-                    limit_low: e.min,
-                    limit_high: e.max,
-                    is_within_limit: !isDev,
-                    corrective_action: isDev ? (document.getElementById(`haccp-corr-input-${i}`)?.value || '') : null,
-                    initials: document.getElementById(`haccp-init-${i}`)?.value || 'JM'
-                };
+    if (!currentCompany) return;
+    const today = new Date().toISOString().split('T')[0];
+    
+    await supabaseClient.from('haccp_logs').delete().eq('company_id', currentCompany.id).eq('log_date', today);
+    
+    // Obtener country_id con fetch directo
+    let esCountryId = null;
+    try {
+        const res = await fetch(
+            'https://smyuylvztkigxruyywhb.supabase.co/rest/v1/countries?select=id&code=eq.ES&limit=1',
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_KEY,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        const countries = await res.json();
+        if (countries && countries.length > 0) esCountryId = countries[0].id;
+    } catch(e) {}
+    
+    const records = haccpEntries.map((e, i) => {
+        const val = parseFloat(document.getElementById(`haccp-val-${i}`)?.value) || e.value;
+        const isDev = (e.max !== null && val > e.max) || (e.min !== null && val < e.min);
+        return {
+            company_id: currentCompany.id,
+            user_id: currentUser.id,
+            country_id: esCountryId,
+            log_date: today,
+            entry_time: e.time,
+            area: e.area,
+            equipment: e.equipment,
+            value_numeric: val,
+            unit: e.unit,
+            limit_low: e.min,
+            limit_high: e.max,
+            is_within_limit: !isDev,
+            corrective_action: isDev ? (document.getElementById(`haccp-corr-input-${i}`)?.value || '') : null,
+            initials: document.getElementById(`haccp-init-${i}`)?.value || 'JM'
+        };
+    });
+    
+    await supabaseClient.from('haccp_logs').insert(records);
+    showToast('HACCP data saved! 📄');
+}
+
+// Insert current entries
+const records = haccpEntries.map((e, i) => {
+    const val = parseFloat(document.getElementById(`haccp-val-${i}`)?.value) || e.value;
+    const isDev = (e.max !== null && val > e.max) || (e.min !== null && val < e.min);
+    return {
+        company_id: currentCompany.id,
+        user_id: currentUser.id,
+        country_id: esCountryId,
+        log_date: today,
+        entry_time: e.time,
+        area: e.area,
+        equipment: e.equipment,
+        value_numeric: val,
+        unit: e.unit,
+        limit_low: e.min,
+        limit_high: e.max,
+        is_within_limit: !isDev,
+        corrective_action: isDev ? (document.getElementById(`haccp-corr-input-${i}`)?.value || '') : null,
+        initials: document.getElementById(`haccp-init-${i}`)?.value || 'JM'
+    };
+});
             });
             
             await supabaseClient.from('haccp_logs').insert(records);
