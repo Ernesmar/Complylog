@@ -15,6 +15,58 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
+        <script>
+/* Supabase Client - Fetch API directo */
+(function(w){
+    w.supabaseLib={createClient:function(e,t){
+        var h={'apikey':t,'Authorization':'Bearer '+t,'Content-Type':'application/json'};
+        async function r(m,p,b){
+            var o={method:m,headers:h};
+            if(b){o.body=JSON.stringify(b);o.headers['Prefer']='return=representation'}
+            try{
+                var f=await fetch(e+'/rest/v1'+p,o);
+                var d=await f.text();
+                if(!f.ok){var j;try{j=JSON.parse(d)}catch(ex){j={message:d}};return{data:null,error:j}}
+                if(!d)return{data:null,error:null};
+                try{return{data:JSON.parse(d),error:null}}catch(ex){return{data:d,error:null}}
+            }catch(ex){return{data:null,error:{message:ex.message}}}
+        }
+        return{
+            from:function(t){
+                var filters=[],sel='*',lim=null,ord=null;
+                var builder={
+                    select:function(c){sel=c||'*';return builder},
+                    eq:function(c,v){filters.push(c+'=eq.'+encodeURIComponent(v));return builder},
+                    ilike:function(c,v){filters.push(c+'=ilike.'+encodeURIComponent(v));return builder},
+                    limit:function(n){lim=n;return builder},
+                    order:function(c,o){ord=c+'.'+((o&&o.ascending===false)?'desc':'asc');return builder},
+                    range:function(a,b){lim=(b-a+1);filters.push('offset='+a);return builder},
+                    single:function(){lim=1;return builder.then(function(res){if(res.error)return res;return{data:Array.isArray(res.data)?res.data[0]||null:res.data,error:null}})},
+                    then:function(resolve,reject){
+                        var path='/'+t+'?select='+encodeURIComponent(sel);
+                        filters.forEach(function(f){path+='&'+f});
+                        if(lim!==null&&!filters.some(f=>f.startsWith('offset=')))path+='&limit='+lim;
+                        if(ord!==null)path+='&order='+ord;
+                        return r('GET',path).then(resolve,reject)
+                    },
+                    insert:function(v){return r('POST','/'+t,Array.isArray(v)?v:[v])},
+                    update:function(v){var path='/'+t;if(filters.length>0)path+='?'+filters.join('&');return r('PATCH',path,v)},
+                    delete:function(){var path='/'+t;if(filters.length>0)path+='?'+filters.join('&');return r('DELETE',path)}
+                };
+                return builder;
+            },
+            auth:{
+                getSession:function(){return r('GET','/auth/v1/user').then(function(d){return{data:{session:d.data?{user:d.data}:null}}})},
+                signInWithPassword:function(d){return r('POST','/auth/v1/token?grant_type=password',d).then(function(res){return res.data?{data:{user:res.data.user,session:res.data.session},error:null}:{data:null,error:res.error}})},
+                signUp:function(d){return r('POST','/auth/v1/signup',d).then(function(res){return res.data?{data:{user:res.data.user,session:res.data.session},error:null}:{data:null,error:res.error}})},
+                signInWithOAuth:function(d){var url=e+'/auth/v1/authorize?provider='+d.provider+'&redirect_to='+encodeURIComponent(d.options?.redirectTo||'');window.location.href=url;return Promise.resolve({data:{},error:null})},
+                signOut:function(){return r('POST','/auth/v1/logout').then(function(){return{error:null}})}
+            }
+        }
+    }};
+    console.log('✅ Supabase Client inline listo');
+})(window);
+</script>
 /* Supabase Client - Fetch API directo (sin CDN) */
 (function(w){
     w.supabaseLib={createClient:function(e,t){
