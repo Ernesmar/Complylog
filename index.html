@@ -1,701 +1,404 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ComplyLog Pro - Compliance Management for Regulated SMBs</title>
-    
-    <!-- Primary Meta Tags -->
-    <meta name="title" content="ComplyLog Pro - Compliance Management for Regulated SMBs">
-    <meta name="description" content="Simplify your HACCP, GMP, and regulatory compliance. AI-powered tools for food, cannabis, and pharma businesses. Audit-ready PDFs in 30 seconds.">
-    <meta name="keywords" content="HACCP, compliance, food safety, GMP, cannabis compliance, FDA, AESAN, regulatory software, small business">
-    <meta name="author" content="ComplyLog Pro">
-    <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://declarcloudeployed.top">
-    <meta property="og:title" content="ComplyLog Pro - Compliance Management for Regulated SMBs">
-    <meta property="og:description" content="Simplify your HACCP, GMP, and regulatory compliance. AI-powered tools for food, cannabis, and pharma businesses.">
-    <meta property="og:image" content="https://declarcloudeployed.top/og-image.png">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://declarcloudeployed.top">
-    <meta property="twitter:title" content="ComplyLog Pro - Compliance Management for Regulated SMBs">
-    <meta property="twitter:description" content="Simplify your HACCP, GMP, and regulatory compliance. AI-powered tools for food, cannabis, and pharma businesses.">
-    
-    <!-- PWA -->
-    <meta name="theme-color" content="#0a0a0b">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ComplyLog Pro">
-    <link rel="manifest" href="/manifest.json">
-    
-    <!-- Canonical -->
-    <link rel="canonical" href="https://declarcloudeployed.top">
-    
-    <!-- Schema.org -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "ComplyLog Pro",
-        "applicationCategory": "BusinessApplication",
-        "operatingSystem": "Web",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "description": "Compliance management for food, cannabis, and pharma SMBs. AI-powered HACCP and GMP logs.",
-        "url": "https://declarcloudeployed.top"
-    }
-    </script>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Supabase CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        :root {
-            --bg-primary: #0a0a0b;
-            --bg-secondary: #141416;
-            --bg-tertiary: #1c1c1f;
-            --border: #2a2a2e;
-            --text-primary: #f4f4f5;
-            --text-secondary: #a1a1aa;
-            --text-tertiary: #71717a;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --success: #22c55e;
-            --warning: #eab308;
-            --danger: #ef4444;
-            --radius: 16px;
-            --radius-sm: 10px;
-            --transition: all 0.2s ease;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            letter-spacing: -0.01em;
-            -webkit-font-smoothing: antialiased;
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-        
-        /* Header */
-        header {
-            background: rgba(10,10,11,0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .logo {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        
-        /* Language Switcher */
-        .lang-switcher { display: flex; gap: 2px; background: var(--bg-tertiary); border-radius: 8px; padding: 2px; }
-        .lang-btn {
-            padding: 6px 12px; border: none; background: transparent; cursor: pointer;
-            border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--text-secondary);
-            transition: var(--transition); font-family: inherit;
-        }
-        .lang-btn.active { background: var(--bg-secondary); color: var(--text-primary); }
-        
-        /* Buttons */
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 10px 20px; border: none; border-radius: var(--radius-sm);
-            font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--transition);
-            text-decoration: none; font-family: inherit; letter-spacing: 0.02em; white-space: nowrap;
-        }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); }
-        .btn-outline { background: transparent; color: var(--text-primary); border: 1px solid var(--border); }
-        .btn-outline:hover { background: var(--bg-tertiary); }
-        .btn-lg { padding: 14px 28px; font-size: 15px; border-radius: 12px; }
-        .btn-loading { position: relative; color: transparent !important; }
-        .btn-loading::after {
-            content: ''; position: absolute; width: 18px; height: 18px;
-            border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        /* Hero */
-        .hero { padding: 80px 0 60px; text-align: center; }
-        .hero-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);
-            color: var(--accent); padding: 6px 16px; border-radius: 20px;
-            font-size: 13px; font-weight: 500; margin-bottom: 24px;
-        }
-        .hero-badge .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        .hero h1 {
-            font-size: clamp(32px, 5vw, 56px); font-weight: 800; letter-spacing: -0.03em;
-            line-height: 1.1; margin-bottom: 20px;
-            background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .hero p { font-size: 18px; color: var(--text-secondary); margin-bottom: 40px; max-width: 550px; margin-inline: auto; }
-        .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-        .trust-badges { display: flex; gap: 32px; justify-content: center; margin-top: 56px; flex-wrap: wrap; font-size: 12px; color: var(--text-tertiary); }
-        .trust-badges span { display: flex; align-items: center; gap: 8px; }
-        
-        /* Sections */
-        section { padding: 80px 0; }
-        .section-label { text-align: center; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 12px; }
-        .section-title { text-align: center; font-size: clamp(28px, 4vw, 36px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; }
-        .section-subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 64px; font-size: 16px; }
-        
-        /* Features Grid */
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
-        .feature-card {
-            background: var(--bg-secondary); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 32px; transition: var(--transition);
-        }
-        .feature-card:hover { border-color: rgba(59,130,246,0.3); transform: translateY(-2px); }
-        .feature-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(59,130,246,0.1); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px; }
-        .feature-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-        .feature-card p { color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
-        
-        /* Pricing */
-        .pricing-toggle {
-            display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 40px;
-        }
-        .pricing-toggle span { font-size: 14px; color: var(--text-secondary); }
-        .pricing-toggle .save { color: var(--success); font-size: 12px; font-weight: 600; }
-        .toggle-switch {
-            width: 48px; height: 26px; background: var(--bg-tertiary); border: 1px solid var(--border);
-            border-radius: 13px; cursor: pointer; position: relative; transition: var(--transition);
-        }
-        .toggle-switch.active { background: var(--accent); }
-        .toggle-switch::after {
-            content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px;
-            background: white; border-radius: 50%; transition: var(--transition);
-        }
-        .toggle-switch.active::after { left: 25px; }
-        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 960px; margin: 0 auto; }
-        .pricing-card {
-            background: var(--bg-secondary); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 40px 32px; text-align: center; transition: var(--transition);
-        }
-        .pricing-card.featured {
-            border-color: rgba(59,130,246,0.4);
-            background: linear-gradient(180deg, rgba(59,130,246,0.05) 0%, var(--bg-secondary) 100%);
-        }
-        .pricing-card h3 { font-size: 20px; margin-bottom: 4px; }
-        .price { font-size: 48px; font-weight: 800; margin: 20px 0; letter-spacing: -0.03em; }
-        .price span { font-size: 16px; font-weight: 400; color: var(--text-tertiary); }
-        .pricing-card ul { list-style: none; margin: 28px 0; text-align: left; }
-        .pricing-card ul li { padding: 10px 0; font-size: 14px; color: var(--text-secondary); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 10px; }
-        .pricing-card ul li::before { content: '✓'; color: var(--success); font-weight: 700; }
-        
-        /* FAQ */
-        .faq-list { max-width: 700px; margin: 0 auto; }
-        .faq-item { border-bottom: 1px solid var(--border); }
-        .faq-question {
-            width: 100%; padding: 20px 0; background: transparent; border: none;
-            color: var(--text-primary); font-size: 16px; font-weight: 600; text-align: left;
-            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-            font-family: inherit;
-        }
-        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; color: var(--text-secondary); font-size: 14px; line-height: 1.7; }
-        .faq-answer.open { max-height: 200px; padding-bottom: 20px; }
-        .faq-question .arrow { transition: transform 0.3s; }
-        .faq-question .arrow.open { transform: rotate(180deg); }
-        
-        /* Cookie Consent */
-        .cookie-banner {
-            position: fixed; bottom: 20px; left: 20px; right: 20px;
-            background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius);
-            padding: 20px; max-width: 400px; z-index: 1000; display: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        }
-        .cookie-banner.show { display: block; }
-        .cookie-banner p { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
-        .cookie-actions { display: flex; gap: 8px; }
-        
-        /* Footer */
-        footer { border-top: 1px solid var(--border); padding: 40px 0; text-align: center; }
-        footer p { color: var(--text-tertiary); font-size: 13px; }
-        footer a { color: var(--text-secondary); text-decoration: none; }
-        
-        /* Modal */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000;
-            align-items: center; justify-content: center;
-        }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: var(--bg-secondary); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 40px; max-width: 420px; width: 90%;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .modal-content h2 { font-size: 22px; margin-bottom: 8px; }
-        .modal-content .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
-        .divider { display: flex; align-items: center; margin: 20px 0; color: var(--text-tertiary); font-size: 12px; }
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border); }
-        .divider span { padding: 0 16px; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
-        .form-input {
-            width: 100%; padding: 10px 14px; background: var(--bg-tertiary); border: 1px solid var(--border);
-            border-radius: 8px; font-size: 14px; font-family: inherit; color: var(--text-primary); transition: var(--transition);
-        }
-        .form-input:focus { outline: none; border-color: var(--accent); }
-        .form-input.error { border-color: var(--danger); }
-        .form-error { color: var(--danger); font-size: 12px; margin-top: 4px; display: none; }
-        .form-error.show { display: block; }
-        .alert { padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; display: none; }
-        .alert.show { display: block; }
-        .alert-error { background: rgba(239,68,68,0.1); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
-        .alert-success { background: rgba(34,197,94,0.1); color: var(--success); border: 1px solid rgba(34,197,94,0.2); }
-        .alert-info { background: rgba(59,130,246,0.1); color: var(--accent); border: 1px solid rgba(59,130,246,0.2); }
-        .text-link { color: var(--accent); cursor: pointer; font-weight: 500; }
-        
-        /* Sticky CTA Mobile */
-        .sticky-cta {
-            display: none; position: fixed; bottom: 0; left: 0; right: 0; padding: 16px;
-            background: rgba(10,10,11,0.95); backdrop-filter: blur(12px); border-top: 1px solid var(--border);
-            z-index: 99;
-        }
-        @media (max-width: 768px) {
-            .sticky-cta { display: block; }
-            .hero h1 { font-size: 32px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ComplyLog Pro — Compliance Management for SMBs</title>
+<meta name="description" content="Track legal, tax, and regulatory obligations in one place. Built for food, cannabis, pharma, and regulated industries across USA, Europe, and LATAM.">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ComplyLog Pro">
+<!-- Open Graph -->
+<meta property="og:title" content="ComplyLog Pro — Compliance Management for SMBs">
+<meta property="og:description" content="Track legal, tax, and regulatory obligations in one place. AI-powered suggestions, audit-ready PDFs, multi-country support.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://declarcloudeployed.top">
+<meta property="og:image" content="https://declarcloudeployed.top/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ComplyLog Pro">
+<meta name="twitter:description" content="Compliance Management Simplified for SMBs">
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg-primary:#0a0a0b;--bg-secondary:#141416;--bg-tertiary:#1c1c1f;--border:#2a2a2e;--text-primary:#f4f4f5;--text-secondary:#a1a1aa;--text-tertiary:#71717a;--accent:#3b82f6;--accent-hover:#2563eb;--success:#22c55e;--warning:#eab308;--danger:#ef4444;--radius:16px;--radius-sm:10px;--shadow:0 1px 3px rgba(0,0,0,0.3);--shadow-lg:0 4px 24px rgba(0,0,0,0.4)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.6;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;min-height:100vh}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+header{background:rgba(10,10,11,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;z-index:100}
+.header-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.logo{font-size:22px;font-weight:700;color:var(--text-primary);text-decoration:none;display:flex;align-items:center;gap:10px}
+.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lang-switcher{display:flex;gap:2px;background:var(--bg-tertiary);border-radius:8px;padding:2px}
+.lang-btn{padding:6px 12px;border:none;background:transparent;cursor:pointer;border-radius:6px;font-size:12px;font-weight:600;color:var(--text-secondary);transition:all .15s;font-family:inherit}
+.lang-btn.active{background:var(--bg-secondary);color:var(--text-primary);box-shadow:0 1px 2px rgba(0,0,0,0.2)}
+.lang-btn:hover:not(.active){color:var(--text-primary)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;text-decoration:none;font-family:inherit;letter-spacing:.02em;white-space:nowrap}
+.btn-primary{background:var(--accent);color:white;box-shadow:0 1px 2px rgba(59,130,246,0.3)}
+.btn-primary:hover{background:var(--accent-hover);box-shadow:0 4px 12px rgba(59,130,246,0.4);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-outline{background:transparent;color:var(--text-primary);border:1px solid var(--border)}
+.btn-outline:hover{background:var(--bg-tertiary);border-color:rgba(255,255,255,0.2)}
+.btn-lg{padding:14px 28px;font-size:15px;border-radius:12px}
+.hero{padding:100px 0 80px;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:6px 16px;border-radius:20px;font-size:13px;font-weight:500;margin-bottom:24px}
+.hero-badge .dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:20px;background:linear-gradient(180deg,#fff 0%,#a1a1aa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:18px;color:var(--text-secondary);margin-bottom:40px;max-width:550px;margin-left:auto;margin-right:auto}
+.hero-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.trust-badges{display:flex;gap:32px;justify-content:center;margin-top:56px;flex-wrap:wrap;font-size:12px;color:var(--text-tertiary)}
+.trust-badges span{display:flex;align-items:center;gap:8px}
+section{padding:80px 0}
+.section-label{text-align:center;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px}
+.section-title{text-align:center;font-size:36px;font-weight:700;letter-spacing:-.02em;margin-bottom:16px}
+.section-subtitle{text-align:center;color:var(--text-secondary);margin-bottom:64px;font-size:16px}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.feature-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:32px;transition:all .2s}
+.feature-card:hover{border-color:rgba(59,130,246,0.3);box-shadow:0 4px 20px rgba(59,130,246,0.1)}
+.feature-icon{width:44px;height:44px;border-radius:12px;background:rgba(59,130,246,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:20px}
+.feature-card h3{font-size:18px;font-weight:600;margin-bottom:8px}
+.feature-card p{color:var(--text-secondary);font-size:14px;line-height:1.7}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:960px;margin:0 auto}
+.pricing-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:40px 32px;text-align:center;transition:all .2s}
+.pricing-card.featured{border-color:rgba(59,130,246,0.4);background:linear-gradient(180deg,rgba(59,130,246,0.05) 0%,var(--bg-secondary) 100%);box-shadow:0 4px 24px rgba(59,130,246,0.15)}
+.pricing-card h3{font-size:20px;margin-bottom:4px}
+.pricing-card .price{font-size:48px;font-weight:700;margin:20px 0;letter-spacing:-.03em}
+.pricing-card .price span{font-size:16px;font-weight:400;color:var(--text-tertiary)}
+.pricing-card ul{list-style:none;margin:28px 0;text-align:left}
+.pricing-card ul li{padding:10px 0;font-size:14px;color:var(--text-secondary);border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:10px}
+.pricing-card ul li::before{content:'✓';color:var(--success);font-weight:700;font-size:14px}
+.cta-section{text-align:center;padding:100px 0}
+.cta-section h2{font-size:40px;font-weight:700;letter-spacing:-.02em;margin-bottom:16px}
+.cta-section p{color:var(--text-secondary);margin-bottom:32px;font-size:16px}
+.faq-grid{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.faq-item{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:20px 24px;cursor:pointer;transition:all .15s}
+.faq-item:hover{border-color:var(--border-hover)}
+.faq-item .faq-q{font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.faq-item .faq-a{font-size:14px;color:var(--text-secondary);margin-top:12px;line-height:1.7;display:none}
+.faq-item.open .faq-a{display:block}
+.faq-item .faq-icon{transition:transform .2s}
+.faq-item.open .faq-icon{transform:rotate(180deg)}
+footer{border-top:1px solid var(--border);padding:40px 0;text-align:center}
+footer p{color:var(--text-tertiary);font-size:13px}
+footer a{color:var(--text-secondary);text-decoration:none}
+footer a:hover{color:var(--text-primary)}
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center}
+.modal.active{display:flex}
+.modal-content{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:40px;max-width:420px;width:90%;box-shadow:var(--shadow-lg);animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-content h2{font-size:22px;margin-bottom:8px}
+.modal-content .subtitle{color:var(--text-secondary);font-size:14px;margin-bottom:24px}
+.divider{display:flex;align-items:center;margin:20px 0;color:var(--text-tertiary);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;border-bottom:1px solid var(--border)}
+.divider span{padding:0 16px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text-secondary)}
+.form-input{width:100%;padding:10px 14px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text-primary);transition:all .15s}
+.form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,0.15)}
+.form-input::placeholder{color:var(--text-tertiary)}
+.form-input.error{border-color:var(--danger)}
+.form-error{font-size:12px;color:var(--danger);margin-top:4px;display:none}
+.form-error.show{display:block}
+.alert{padding:10px 14px;border-radius:8px;margin-bottom:16px;font-size:13px;display:none}
+.alert.show{display:block}
+.alert-error{background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2)}
+.alert-success{background:rgba(34,197,94,0.1);color:var(--success);border:1px solid rgba(34,197,94,0.2)}
+.alert-info{background:rgba(59,130,246,0.1);color:var(--accent);border:1px solid rgba(59,130,246,0.2)}
+.text-link{color:var(--accent);cursor:pointer;font-weight:500}
+.text-link:hover{text-decoration:underline}
+.cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--bg-secondary);border-top:1px solid var(--border);padding:16px 24px;z-index:2000;display:none;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.cookie-banner.show{display:flex}
+.cookie-banner p{font-size:13px;color:var(--text-secondary)}
+.sticky-cta{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:100;display:none}
+.sticky-cta.show{display:block}
+@media(max-width:768px){
+  .hero h1{font-size:36px}.hero p{font-size:16px}.section-title{font-size:28px}.header-content{flex-direction:column}.hero-buttons{flex-direction:column;align-items:center}.hero-buttons .btn{width:100%;max-width:300px}.sticky-cta.show{display:block}
+}
+</style>
+<base target="_blank">
 </head>
 <body>
-    <header>
-        <div class="container header-content">
-            <a href="/" class="logo">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-                <span data-i18n="brand">ComplyLog Pro</span>
-            </a>
-            <div class="header-actions">
-                <div class="lang-switcher">
-                    <button class="lang-btn active" id="btnEN" onclick="switchLang('en')">EN</button>
-                    <button class="lang-btn" id="btnES" onclick="switchLang('es')">ES</button>
-                </div>
-                <button class="btn btn-outline" onclick="showModal('login')" data-i18n="loginBtn">Sign In</button>
-                <button class="btn btn-primary" onclick="showModal('register')" data-i18n="registerBtn">Start Free</button>
-            </div>
-        </div>
-    </header>
-
-    <section class="hero">
-        <div class="container">
-            <div class="hero-badge"><span class="dot"></span> <span data-i18n="heroBadge">AI-powered compliance for regulated SMBs</span></div>
-            <h1 data-i18n="heroTitle">Compliance Management That Works While You Sleep</h1>
-            <p data-i18n="heroSubtitle">Automated HACCP, GMP, and regulatory logs. AI detects issues before auditors do. Built for food, cannabis, and pharma businesses.</p>
-            <div class="hero-buttons">
-                <button class="btn btn-primary btn-lg" onclick="showModal('register')" data-i18n="heroCTA">Start Free — No Credit Card</button>
-                <button class="btn btn-outline btn-lg" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})" data-i18n="heroFeatures">See Features</button>
-            </div>
-            <div class="trust-badges">
-                <span>🔒 SOC 2 Compliant</span><span>⏱️ 99.9% Uptime</span><span>📍 US & EU Based</span><span>🧠 AI-Powered</span>
-            </div>
-        </div>
-    </section>
-
-    <section id="features">
-        <div class="container">
-            <p class="section-label" data-i18n="featuresLabel">Everything you need</p>
-            <h2 class="section-title" data-i18n="featuresTitle">Stay Compliant Without the Headaches</h2>
-            <p class="section-subtitle" data-i18n="featuresSubtitle">Powerful tools designed for regulated small businesses</p>
-            <div class="features-grid" id="featuresGrid"></div>
-        </div>
-    </section>
-
-    <section>
-        <div class="container">
-            <p class="section-label" data-i18n="pricingLabel">Simple pricing</p>
-            <h2 class="section-title" data-i18n="pricingTitle">Plans That Grow With You</h2>
-            <p class="section-subtitle" data-i18n="pricingSubtitle">Start free. Upgrade when you need more.</p>
-            <div class="pricing-toggle">
-                <span data-i18n="monthly">Monthly</span>
-                <div class="toggle-switch" id="pricingToggle" onclick="togglePricing()"></div>
-                <span data-i18n="annual">Annual</span>
-                <span class="save" data-i18n="savePercent">Save 20%</span>
-            </div>
-            <div class="pricing-grid" id="pricingGrid"></div>
-        </div>
-    </section>
-
-    <section id="faq">
-        <div class="container">
-            <h2 class="section-title" data-i18n="faqTitle">Frequently Asked Questions</h2>
-            <div class="faq-list" id="faqList"></div>
-        </div>
-    </section>
-
-    <section class="cta-section" style="text-align:center;padding:100px 0">
-        <div class="container">
-            <h2 style="font-size:40px;font-weight:700;margin-bottom:16px" data-i18n="ctaTitle">Ready to simplify your compliance?</h2>
-            <p style="color:var(--text-secondary);margin-bottom:32px;font-size:16px" data-i18n="ctaSubtitle">Join businesses that trust ComplyLog Pro.</p>
-            <button class="btn btn-primary btn-lg" onclick="showModal('register')" data-i18n="ctaBtn">Start Free Today</button>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <p style="font-weight:600;margin-bottom:4px">🛡️ <span data-i18n="brand">ComplyLog Pro</span></p>
-            <p data-i18n="footerText">&copy; 2026 ComplyLog Pro. All rights reserved.</p>
-            <p style="margin-top:4px"><a href="https://declarcloudeployed.top">declarcloudeployed.top</a></p>
-        </div>
-    </footer>
-
-    <div class="sticky-cta">
-        <button class="btn btn-primary btn-lg" style="width:100%" onclick="showModal('register')" data-i18n="heroCTA">Start Free Today</button>
+<header>
+  <div class="container header-content">
+    <a href="/" class="logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+      <span data-i18n="brand">ComplyLog Pro</span>
+    </a>
+    <div class="header-actions">
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang-btn="en" onclick="switchLang('en')">EN</button>
+        <button class="lang-btn" data-lang-btn="es" onclick="switchLang('es')">ES</button>
+        <button class="lang-btn" data-lang-btn="it" onclick="switchLang('it')">IT</button>
+        <button class="lang-btn" data-lang-btn="fr" onclick="switchLang('fr')">FR</button>
+        <button class="lang-btn" data-lang-btn="de" onclick="switchLang('de')">DE</button>
+        <button class="lang-btn" data-lang-btn="pt" onclick="switchLang('pt')">PT</button>
+      </div>
+      <button class="btn btn-outline" onclick="showModal('login')" data-i18n="loginBtn">Sign In</button>
+      <button class="btn btn-primary" onclick="showModal('register')" data-i18n="registerBtn">Start Free</button>
     </div>
+  </div>
+</header>
 
-    <div class="modal" id="authModal">
-        <div class="modal-content" id="authContent"></div>
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge"><span class="dot"></span> <span data-i18n="heroBadge">Now with AI-powered compliance suggestions</span></div>
+    <h1 data-i18n="heroTitle">Compliance Management Simplified for SMBs</h1>
+    <p data-i18n="heroSubtitle">Track your legal, tax, and regulatory obligations in one place. Built for food manufacturers, cannabis producers, pharma labs, and regulated industries across USA, Europe & LATAM.</p>
+    <div class="hero-buttons">
+      <button class="btn btn-primary btn-lg" onclick="showModal('register')" data-i18n="heroCTA">Start Free Today</button>
+      <button class="btn btn-outline btn-lg" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})" data-i18n="heroFeatures">See Features</button>
     </div>
-
-    <div class="cookie-banner" id="cookieBanner">
-        <p data-i18n="cookieText">We use cookies to improve your experience. By continuing, you agree to our use of cookies.</p>
-        <div class="cookie-actions">
-            <button class="btn btn-primary btn-sm" onclick="acceptCookies()" data-i18n="cookieAccept">Accept</button>
-            <button class="btn btn-outline btn-sm" onclick="declineCookies()" data-i18n="cookieDecline">Decline</button>
-        </div>
+    <div class="trust-badges">
+      <span>🔒 SOC 2 Compliant</span>
+      <span>⏱️ 99.9% Uptime</span>
+      <span>📍 US & EU Based</span>
+      <span>🌍 12 Countries Supported</span>
     </div>
+  </div>
+</section>
 
-    <script>
-        // ============================================
-        // CONFIG
-        // ============================================
-        const SUPABASE_URL = 'https://smyuylvztkigxruyywhb.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_WkV_W4ypyw_GNGc9iR50UQ_u3y12ik-';
-        const DEEPSEEK_KEY = 'sk-f1f09740a5f149c2b5685b25a0072247';
-        const DOMAIN = 'https://declarcloudeployed.top';
-        let supabaseClient = null;
-        let currentLang = 'en';
+<section id="features">
+  <div class="container">
+    <p class="section-label" data-i18n="featuresLabel">Everything you need</p>
+    <h2 class="section-title" data-i18n="featuresTitle">Stay Compliant Without the Headaches</h2>
+    <p class="section-subtitle" data-i18n="featuresSubtitle">Powerful tools designed for regulated small businesses</p>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">📋</div><h3 data-i18n="feature1Title">Task Management</h3><p data-i18n="feature1Desc">Create, assign and track compliance tasks with deadlines, priorities, automated reminders, and recurrence.</p></div>
+      <div class="feature-card"><div class="feature-icon">📅</div><h3 data-i18n="feature2Title">Regulatory Calendar</h3><p data-i18n="feature2Desc">Visualize all your obligations in one calendar. Never miss a deadline with 7/3/1 day reminders.</p></div>
+      <div class="feature-card"><div class="feature-icon">📄</div><h3 data-i18n="feature3Title">Audit-Ready PDFs</h3><p data-i18n="feature3Desc">Generate formatted regulatory logs instantly. FDA, AESAN, COFEPRIS, ANVISA, and more. Print-ready in seconds.</p></div>
+      <div class="feature-card"><div class="feature-icon">🧠</div><h3 data-i18n="feature4Title">AI Suggestions</h3><p data-i18n="feature4Desc">Our AI analyzes your HACCP data and suggests corrective actions when deviations are detected.</p></div>
+      <div class="feature-card"><div class="feature-icon">🌍</div><h3 data-i18n="feature5Title">Multi-Country Ready</h3><p data-i18n="feature5Desc">Automatically adapts to your country's regulations: FDA (US), AESAN (ES), COFEPRIS (MX), ANVISA (BR), and more.</p></div>
+      <div class="feature-card"><div class="feature-icon">🔔</div><h3 data-i18n="feature6Title">Smart Notifications</h3><p data-i18n="feature6Desc">Email and in-app alerts. SMS and WhatsApp coming soon. Stay ahead of every deadline.</p></div>
+      <div class="feature-card"><div class="feature-icon">👥</div><h3 data-i18n="feature7Title">Team Collaboration</h3><p data-i18n="feature7Desc">Invite your team, assign tasks, and track who did what with full audit logs.</p></div>
+      <div class="feature-card"><div class="feature-icon">📦</div><h3 data-i18n="feature8Title">Template Marketplace</h3><p data-i18n="feature8Desc">Pre-built compliance checklists for food, cannabis, pharma, construction, and more.</p></div>
+    </div>
+  </div>
+</section>
 
-        // ============================================
-        // i18n
-        // ============================================
-        const translations = {
-            en: {
-                brand:'ComplyLog Pro',loginBtn:'Sign In',registerBtn:'Start Free',
-                heroBadge:'AI-powered compliance for regulated SMBs',
-                heroTitle:'Compliance Management That Works While You Sleep',
-                heroSubtitle:'Automated HACCP, GMP, and regulatory logs. AI detects issues before auditors do. Built for food, cannabis, and pharma businesses.',
-                heroCTA:'Start Free — No Credit Card',heroFeatures:'See Features',
-                featuresLabel:'Everything you need',featuresTitle:'Stay Compliant Without the Headaches',featuresSubtitle:'Powerful tools designed for regulated small businesses',
-                pricingLabel:'Simple pricing',pricingTitle:'Plans That Grow With You',pricingSubtitle:'Start free. Upgrade when you need more.',
-                monthly:'Monthly',annual:'Annual',savePercent:'Save 20%',
-                faqTitle:'Frequently Asked Questions',
-                ctaTitle:'Ready to simplify your compliance?',ctaSubtitle:'Join businesses that trust ComplyLog Pro.',ctaBtn:'Start Free Today',
-                footerText:'© 2026 ComplyLog Pro. All rights reserved.',
-                cookieText:'We use cookies to improve your experience.',cookieAccept:'Accept',cookieDecline:'Decline',
-                welcomeBack:'Welcome Back',loginSubtitle:'Sign in to your account',
-                createAccount:'Create Free Account',registerSubtitle:'Get started in under 1 minute',
-                forgotPassword:'Reset Password',forgotSubtitle:'We\'ll send you a reset link',
-                googleContinue:'Continue with Google',googleRegister:'Sign up with Google',orWithEmail:'or with email',
-                emailLabel:'Email',passwordLabel:'Password',companyLabel:'Company Name',
-                loginAction:'Sign In',registerAction:'Create Account',sendLink:'Send Reset Link',
-                noAccount:'Don\'t have an account?',hasAccount:'Already have an account?',signUpFree:'Sign up free',signIn:'Sign in',
-                forgotLink:'Forgot password?',backToLogin:'← Back to sign in',
-                fillAllFields:'Please fill in all fields',passwordMin:'Password must be at least 6 characters',
-                loggingIn:'Signing in...',creatingAccount:'Creating account...',sendingLink:'Sending link...',
-                loginSuccess:'Signed in! Redirecting...',accountCreated:'Account created! Check your email.',
-                emailConfirmed:'Email confirmed! Redirecting...',linkSent:'Link sent. Check your email.',
-                connectingGoogle:'Connecting with Google...'
-            },
-            es: {
-                brand:'ComplyLog Pro',loginBtn:'Iniciar Sesión',registerBtn:'Comenzar Gratis',
-                heroBadge:'Cumplimiento con IA para PYMES reguladas',
-                heroTitle:'Gestión de Cumplimiento que Trabaja Mientras Duermes',
-                heroSubtitle:'Registros HACCP, GMP y regulatorios automatizados. La IA detecta problemas antes que los auditores.',
-                heroCTA:'Comenzar Gratis — Sin Tarjeta',heroFeatures:'Ver Funcionalidades',
-                featuresLabel:'Todo lo que necesitas',featuresTitle:'Cumple sin Complicaciones',featuresSubtitle:'Herramientas para pequeñas empresas reguladas',
-                pricingLabel:'Precios simples',pricingTitle:'Planes que Crecen Contigo',pricingSubtitle:'Comienza gratis. Actualiza cuando necesites más.',
-                monthly:'Mensual',annual:'Anual',savePercent:'Ahorra 20%',
-                faqTitle:'Preguntas Frecuentes',
-                ctaTitle:'¿Listo para simplificar tu cumplimiento?',ctaSubtitle:'Únete a empresas que confían en ComplyLog Pro.',ctaBtn:'Comenzar Gratis Hoy',
-                footerText:'© 2026 ComplyLog Pro. Todos los derechos reservados.',
-                cookieText:'Usamos cookies para mejorar tu experiencia.',cookieAccept:'Aceptar',cookieDecline:'Rechazar',
-                welcomeBack:'Bienvenido',loginSubtitle:'Inicia sesión en tu cuenta',
-                createAccount:'Crear Cuenta Gratis',registerSubtitle:'Comienza en menos de 1 minuto',
-                forgotPassword:'Recuperar Contraseña',forgotSubtitle:'Te enviaremos un enlace',
-                googleContinue:'Continuar con Google',googleRegister:'Registrarse con Google',orWithEmail:'o con email',
-                emailLabel:'Email',passwordLabel:'Contraseña',companyLabel:'Nombre de Empresa',
-                loginAction:'Iniciar Sesión',registerAction:'Crear Cuenta',sendLink:'Enviar Enlace',
-                noAccount:'¿No tienes cuenta?',hasAccount:'¿Ya tienes cuenta?',signUpFree:'Regístrate gratis',signIn:'Inicia sesión',
-                forgotLink:'¿Olvidaste tu contraseña?',backToLogin:'← Volver',
-                fillAllFields:'Completa todos los campos',passwordMin:'Mínimo 6 caracteres',
-                loggingIn:'Iniciando sesión...',creatingAccount:'Creando cuenta...',sendingLink:'Enviando enlace...',
-                loginSuccess:'¡Sesión iniciada!',accountCreated:'¡Cuenta creada! Revisa tu email.',
-                emailConfirmed:'¡Email confirmado!',linkSent:'Enlace enviado. Revisa tu email.',
-                connectingGoogle:'Conectando con Google...'
-            }
-        };
+<section>
+  <div class="container">
+    <p class="section-label" data-i18n="pricingLabel">Simple pricing</p>
+    <h2 class="section-title" data-i18n="pricingTitle">Plans That Grow With You</h2>
+    <p class="section-subtitle" data-i18n="pricingSubtitle">Start free. Upgrade when you need more.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3 data-i18n="plan1Name">Starter</h3><p style="color:var(--text-tertiary);font-size:14px" data-i18n="plan1Desc">For getting started</p>
+        <div class="price">$0<span>/mo</span></div>
+        <ul><li data-i18n="plan1f1">10 active tasks</li><li data-i18n="plan1f2">1 user</li><li data-i18n="plan1f3">Basic reminders</li><li data-i18n="plan1f4">1 industry</li><li data-i18n="plan1f5">Email support</li></ul>
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="showModal('register')" data-i18n="plan1CTA">Start Free</button>
+      </div>
+      <div class="pricing-card featured">
+        <h3 data-i18n="plan2Name">Professional</h3><p style="color:var(--accent);font-size:14px" data-i18n="plan2Desc">Most popular</p>
+        <div class="price">$29<span>/mo</span></div>
+        <ul><li data-i18n="plan2f1">100 active tasks</li><li data-i18n="plan2f2">5 users</li><li data-i18n="plan2f3">PDF/Excel reports</li><li data-i18n="plan2f4">All industries</li><li data-i18n="plan2f5">AI suggestions</li><li data-i18n="plan2f6">Priority support</li></ul>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="showModal('register')" data-i18n="plan2CTA">Start Pro</button>
+      </div>
+      <div class="pricing-card">
+        <h3 data-i18n="plan3Name">Enterprise</h3><p style="color:var(--text-tertiary);font-size:14px" data-i18n="plan3Desc">Unlimited everything</p>
+        <div class="price">$79<span>/mo</span></div>
+        <ul><li data-i18n="plan3f1">Unlimited tasks</li><li data-i18n="plan3f2">Unlimited users</li><li data-i18n="plan3f3">Advanced audit</li><li data-i18n="plan3f4">Custom API</li><li data-i18n="plan3f5">White label</li><li data-i18n="plan3f6">24/7 support</li></ul>
+        <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="showModal('register')" data-i18n="plan3CTA">Contact Us</button>
+      </div>
+    </div>
+  </div>
+</section>
 
-        function t(key) { return translations[currentLang]?.[key] || translations['en'][key] || key; }
+<section>
+  <div class="container">
+    <p class="section-label" data-i18n="faqLabel">FAQ</p>
+    <h2 class="section-title" data-i18n="faqTitle">Frequently Asked Questions</h2>
+    <p class="section-subtitle" data-i18n="faqSubtitle">Everything you need to know before getting started</p>
+    <div class="faq-grid">
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q"><span data-i18n="faq1q">Is ComplyLog Pro suitable for my industry?</span> <span class="faq-icon">▼</span></div>
+        <div class="faq-a" data-i18n="faq1a">We support Food & Beverage, Cannabis, Pharmaceutical, Laboratory, Construction, Cosmetics, and Medical Devices. If your industry is regulated, we likely have templates for you.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q"><span data-i18n="faq2q">Which countries do you support?</span> <span class="faq-icon">▼</span></div>
+        <div class="faq-a" data-i18n="faq2a">USA, Spain, Germany, France, Italy, UK, Portugal, Mexico, Brazil, Argentina, Chile, Uruguay, Dominican Republic, and Colombia. We add new countries based on user demand.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q"><span data-i18n="faq3q">Can I export audit-ready PDFs?</span> <span class="faq-icon">▼</span></div>
+        <div class="faq-a" data-i18n="faq3a">Yes! Generate HACCP logs, compliance reports, and task summaries in PDF or CSV/Excel format with your company branding, signature, and regulatory references.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q"><span data-i18n="faq4q">Is my data secure?</span> <span class="faq-icon">▼</span></div>
+        <div class="faq-a" data-i18n="faq4a">Absolutely. We use Supabase (SOC 2 compliant) with Row Level Security, encrypted storage, and all API keys are server-side only. Your data never leaves your company's isolated environment.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q"><span data-i18n="faq5q">Can I invite my team?</span> <span class="faq-icon">▼</span></div>
+        <div class="faq-a" data-i18n="faq5a">Yes. Starter supports 1 user, Professional supports 5, and Enterprise is unlimited. Each member can have roles: Owner, Admin, Editor, or Viewer.</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        function switchLang(lang) {
-            currentLang = lang;
-            document.getElementById('btnEN').classList.toggle('active', lang==='en');
-            document.getElementById('btnES').classList.toggle('active', lang==='es');
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang]?.[key]) el.textContent = translations[lang][key];
-            });
-            localStorage.setItem('complylog_lang', lang);
-            renderFeatures(); renderPricing(); renderFAQ();
-        }
+<section class="cta-section">
+  <div class="container">
+    <h2 data-i18n="ctaTitle">Ready to simplify your compliance?</h2>
+    <p data-i18n="ctaSubtitle">Join hundreds of businesses that trust ComplyLog Pro.</p>
+    <button class="btn btn-primary btn-lg" onclick="showModal('register')" data-i18n="ctaBtn">Start Free Today</button>
+  </div>
+</section>
 
-        // ============================================
-        // FEATURES RENDER
-        // ============================================
-        function renderFeatures() {
-            const features = [
-                {icon:'📋',title:'feature1Title',desc:'feature1Desc'},
-                {icon:'📅',title:'feature2Title',desc:'feature2Desc'},
-                {icon:'📄',title:'feature3Title',desc:'feature3Desc'},
-                {icon:'🧠',title:'feature4Title',desc:'feature4Desc'},
-                {icon:'🌍',title:'feature5Title',desc:'feature5Desc'},
-                {icon:'🔔',title:'feature6Title',desc:'feature6Desc'}
-            ];
-            document.getElementById('featuresGrid').innerHTML = features.map(f => `
-                <div class="feature-card">
-                    <div class="feature-icon">${f.icon}</div>
-                    <h3>${t(f.title)}</h3>
-                    <p>${t(f.desc)}</p>
-                </div>`).join('');
-        }
+<footer>
+  <div class="container">
+    <p style="font-weight:600;margin-bottom:4px">🛡️ <span data-i18n="brand">ComplyLog Pro</span></p>
+    <p data-i18n="footerText">&copy; 2026 ComplyLog Pro. All rights reserved.</p>
+    <p style="margin-top:4px"><a href="https://declarcloudeployed.top">declarcloudeployed.top</a></p>
+  </div>
+</footer>
 
-        // ============================================
-        // PRICING
-        // ============================================
-        let isAnnual = false;
-        function togglePricing() {
-            isAnnual = !isAnnual;
-            document.getElementById('pricingToggle').classList.toggle('active', isAnnual);
-            renderPricing();
-        }
-        function renderPricing() {
-            const plans = [
-                {name:'plan1Name',desc:'plan1Desc',price:0,features:['plan1f1','plan1f2','plan1f3','plan1f4','plan1f5'],cta:'plan1CTA'},
-                {name:'plan2Name',desc:'plan2Desc',price:29,features:['plan2f1','plan2f2','plan2f3','plan2f4','plan2f5','plan2f6'],cta:'plan2CTA',featured:true},
-                {name:'plan3Name',desc:'plan3Desc',price:79,features:['plan3f1','plan3f2','plan3f3','plan3f4','plan3f5','plan3f6'],cta:'plan3CTA'}
-            ];
-            document.getElementById('pricingGrid').innerHTML = plans.map(p => {
-                const price = isAnnual ? Math.round(p.price * 0.8 * 12) / 12 : p.price;
-                return `<div class="pricing-card${p.featured?' featured':''}">
-                    <h3>${t(p.name)}</h3><p style="color:var(--text-tertiary);font-size:14px">${t(p.desc)}</p>
-                    <div class="price">$${price}<span>/mo</span></div>
-                    <ul>${p.features.map(f => `<li>${t(f)}</li>`).join('')}</ul>
-                    <button class="btn ${p.featured?'btn-primary':'btn-outline'}" style="width:100%;justify-content:center" onclick="showModal('register')">${t(p.cta)}</button>
-                </div>`;
-            }).join('');
-        }
+<div class="modal" id="authModal">
+  <div class="modal-content" id="authContent"></div>
+</div>
 
-        // ============================================
-        // FAQ
-        // ============================================
-        function renderFAQ() {
-            const faqs = [
-                {q:'What is HACCP compliance?',a:'HACCP is a preventive system for food safety. Our tool automates temperature, pH, and cleaning logs required by FDA and EU regulations.'},
-                {q:'Can I customize the checklists?',a:'Yes! You can add, remove, and reorder fields. Set your own critical limits for temperature, pH, and more.'},
-                {q:'How does the AI help?',a:'Our AI analyzes your logs and suggests corrective actions when deviations are detected. It learns from your patterns.'},
-                {q:'Is my data secure?',a:'Yes. We use Supabase with Row Level Security, SSL encryption, and your data is isolated by company.'},
-                {q:'Can I cancel anytime?',a:'Absolutely. No contracts. Cancel with one click. Your data is exportable anytime.'}
-            ];
-            document.getElementById('faqList').innerHTML = faqs.map((f,i) => `
-                <div class="faq-item">
-                    <button class="faq-question" onclick="toggleFAQ(${i})">${f.q} <span class="arrow">▼</span></button>
-                    <div class="faq-answer" id="faqAnswer${i}">${f.a}</div>
-                </div>`).join('');
-        }
-        window.toggleFAQ = function(i) {
-            const answer = document.getElementById('faqAnswer'+i);
-            const arrow = document.querySelectorAll('.faq-question .arrow')[i];
-            answer.classList.toggle('open');
-            arrow.classList.toggle('open');
-        };
+<div class="sticky-cta" id="stickyCTA">
+  <button class="btn btn-primary btn-lg" onclick="showModal('register')">Start Free Today</button>
+</div>
 
-        // ============================================
-        // COOKIES
-        // ============================================
-        function acceptCookies() {
-            localStorage.setItem('cookies_accepted', 'true');
-            document.getElementById('cookieBanner').classList.remove('show');
-        }
-        function declineCookies() {
-            localStorage.setItem('cookies_accepted', 'false');
-            document.getElementById('cookieBanner').classList.remove('show');
-        }
+<div class="cookie-banner" id="cookieBanner">
+  <p>We use cookies to improve your experience. By continuing, you agree to our privacy policy.</p>
+  <button class="btn btn-primary btn-sm" onclick="acceptCookies()">Accept</button>
+</div>
 
-        // ============================================
-        // SUPABASE AUTH
-        // ============================================
-        function initSupabase() {
-            if (typeof supabase !== 'undefined') {
-                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                checkSession();
-            }
-        }
-        async function checkSession() {
-            try {
-                const { data } = await supabaseClient.auth.getSession();
-                if (data?.session) window.location.href = '/app.html';
-            } catch(e) {}
-        }
+<script>
+const translations={
+  en:{brand:'ComplyLog Pro',loginBtn:'Sign In',registerBtn:'Start Free',heroBadge:'Now with AI-powered compliance suggestions',heroTitle:'Compliance Management Simplified for SMBs',heroSubtitle:'Track your legal, tax, and regulatory obligations in one place. Built for food manufacturers, cannabis producers, pharma labs, and regulated industries across USA, Europe & LATAM.',heroCTA:'Start Free Today',heroFeatures:'See Features',featuresLabel:'Everything you need',featuresTitle:'Stay Compliant Without the Headaches',featuresSubtitle:'Powerful tools designed for regulated small businesses',feature1Title:'Task Management',feature1Desc:'Create, assign and track compliance tasks with deadlines, priorities, automated reminders, and recurrence.',feature2Title:'Regulatory Calendar',feature2Desc:'Visualize all your obligations in one calendar. Never miss a deadline with 7/3/1 day reminders.',feature3Title:'Audit-Ready PDFs',feature3Desc:'Generate formatted regulatory logs instantly. FDA, AESAN, COFEPRIS, ANVISA, and more. Print-ready in seconds.',feature4Title:'AI Suggestions',feature4Desc:'Our AI analyzes your HACCP data and suggests corrective actions when deviations are detected.',feature5Title:'Multi-Country Ready',feature5Desc:"Automatically adapts to your country's regulations: FDA (US), AESAN (ES), COFEPRIS (MX), ANVISA (BR), and more.",feature6Title:'Smart Notifications',feature6Desc:'Email and in-app alerts. SMS and WhatsApp coming soon. Stay ahead of every deadline.',feature7Title:'Team Collaboration',feature7Desc:'Invite your team, assign tasks, and track who did what with full audit logs.',feature8Title:'Template Marketplace',feature8Desc:'Pre-built compliance checklists for food, cannabis, pharma, construction, and more.',pricingLabel:'Simple pricing',pricingTitle:'Plans That Grow With You',pricingSubtitle:'Start free. Upgrade when you need more.',plan1Name:'Starter',plan1Desc:'For getting started',plan1f1:'10 active tasks',plan1f2:'1 user',plan1f3:'Basic reminders',plan1f4:'1 industry',plan1f5:'Email support',plan1CTA:'Start Free',plan2Name:'Professional',plan2Desc:'Most popular',plan2f1:'100 active tasks',plan2f2:'5 users',plan2f3:'PDF/Excel reports',plan2f4:'All industries',plan2f5:'AI suggestions',plan2f6:'Priority support',plan2CTA:'Start Pro',plan3Name:'Enterprise',plan3Desc:'Unlimited everything',plan3f1:'Unlimited tasks',plan3f2:'Unlimited users',plan3f3:'Advanced audit',plan3f4:'Custom API',plan3f5:'White label',plan3f6:'24/7 support',plan3CTA:'Contact Us',ctaTitle:'Ready to simplify your compliance?',ctaSubtitle:'Join hundreds of businesses that trust ComplyLog Pro.',ctaBtn:'Start Free Today',footerText:'© 2026 ComplyLog Pro. All rights reserved.',welcomeBack:'Welcome Back',loginSubtitle:'Sign in to your account',createAccount:'Create Free Account',registerSubtitle:'Get started in under 1 minute',forgotPassword:'Reset Password',forgotSubtitle:"We'll send you a reset link",googleContinue:'Continue with Google',googleRegister:'Sign up with Google',orWithEmail:'or with email',emailLabel:'Email',passwordLabel:'Password',companyLabel:'Company Name',loginAction:'Sign In',registerAction:'Create Account',sendLink:'Send Reset Link',noAccount:"Don't have an account?",hasAccount:'Already have an account?',signUpFree:'Sign up free',signIn:'Sign in',forgotLink:'Forgot password?',backToLogin:'← Back to sign in',fillAllFields:'Please fill in all fields',passwordMin:'Password must be at least 6 characters',loggingIn:'Signing in...',creatingAccount:'Creating account...',sendingLink:'Sending link...',loginSuccess:'Signed in! Redirecting...',accountCreated:'Account created! Check your email.',linkSent:'Link sent. Check your email.',connectingGoogle:'Connecting with Google...',faqLabel:'FAQ',faqTitle:'Frequently Asked Questions',faqSubtitle:'Everything you need to know before getting started',faq1q:'Is ComplyLog Pro suitable for my industry?',faq1a:'We support Food & Beverage, Cannabis, Pharmaceutical, Laboratory, Construction, Cosmetics, and Medical Devices. If your industry is regulated, we likely have templates for you.',faq2q:'Which countries do you support?',faq2a:'USA, Spain, Germany, France, Italy, UK, Portugal, Mexico, Brazil, Argentina, Chile, Uruguay, Dominican Republic, and Colombia. We add new countries based on user demand.',faq3q:'Can I export audit-ready PDFs?',faq3a:'Yes! Generate HACCP logs, compliance reports, and task summaries in PDF or CSV/Excel format with your company branding, signature, and regulatory references.',faq4q:'Is my data secure?',faq4a:"Absolutely. We use Supabase (SOC 2 compliant) with Row Level Security, encrypted storage, and all API keys are server-side only. Your data never leaves your company's isolated environment.",faq5q:'Can I invite my team?',faq5a:'Yes. Starter supports 1 user, Professional supports 5, and Enterprise is unlimited. Each member can have roles: Owner, Admin, Editor, or Viewer.',agreeTermsLabel:'I agree to the',termsOfService:'Terms of Service',and:'and',privacyPolicy:'Privacy Policy',mustAgreeTerms:'Please accept the Terms of Service and Privacy Policy to continue'},
+  es:{brand:'ComplyLog Pro',loginBtn:'Iniciar Sesión',registerBtn:'Comenzar Gratis',heroBadge:'Ahora con sugerencias de IA para cumplimiento',heroTitle:'Gestión de Cumplimiento Simplificada para PYMES',heroSubtitle:'Controla tus obligaciones legales, fiscales y regulatorias en un solo lugar. Diseñado para fabricantes de alimentos, productores de cannabis, laboratorios farmacéuticos e industrias reguladas en USA, Europa y LATAM.',heroCTA:'Comenzar Gratis Hoy',heroFeatures:'Ver Funcionalidades',featuresLabel:'Todo lo que necesitas',featuresTitle:'Cumple sin Complicaciones',featuresSubtitle:'Herramientas poderosas diseñadas para pequeñas empresas reguladas',feature1Title:'Gestión de Tareas',feature1Desc:'Crea, asigna y sigue tareas de cumplimiento con fechas límite, prioridades, recordatorios automáticos y recurrencia.',feature2Title:'Calendario Regulatorio',feature2Desc:'Visualiza todas tus obligaciones en un calendario. No pierdas ningún plazo con avisos de 7/3/1 días.',feature3Title:'PDFs Listos para Auditoría',feature3Desc:'Genera registros regulatorios formateados al instante. FDA, AESAN, COFEPRIS, ANVISA y más. Listos para imprimir.',feature4Title:'Sugerencias con IA',feature4Desc:'Nuestra IA analiza tus datos HACCP y sugiere acciones correctivas cuando se detectan desviaciones.',feature5Title:'Multi-País',feature5Desc:'Se adapta automáticamente a la normativa de tu país: FDA (US), AESAN (ES), COFEPRIS (MX), ANVISA (BR) y más.',feature6Title:'Notificaciones Inteligentes',feature6Desc:'Alertas por email y en la app. SMS y WhatsApp próximamente. Adelántate a cada plazo.',feature7Title:'Colaboración en Equipo',feature7Desc:'Invita a tu equipo, asigna tareas y rastrea quién hizo qué con logs de auditoría completos.',feature8Title:'Marketplace de Templates',feature8Desc:'Checklists de cumplimiento pre-armados para alimentos, cannabis, farmacia, construcción y más.',pricingLabel:'Precios simples',pricingTitle:'Planes que Crecen Contigo',pricingSubtitle:'Comienza gratis. Actualiza cuando necesites más.',plan1Name:'Inicial',plan1Desc:'Para empezar',plan1f1:'10 tareas activas',plan1f2:'1 usuario',plan1f3:'Recordatorios básicos',plan1f4:'1 industria',plan1f5:'Soporte email',plan1CTA:'Comenzar Gratis',plan2Name:'Profesional',plan2Desc:'Más popular',plan2f1:'100 tareas activas',plan2f2:'5 usuarios',plan2f3:'Reportes PDF/Excel',plan2f4:'Todas las industrias',plan2f5:'Sugerencias IA',plan2f6:'Soporte prioritario',plan2CTA:'Comenzar Pro',plan3Name:'Empresarial',plan3Desc:'Ilimitado',plan3f1:'Tareas ilimitadas',plan3f2:'Usuarios ilimitados',plan3f3:'Auditoría avanzada',plan3f4:'API personalizada',plan3f5:'White label',plan3f6:'Soporte 24/7',plan3CTA:'Contactar',ctaTitle:'¿Listo para simplificar tu cumplimiento?',ctaSubtitle:'Únete a cientos de empresas que confían en ComplyLog Pro.',ctaBtn:'Comenzar Gratis Hoy',footerText:'© 2026 ComplyLog Pro. Todos los derechos reservados.',welcomeBack:'Bienvenido',loginSubtitle:'Inicia sesión en tu cuenta',createAccount:'Crear Cuenta Gratis',registerSubtitle:'Comienza en menos de 1 minuto',forgotPassword:'Recuperar Contraseña',forgotSubtitle:'Te enviaremos un enlace',googleContinue:'Continuar con Google',googleRegister:'Registrarse con Google',orWithEmail:'o con email',emailLabel:'Email',passwordLabel:'Contraseña',companyLabel:'Nombre de Empresa',loginAction:'Iniciar Sesión',registerAction:'Crear Cuenta',sendLink:'Enviar Enlace',noAccount:'¿No tienes cuenta?',hasAccount:'¿Ya tienes cuenta?',signUpFree:'Regístrate gratis',signIn:'Inicia sesión',forgotLink:'¿Olvidaste tu contraseña?',backToLogin:'← Volver',fillAllFields:'Completa todos los campos',passwordMin:'Mínimo 6 caracteres',loggingIn:'Iniciando sesión...',creatingAccount:'Creando cuenta...',sendingLink:'Enviando enlace...',loginSuccess:'¡Sesión iniciada! Redirigiendo...',accountCreated:'¡Cuenta creada! Revisa tu email.',linkSent:'Enlace enviado. Revisa tu email.',connectingGoogle:'Conectando con Google...',faqLabel:'FAQ',faqTitle:'Preguntas Frecuentes',faqSubtitle:'Todo lo que necesitas saber antes de empezar',faq1q:'¿Es ComplyLog Pro adecuado para mi industria?',faq1a:'Cubrimos Alimentos y Bebidas, Cannabis, Farmacéutica, Laboratorio, Construcción, Cosmética y Dispositivos Médicos. Si tu industria está regulada, probablemente tengamos templates para ti.',faq2q:'¿Qué países cubren?',faq2a:'EE.UU., España, Alemania, Francia, Italia, Reino Unido, Portugal, México, Brasil, Argentina, Chile, Uruguay, República Dominicana y Colombia. Agregamos países nuevos según demanda.',faq3q:'¿Puedo exportar PDFs listos para auditoría?',faq3a:'¡Sí! Genera registros HACCP, reportes de cumplimiento y resúmenes de tareas en formato PDF o CSV/Excel con tu marca, firma y referencias regulatorias.',faq4q:'¿Mis datos están seguros?',faq4a:'Totalmente. Usamos Supabase (compatible con SOC 2) con Row Level Security, almacenamiento cifrado, y todas las API keys están solo del lado del servidor. Tus datos nunca salen del entorno aislado de tu empresa.',faq5q:'¿Puedo invitar a mi equipo?',faq5a:'Sí. Inicial soporta 1 usuario, Profesional soporta 5, y Empresarial es ilimitado. Cada miembro puede tener rol de Dueño, Administrador, Editor o Solo lectura.',agreeTermsLabel:'Acepto los',termsOfService:'Términos de Servicio',and:'y la',privacyPolicy:'Política de Privacidad',mustAgreeTerms:'Debes aceptar los Términos de Servicio y la Política de Privacidad para continuar'},
+  it:{brand:"ComplyLog Pro",loginBtn:"Accedi",registerBtn:"Inizia Gratis",heroBadge:"Ora con suggerimenti IA per la conformità",heroTitle:"Gestione della Conformità Semplificata per le PMI",heroSubtitle:"Tieni traccia dei tuoi obblighi legali, fiscali e normativi in un unico posto. Progettato per produttori alimentari, produttori di cannabis, laboratori farmaceutici e settori regolamentati in USA, Europa e America Latina.",heroCTA:"Inizia Gratis Oggi",heroFeatures:"Vedi le Funzionalità",featuresLabel:"Tutto ciò che ti serve",featuresTitle:"Resta Conforme Senza Grattacapi",featuresSubtitle:"Strumenti potenti progettati per piccole imprese regolamentate",feature1Title:"Gestione delle Attività",feature1Desc:"Crea, assegna e monitora attività di conformità con scadenze, priorità, promemoria automatici e ricorrenza.",feature2Title:"Calendario Normativo",feature2Desc:"Visualizza tutti i tuoi obblighi in un unico calendario. Non perdere mai una scadenza con promemoria a 7/3/1 giorni.",feature3Title:"PDF Pronti per l'Audit",feature3Desc:"Genera registri normativi formattati all'istante. FDA, AESAN, COFEPRIS, ANVISA e altro. Pronti per la stampa in pochi secondi.",feature4Title:"Suggerimenti IA",feature4Desc:"La nostra IA analizza i tuoi dati HACCP e suggerisce azioni correttive quando vengono rilevate deviazioni.",feature5Title:"Pronto per Più Paesi",feature5Desc:"Si adatta automaticamente alle normative del tuo paese: FDA (US), AESAN (ES), COFEPRIS (MX), ANVISA (BR) e altro.",feature6Title:"Notifiche Intelligenti",feature6Desc:"Avvisi via email e in-app. SMS e WhatsApp in arrivo. Resta sempre un passo avanti a ogni scadenza.",feature7Title:"Collaborazione di Team",feature7Desc:"Invita il tuo team, assegna attività e traccia chi ha fatto cosa con log di audit completi.",feature8Title:"Marketplace di Template",feature8Desc:"Checklist di conformità pre-costruite per alimenti, cannabis, farmaceutica, edilizia e altro.",pricingLabel:"Prezzi semplici",pricingTitle:"Piani che Crescono con Te",pricingSubtitle:"Inizia gratis. Passa a un piano superiore quando ne hai bisogno.",plan1Name:"Base",plan1Desc:"Per iniziare",plan1f1:"10 attività attive",plan1f2:"1 utente",plan1f3:"Promemoria di base",plan1f4:"1 settore",plan1f5:"Supporto via email",plan1CTA:"Inizia Gratis",plan2Name:"Professionale",plan2Desc:"Il più popolare",plan2f1:"100 attività attive",plan2f2:"5 utenti",plan2f3:"Report PDF/Excel",plan2f4:"Tutti i settori",plan2f5:"Suggerimenti IA",plan2f6:"Supporto prioritario",plan2CTA:"Passa a Pro",plan3Name:"Enterprise",plan3Desc:"Tutto illimitato",plan3f1:"Attività illimitate",plan3f2:"Utenti illimitati",plan3f3:"Audit avanzato",plan3f4:"API personalizzata",plan3f5:"White label",plan3f6:"Supporto 24/7",plan3CTA:"Contattaci",ctaTitle:"Pronto a semplificare la tua conformità?",ctaSubtitle:"Unisciti a centinaia di aziende che si fidano di ComplyLog Pro.",ctaBtn:"Inizia Gratis Oggi",footerText:"© 2026 ComplyLog Pro. Tutti i diritti riservati.",welcomeBack:"Bentornato",loginSubtitle:"Accedi al tuo account",createAccount:"Crea Account Gratuito",registerSubtitle:"Inizia in meno di 1 minuto",forgotPassword:"Reimposta Password",forgotSubtitle:"Ti invieremo un link di reimpostazione",googleContinue:"Continua con Google",googleRegister:"Registrati con Google",orWithEmail:"oppure con email",emailLabel:"Email",passwordLabel:"Password",companyLabel:"Nome Azienda",loginAction:"Accedi",registerAction:"Crea Account",sendLink:"Invia Link",noAccount:"Non hai un account?",hasAccount:"Hai già un account?",signUpFree:"Registrati gratis",signIn:"Accedi",forgotLink:"Password dimenticata?",backToLogin:"← Torna al login",fillAllFields:"Compila tutti i campi",passwordMin:"La password deve avere almeno 6 caratteri",loggingIn:"Accesso in corso...",creatingAccount:"Creazione account...",sendingLink:"Invio link...",loginSuccess:"Accesso effettuato! Reindirizzamento...",accountCreated:"Account creato! Controlla la tua email.",linkSent:"Link inviato. Controlla la tua email.",connectingGoogle:"Connessione con Google...",faqLabel:"FAQ",faqTitle:"Domande Frequenti",faqSubtitle:"Tutto ciò che devi sapere prima di iniziare",faq1q:"ComplyLog Pro è adatto al mio settore?",faq1a:"Supportiamo Alimentare e Bevande, Cannabis, Farmaceutico, Laboratorio, Edilizia, Cosmetica e Dispositivi Medici. Se il tuo settore è regolamentato, probabilmente abbiamo template per te.",faq2q:"Quali paesi supportate?",faq2a:"USA, Spagna, Germania, Francia, Italia, Regno Unito, Portogallo, Messico, Brasile, Argentina, Cile, Uruguay, Repubblica Dominicana e Colombia. Aggiungiamo nuovi paesi in base alla domanda degli utenti.",faq3q:"Posso esportare PDF pronti per l'audit?",faq3a:"Sì! Genera registri HACCP, report di conformità e riepiloghi delle attività in formato PDF o CSV/Excel con il tuo marchio, firma e riferimenti normativi.",faq4q:"I miei dati sono al sicuro?",faq4a:"Assolutamente. Utilizziamo Supabase (conforme SOC 2) con Row Level Security, archiviazione crittografata e tutte le chiavi API solo lato server. I tuoi dati non lasciano mai l'ambiente isolato della tua azienda.",faq5q:"Posso invitare il mio team?",faq5a:"Sì. Base supporta 1 utente, Professionale supporta 5 e Enterprise è illimitato. Ogni membro può avere ruolo di Proprietario, Amministratore, Editor o Sola lettura.",agreeTermsLabel:"Accetto i",termsOfService:"Termini di Servizio",and:"e la",privacyPolicy:"Informativa sulla Privacy",mustAgreeTerms:"Devi accettare i Termini di Servizio e l'Informativa sulla Privacy per continuare"},
+  fr:{brand:"ComplyLog Pro",loginBtn:"Connexion",registerBtn:"Commencer Gratuitement",heroBadge:"Maintenant avec des suggestions IA pour la conformité",heroTitle:"Gestion de la Conformité Simplifiée pour les PME",heroSubtitle:"Suivez vos obligations légales, fiscales et réglementaires en un seul endroit. Conçu pour les fabricants alimentaires, les producteurs de cannabis, les laboratoires pharmaceutiques et les secteurs réglementés aux États-Unis, en Europe et en Amérique latine.",heroCTA:"Commencer Gratuitement",heroFeatures:"Voir les Fonctionnalités",featuresLabel:"Tout ce dont vous avez besoin",featuresTitle:"Restez Conforme Sans Prise de Tête",featuresSubtitle:"Des outils puissants conçus pour les petites entreprises réglementées",feature1Title:"Gestion des Tâches",feature1Desc:"Créez, assignez et suivez les tâches de conformité avec échéances, priorités, rappels automatiques et récurrence.",feature2Title:"Calendrier Réglementaire",feature2Desc:"Visualisez toutes vos obligations dans un seul calendrier. Ne manquez jamais une échéance grâce aux rappels à 7/3/1 jours.",feature3Title:"PDF Prêts pour l'Audit",feature3Desc:"Générez des registres réglementaires formatés instantanément. FDA, AESAN, COFEPRIS, ANVISA, et plus. Prêts à imprimer en quelques secondes.",feature4Title:"Suggestions IA",feature4Desc:"Notre IA analyse vos données HACCP et suggère des actions correctives lorsque des écarts sont détectés.",feature5Title:"Compatible Multi-Pays",feature5Desc:"S'adapte automatiquement aux réglementations de votre pays : FDA (US), AESAN (ES), COFEPRIS (MX), ANVISA (BR), et plus.",feature6Title:"Notifications Intelligentes",feature6Desc:"Alertes par email et dans l'application. SMS et WhatsApp bientôt disponibles. Restez toujours en avance sur chaque échéance.",feature7Title:"Collaboration d'Équipe",feature7Desc:"Invitez votre équipe, assignez des tâches et suivez qui a fait quoi grâce à des journaux d'audit complets.",feature8Title:"Marketplace de Modèles",feature8Desc:"Listes de contrôle de conformité prédéfinies pour l'alimentation, le cannabis, la pharmacie, la construction, et plus.",pricingLabel:"Tarification simple",pricingTitle:"Des Forfaits qui Évoluent avec Vous",pricingSubtitle:"Commencez gratuitement. Passez à un forfait supérieur si besoin.",plan1Name:"Starter",plan1Desc:"Pour bien démarrer",plan1f1:"10 tâches actives",plan1f2:"1 utilisateur",plan1f3:"Rappels de base",plan1f4:"1 secteur",plan1f5:"Support par email",plan1CTA:"Commencer Gratuitement",plan2Name:"Professionnel",plan2Desc:"Le plus populaire",plan2f1:"100 tâches actives",plan2f2:"5 utilisateurs",plan2f3:"Rapports PDF/Excel",plan2f4:"Tous les secteurs",plan2f5:"Suggestions IA",plan2f6:"Support prioritaire",plan2CTA:"Passer à Pro",plan3Name:"Entreprise",plan3Desc:"Tout illimité",plan3f1:"Tâches illimitées",plan3f2:"Utilisateurs illimités",plan3f3:"Audit avancé",plan3f4:"API personnalisée",plan3f5:"Marque blanche",plan3f6:"Support 24/7",plan3CTA:"Nous Contacter",ctaTitle:"Prêt à simplifier votre conformité ?",ctaSubtitle:"Rejoignez des centaines d'entreprises qui font confiance à ComplyLog Pro.",ctaBtn:"Commencer Gratuitement",footerText:"© 2026 ComplyLog Pro. Tous droits réservés.",welcomeBack:"Content de vous revoir",loginSubtitle:"Connectez-vous à votre compte",createAccount:"Créer un Compte Gratuit",registerSubtitle:"Commencez en moins d'une minute",forgotPassword:"Réinitialiser le Mot de Passe",forgotSubtitle:"Nous vous enverrons un lien de réinitialisation",googleContinue:"Continuer avec Google",googleRegister:"S'inscrire avec Google",orWithEmail:"ou avec un email",emailLabel:"Email",passwordLabel:"Mot de passe",companyLabel:"Nom de l'Entreprise",loginAction:"Se Connecter",registerAction:"Créer un Compte",sendLink:"Envoyer le Lien",noAccount:"Vous n'avez pas de compte ?",hasAccount:"Vous avez déjà un compte ?",signUpFree:"Inscrivez-vous gratuitement",signIn:"Se connecter",forgotLink:"Mot de passe oublié ?",backToLogin:"← Retour à la connexion",fillAllFields:"Veuillez remplir tous les champs",passwordMin:"Le mot de passe doit contenir au moins 6 caractères",loggingIn:"Connexion en cours...",creatingAccount:"Création du compte...",sendingLink:"Envoi du lien...",loginSuccess:"Connecté ! Redirection...",accountCreated:"Compte créé ! Vérifiez votre email.",linkSent:"Lien envoyé. Vérifiez votre email.",connectingGoogle:"Connexion avec Google...",faqLabel:"FAQ",faqTitle:"Questions Fréquentes",faqSubtitle:"Tout ce que vous devez savoir avant de commencer",faq1q:"ComplyLog Pro convient-il à mon secteur ?",faq1a:"Nous couvrons l'Alimentation et les Boissons, le Cannabis, le Pharmaceutique, les Laboratoires, la Construction, la Cosmétique et les Dispositifs Médicaux. Si votre secteur est réglementé, nous avons probablement des modèles pour vous.",faq2q:"Quels pays couvrez-vous ?",faq2a:"États-Unis, Espagne, Allemagne, France, Italie, Royaume-Uni, Portugal, Mexique, Brésil, Argentine, Chili, Uruguay, République Dominicaine et Colombie. Nous ajoutons de nouveaux pays selon la demande des utilisateurs.",faq3q:"Puis-je exporter des PDF prêts pour l'audit ?",faq3a:"Oui ! Générez des registres HACCP, des rapports de conformité et des résumés de tâches au format PDF ou CSV/Excel avec votre marque, signature et références réglementaires.",faq4q:"Mes données sont-elles sécurisées ?",faq4a:"Absolument. Nous utilisons Supabase (conforme SOC 2) avec Row Level Security, un stockage chiffré, et toutes les clés API sont uniquement côté serveur. Vos données ne quittent jamais l'environnement isolé de votre entreprise.",faq5q:"Puis-je inviter mon équipe ?",faq5a:"Oui. Starter prend en charge 1 utilisateur, Professionnel 5, et Entreprise est illimité. Chaque membre peut avoir le rôle de Propriétaire, Administrateur, Éditeur ou Lecture seule.",agreeTermsLabel:"J'accepte les",termsOfService:"Conditions d'Utilisation",and:"et la",privacyPolicy:"Politique de Confidentialité",mustAgreeTerms:"Vous devez accepter les Conditions d'Utilisation et la Politique de Confidentialité pour continuer"},
+  de:{brand:"ComplyLog Pro",loginBtn:"Anmelden",registerBtn:"Kostenlos Starten",heroBadge:"Jetzt mit KI-gestützten Compliance-Vorschlägen",heroTitle:"Vereinfachtes Compliance-Management für KMU",heroSubtitle:"Behalten Sie Ihre rechtlichen, steuerlichen und regulatorischen Pflichten an einem Ort im Blick. Entwickelt für Lebensmittelhersteller, Cannabis-Produzenten, Pharmalabore und regulierte Branchen in den USA, Europa und Lateinamerika.",heroCTA:"Jetzt Kostenlos Starten",heroFeatures:"Funktionen Ansehen",featuresLabel:"Alles, was Sie brauchen",featuresTitle:"Compliance ohne Kopfschmerzen",featuresSubtitle:"Leistungsstarke Tools für regulierte kleine Unternehmen",feature1Title:"Aufgabenverwaltung",feature1Desc:"Erstellen, weisen Sie zu und verfolgen Sie Compliance-Aufgaben mit Fristen, Prioritäten, automatischen Erinnerungen und Wiederholung.",feature2Title:"Regulatorischer Kalender",feature2Desc:"Visualisieren Sie alle Ihre Pflichten in einem Kalender. Verpassen Sie mit Erinnerungen nach 7/3/1 Tagen nie wieder eine Frist.",feature3Title:"Auditfertige PDFs",feature3Desc:"Erstellen Sie sofort formatierte Regulierungsprotokolle. FDA, AESAN, COFEPRIS, ANVISA und mehr. In Sekunden druckfertig.",feature4Title:"KI-Vorschläge",feature4Desc:"Unsere KI analysiert Ihre HACCP-Daten und schlägt Korrekturmaßnahmen vor, wenn Abweichungen festgestellt werden.",feature5Title:"Für mehrere Länder geeignet",feature5Desc:"Passt sich automatisch an die Vorschriften Ihres Landes an: FDA (US), AESAN (ES), COFEPRIS (MX), ANVISA (BR) und mehr.",feature6Title:"Intelligente Benachrichtigungen",feature6Desc:"E-Mail- und In-App-Benachrichtigungen. SMS und WhatsApp folgen bald. Bleiben Sie jeder Frist einen Schritt voraus.",feature7Title:"Teamzusammenarbeit",feature7Desc:"Laden Sie Ihr Team ein, weisen Sie Aufgaben zu und verfolgen Sie mit vollständigen Audit-Protokollen, wer was getan hat.",feature8Title:"Vorlagen-Marktplatz",feature8Desc:"Vorgefertigte Compliance-Checklisten für Lebensmittel, Cannabis, Pharma, Bauwesen und mehr.",pricingLabel:"Einfache Preise",pricingTitle:"Pläne, die mit Ihnen wachsen",pricingSubtitle:"Kostenlos starten. Upgraden, wenn Sie mehr brauchen.",plan1Name:"Starter",plan1Desc:"Für den Einstieg",plan1f1:"10 aktive Aufgaben",plan1f2:"1 Benutzer",plan1f3:"Basis-Erinnerungen",plan1f4:"1 Branche",plan1f5:"E-Mail-Support",plan1CTA:"Kostenlos Starten",plan2Name:"Professional",plan2Desc:"Am beliebtesten",plan2f1:"100 aktive Aufgaben",plan2f2:"5 Benutzer",plan2f3:"PDF/Excel-Berichte",plan2f4:"Alle Branchen",plan2f5:"KI-Vorschläge",plan2f6:"Priorisierter Support",plan2CTA:"Zu Pro Wechseln",plan3Name:"Enterprise",plan3Desc:"Alles unbegrenzt",plan3f1:"Unbegrenzte Aufgaben",plan3f2:"Unbegrenzte Benutzer",plan3f3:"Erweitertes Audit",plan3f4:"Individuelle API",plan3f5:"White Label",plan3f6:"24/7-Support",plan3CTA:"Kontaktieren Sie Uns",ctaTitle:"Bereit, Ihre Compliance zu vereinfachen?",ctaSubtitle:"Schließen Sie sich Hunderten von Unternehmen an, die ComplyLog Pro vertrauen.",ctaBtn:"Jetzt Kostenlos Starten",footerText:"© 2026 ComplyLog Pro. Alle Rechte vorbehalten.",welcomeBack:"Willkommen Zurück",loginSubtitle:"Melden Sie sich bei Ihrem Konto an",createAccount:"Kostenloses Konto Erstellen",registerSubtitle:"Starten Sie in weniger als 1 Minute",forgotPassword:"Passwort Zurücksetzen",forgotSubtitle:"Wir senden Ihnen einen Zurücksetzungslink",googleContinue:"Mit Google Fortfahren",googleRegister:"Mit Google Registrieren",orWithEmail:"oder mit E-Mail",emailLabel:"E-Mail",passwordLabel:"Passwort",companyLabel:"Firmenname",loginAction:"Anmelden",registerAction:"Konto Erstellen",sendLink:"Link Senden",noAccount:"Noch kein Konto?",hasAccount:"Bereits ein Konto?",signUpFree:"Kostenlos registrieren",signIn:"Anmelden",forgotLink:"Passwort vergessen?",backToLogin:"← Zurück zur Anmeldung",fillAllFields:"Bitte füllen Sie alle Felder aus",passwordMin:"Das Passwort muss mindestens 6 Zeichen lang sein",loggingIn:"Anmeldung läuft...",creatingAccount:"Konto wird erstellt...",sendingLink:"Link wird gesendet...",loginSuccess:"Angemeldet! Weiterleitung...",accountCreated:"Konto erstellt! Überprüfen Sie Ihre E-Mail.",linkSent:"Link gesendet. Überprüfen Sie Ihre E-Mail.",connectingGoogle:"Verbindung mit Google...",faqLabel:"FAQ",faqTitle:"Häufig Gestellte Fragen",faqSubtitle:"Alles, was Sie vor dem Start wissen müssen",faq1q:"Ist ComplyLog Pro für meine Branche geeignet?",faq1a:"Wir unterstützen Lebensmittel und Getränke, Cannabis, Pharma, Labor, Bauwesen, Kosmetik und Medizinprodukte. Wenn Ihre Branche reguliert ist, haben wir wahrscheinlich passende Vorlagen für Sie.",faq2q:"Welche Länder unterstützen Sie?",faq2a:"USA, Spanien, Deutschland, Frankreich, Italien, Großbritannien, Portugal, Mexiko, Brasilien, Argentinien, Chile, Uruguay, Dominikanische Republik und Kolumbien. Wir fügen je nach Nutzernachfrage neue Länder hinzu.",faq3q:"Kann ich auditfertige PDFs exportieren?",faq3a:"Ja! Erstellen Sie HACCP-Protokolle, Compliance-Berichte und Aufgabenzusammenfassungen im PDF- oder CSV/Excel-Format mit Ihrem Firmenbranding, Ihrer Unterschrift und regulatorischen Verweisen.",faq4q:"Sind meine Daten sicher?",faq4a:"Absolut. Wir verwenden Supabase (SOC-2-konform) mit Row Level Security, verschlüsseltem Speicher, und alle API-Schlüssel sind ausschließlich serverseitig. Ihre Daten verlassen niemals die isolierte Umgebung Ihres Unternehmens.",faq5q:"Kann ich mein Team einladen?",faq5a:"Ja. Starter unterstützt 1 Benutzer, Professional 5, und Enterprise ist unbegrenzt. Jedes Mitglied kann die Rolle Eigentümer, Administrator, Editor oder Nur-Lesen haben.",agreeTermsLabel:"Ich akzeptiere die",termsOfService:"Nutzungsbedingungen",and:"und die",privacyPolicy:"Datenschutzrichtlinie",mustAgreeTerms:"Bitte akzeptieren Sie die Nutzungsbedingungen und die Datenschutzrichtlinie, um fortzufahren"},
+  pt:{brand:"ComplyLog Pro",loginBtn:"Iniciar Sessão",registerBtn:"Começar Grátis",heroBadge:"Agora com sugestões de IA para conformidade",heroTitle:"Gestão de Conformidade Simplificada para PME",heroSubtitle:"Acompanhe as suas obrigações legais, fiscais e regulatórias num só lugar. Concebido para fabricantes de alimentos, produtores de cannabis, laboratórios farmacêuticos e setores regulados nos EUA, Europa e América Latina.",heroCTA:"Começar Grátis Hoje",heroFeatures:"Ver Funcionalidades",featuresLabel:"Tudo o que precisa",featuresTitle:"Esteja em Conformidade Sem Complicações",featuresSubtitle:"Ferramentas poderosas concebidas para pequenas empresas reguladas",feature1Title:"Gestão de Tarefas",feature1Desc:"Crie, atribua e acompanhe tarefas de conformidade com prazos, prioridades, lembretes automáticos e recorrência.",feature2Title:"Calendário Regulatório",feature2Desc:"Visualize todas as suas obrigações num único calendário. Nunca perca um prazo com lembretes de 7/3/1 dias.",feature3Title:"PDFs Prontos para Auditoria",feature3Desc:"Gere registos regulatórios formatados instantaneamente. FDA, AESAN, COFEPRIS, ANVISA e mais. Prontos para imprimir em segundos.",feature4Title:"Sugestões de IA",feature4Desc:"A nossa IA analisa os seus dados HACCP e sugere ações corretivas quando são detetados desvios.",feature5Title:"Pronto para Vários Países",feature5Desc:"Adapta-se automaticamente à regulamentação do seu país: FDA (EUA), AESAN (ES), COFEPRIS (MX), ANVISA (BR) e mais.",feature6Title:"Notificações Inteligentes",feature6Desc:"Alertas por email e na aplicação. SMS e WhatsApp brevemente. Fique sempre à frente de cada prazo.",feature7Title:"Colaboração em Equipa",feature7Desc:"Convide a sua equipa, atribua tarefas e acompanhe quem fez o quê com registos de auditoria completos.",feature8Title:"Marketplace de Templates",feature8Desc:"Checklists de conformidade pré-construídas para alimentos, cannabis, farmacêutica, construção e mais.",pricingLabel:"Preços simples",pricingTitle:"Planos que Crescem Consigo",pricingSubtitle:"Comece grátis. Faça upgrade quando precisar de mais.",plan1Name:"Inicial",plan1Desc:"Para começar",plan1f1:"10 tarefas ativas",plan1f2:"1 utilizador",plan1f3:"Lembretes básicos",plan1f4:"1 setor",plan1f5:"Suporte por email",plan1CTA:"Começar Grátis",plan2Name:"Profissional",plan2Desc:"Mais popular",plan2f1:"100 tarefas ativas",plan2f2:"5 utilizadores",plan2f3:"Relatórios PDF/Excel",plan2f4:"Todos os setores",plan2f5:"Sugestões de IA",plan2f6:"Suporte prioritário",plan2CTA:"Mudar para Pro",plan3Name:"Empresarial",plan3Desc:"Tudo ilimitado",plan3f1:"Tarefas ilimitadas",plan3f2:"Utilizadores ilimitados",plan3f3:"Auditoria avançada",plan3f4:"API personalizada",plan3f5:"White label",plan3f6:"Suporte 24/7",plan3CTA:"Contacte-nos",ctaTitle:"Pronto para simplificar a sua conformidade?",ctaSubtitle:"Junte-se a centenas de empresas que confiam na ComplyLog Pro.",ctaBtn:"Começar Grátis Hoje",footerText:"© 2026 ComplyLog Pro. Todos os direitos reservados.",welcomeBack:"Bem-vindo de Volta",loginSubtitle:"Inicie sessão na sua conta",createAccount:"Criar Conta Gratuita",registerSubtitle:"Comece em menos de 1 minuto",forgotPassword:"Redefinir Palavra-passe",forgotSubtitle:"Enviaremos um link de redefinição",googleContinue:"Continuar com Google",googleRegister:"Registar com Google",orWithEmail:"ou com email",emailLabel:"Email",passwordLabel:"Palavra-passe",companyLabel:"Nome da Empresa",loginAction:"Iniciar Sessão",registerAction:"Criar Conta",sendLink:"Enviar Link",noAccount:"Não tem conta?",hasAccount:"Já tem conta?",signUpFree:"Registe-se grátis",signIn:"Iniciar sessão",forgotLink:"Esqueceu-se da palavra-passe?",backToLogin:"← Voltar ao login",fillAllFields:"Por favor preencha todos os campos",passwordMin:"A palavra-passe deve ter pelo menos 6 caracteres",loggingIn:"A iniciar sessão...",creatingAccount:"A criar conta...",sendingLink:"A enviar link...",loginSuccess:"Sessão iniciada! A redirecionar...",accountCreated:"Conta criada! Verifique o seu email.",linkSent:"Link enviado. Verifique o seu email.",connectingGoogle:"A ligar com Google...",faqLabel:"FAQ",faqTitle:"Perguntas Frequentes",faqSubtitle:"Tudo o que precisa de saber antes de começar",faq1q:"A ComplyLog Pro é adequada para o meu setor?",faq1a:"Cobrimos Alimentação e Bebidas, Cannabis, Farmacêutica, Laboratório, Construção, Cosmética e Dispositivos Médicos. Se o seu setor é regulado, provavelmente temos templates para si.",faq2q:"Que países cobrem?",faq2a:"EUA, Espanha, Alemanha, França, Itália, Reino Unido, Portugal, México, Brasil, Argentina, Chile, Uruguai, República Dominicana e Colômbia. Adicionamos novos países consoante a procura dos utilizadores.",faq3q:"Posso exportar PDFs prontos para auditoria?",faq3a:"Sim! Gere registos HACCP, relatórios de conformidade e resumos de tarefas em formato PDF ou CSV/Excel com a sua marca, assinatura e referências regulatórias.",faq4q:"Os meus dados estão seguros?",faq4a:"Sem dúvida. Utilizamos o Supabase (compatível com SOC 2) com Row Level Security, armazenamento encriptado, e todas as chaves de API são apenas do lado do servidor. Os seus dados nunca saem do ambiente isolado da sua empresa.",faq5q:"Posso convidar a minha equipa?",faq5a:"Sim. O plano Inicial suporta 1 utilizador, o Profissional 5, e o Empresarial é ilimitado. Cada membro pode ter o papel de Proprietário, Administrador, Editor ou Apenas leitura.",agreeTermsLabel:"Concordo com os",termsOfService:"Termos de Serviço",and:"e a",privacyPolicy:"Política de Privacidade",mustAgreeTerms:"Deve aceitar os Termos de Serviço e a Política de Privacidade para continuar"}
+};
 
-        // ============================================
-        // MODAL
-        // ============================================
-        function showModal(type) {
-            const modal = document.getElementById('authModal');
-            const content = document.getElementById('authContent');
-            if (type === 'login') {
-                content.innerHTML = `<h2>${t('welcomeBack')}</h2><p class="subtitle">${t('loginSubtitle')}</p><div id="authAlert" class="alert"></div><button class="btn btn-outline" style="width:100%;margin-bottom:16px;justify-content:center" onclick="loginWithGoogle()">🔵 ${t('googleContinue')}</button><div class="divider"><span>${t('orWithEmail')}</span></div><div class="form-group"><label>${t('emailLabel')}</label><input type="email" class="form-input" id="email" placeholder="you@company.com"></div><div class="form-group"><label>${t('passwordLabel')}</label><input type="password" class="form-input" id="password" placeholder="••••••••"></div><button class="btn btn-primary" style="width:100%;justify-content:center" id="loginBtn" onclick="login()">${t('loginAction')}</button><p style="text-align:center;margin-top:16px;font-size:13px">${t('noAccount')} <span class="text-link" onclick="showModal('register')">${t('signUpFree')}</span></p><p style="text-align:center;margin-top:8px;font-size:12px"><span class="text-link" onclick="showModal('forgot')">${t('forgotLink')}</span></p>`;
-            } else if (type === 'register') {
-                content.innerHTML = `<h2>${t('createAccount')}</h2><p class="subtitle">${t('registerSubtitle')}</p><div id="authAlert" class="alert"></div><button class="btn btn-outline" style="width:100%;margin-bottom:16px;justify-content:center" onclick="loginWithGoogle()">🔵 ${t('googleRegister')}</button><div class="divider"><span>${t('orWithEmail')}</span></div><div class="form-group"><label>${t('companyLabel')}</label><input type="text" class="form-input" id="companyName" placeholder="Your Company LLC"></div><div class="form-group"><label>${t('emailLabel')}</label><input type="email" class="form-input" id="email" placeholder="you@company.com"></div><div class="form-group"><label>${t('passwordLabel')}</label><input type="password" class="form-input" id="password" placeholder="Min 6 characters"><div class="form-error" id="passwordError">${t('passwordMin')}</div></div><button class="btn btn-primary" style="width:100%;justify-content:center" id="registerBtn" onclick="register()">${t('registerAction')}</button><p style="text-align:center;margin-top:16px;font-size:13px">${t('hasAccount')} <span class="text-link" onclick="showModal('login')">${t('signIn')}</span></p>`;
-            } else if (type === 'forgot') {
-                content.innerHTML = `<h2>${t('forgotPassword')}</h2><p class="subtitle">${t('forgotSubtitle')}</p><div id="authAlert" class="alert"></div><div class="form-group"><label>${t('emailLabel')}</label><input type="email" class="form-input" id="email" placeholder="you@company.com"></div><button class="btn btn-primary" style="width:100%;justify-content:center" onclick="resetPassword()">${t('sendLink')}</button><p style="text-align:center;margin-top:16px;font-size:13px"><span class="text-link" onclick="showModal('login')">${t('backToLogin')}</span></p>`;
-            }
-            modal.classList.add('active');
-        }
+let currentLang='en';
+function detectLanguage(){const lang=(navigator.language||navigator.userLanguage||'en').toLowerCase();const supported=['en','es','it','fr','de','pt'];const match=supported.find(l=>lang.startsWith(l));return match||'en'}
+function switchLang(lang){currentLang=lang;document.querySelectorAll('[data-lang-btn]').forEach(btn=>btn.classList.toggle('active',btn.dataset.langBtn===lang));document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.getAttribute('data-i18n');if(translations[lang]&&translations[lang][key])el.textContent=translations[lang][key]});localStorage.setItem('complylog_lang',lang)}
+function t(key){return translations[currentLang]?.[key]||translations['en'][key]||key}
 
-        document.getElementById('authModal').addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('active');
-        });
+// ⚠️ REQUIRED BEFORE THIS APP WORKS: paste the same anon/publishable key you
+// used in app.html. Both files must point at the same Supabase project.
+const SUPABASE_URL='https://rgyriiyaxpdqikuslkph.supabase.co';
+const SUPABASE_KEY='sb_publishable_MmaGLbeVvVGIG1dUPXMTIw_IVePYLqM';
+let supabaseClient=null;
 
-        function setLoading(btnId, loading) {
-            const btn = document.getElementById(btnId);
-            if (btn) { btn.disabled = loading; btn.classList.toggle('btn-loading', loading); }
-        }
+function initSupabase(){if(typeof supabase!=='undefined'){supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);checkSession();}else{console.error('Supabase failed to load');}}
 
-        function showAuthAlert(msg, type) {
-            const el = document.getElementById('authAlert');
-            if (el) { el.textContent = msg; el.className = 'alert alert-'+type+' show'; }
-        }
+async function checkSession(){try{const{data:{session}}=await supabaseClient.auth.getSession();if(session)window.location.href='/app.html';}catch(e){}}
 
-        async function login() {
-            const email = document.getElementById('email')?.value;
-            const password = document.getElementById('password')?.value;
-            if (!email || !password) { showAuthAlert(t('fillAllFields'), 'error'); return; }
-            setLoading('loginBtn', true); showAuthAlert(t('loggingIn'), 'info');
-            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            setLoading('loginBtn', false);
-            if (error) showAuthAlert(error.message, 'error');
-            else { showAuthAlert(t('loginSuccess'), 'success'); setTimeout(() => location.href = '/app.html', 500); }
-        }
+function showModal(type){
+  const modal=document.getElementById('authModal');
+  const content=document.getElementById('authContent');
+  if(type==='login'){
+    content.innerHTML=`<h2>${t('welcomeBack')}</h2><p class="subtitle">${t('loginSubtitle')}</p><div id="authAlert" class="alert"></div><button class="btn btn-outline" style="width:100%;margin-bottom:16px;justify-content:center" onclick="loginWithGoogle()"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>${t('googleContinue')}</button><div class="divider"><span>${t('orWithEmail')}</span></div><div class="form-group"><label>${t('emailLabel')}</label><input type="email" class="form-input" id="email" placeholder="you@company.com"></div><div class="form-group"><label>${t('passwordLabel')}</label><input type="password" class="form-input" id="password" placeholder="••••••••"></div><button class="btn btn-primary" style="width:100%;justify-content:center" id="loginBtn" onclick="login()">${t('loginAction')}</button><p style="text-align:center;margin-top:16px;font-size:13px">${t('noAccount')} <span class="text-link" onclick="showModal('register')">${t('signUpFree')}</span></p><p style="text-align:center;margin-top:8px;font-size:12px"><span class="text-link" onclick="showModal('forgot')">${t('forgotLink')}</span></p>`;
+  }else if(type==='register'){
+    content.innerHTML=`<h2>${t('createAccount')}</h2><p class="subtitle">${t('registerSubtitle')}</p><div id="authAlert" class="alert"></div><button class="btn btn-outline" style="width:100%;margin-bottom:16px;justify-content:center" onclick="loginWithGoogle()"><svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>${t('googleRegister')}</button><div class="divider"><span>${t('orWithEmail')}</span></div><div class="form-group"><label>${t('companyLabel')}</label><input type="text" class="form-input" id="companyName" placeholder="Your Company LLC"></div><div class="form-group"><label>${t('emailLabel')}</label><input type="email" class="form-input" id="email" placeholder="you@company.com"></div><div class="form-group"><label>${t('passwordLabel')}</label><input type="password" class="form-input" id="password" placeholder="Min 6 characters"></div><div class="form-group" style="display:flex;align-items:flex-start;gap:8px"><input type="checkbox" id="agreeTermsCheckbox" style="margin-top:3px;flex-shrink:0"><label for="agreeTermsCheckbox" style="font-size:12px;font-weight:400;text-transform:none;color:var(--text-secondary);cursor:pointer">${t('agreeTermsLabel')} <a href="/legal/terms-of-service.md" style="color:var(--accent)">${t('termsOfService')}</a> ${t('and')} <a href="/legal/privacy-policy.md" style="color:var(--accent)">${t('privacyPolicy')}</a></label></div><button class="btn btn-primary" style="width:100%;justify-content:center" id="registerBtn" onclick="register()">${t('registerAction')}</button><p style="text-align:center;margin-top:16px;font-size:13px">${t('hasAccount')} <span class="text-link" onclick="showModal('login')">${t('signIn')}</span></p>`;
+  }else if(type==='forgot'){
+    content.innerHTML=`<h2>${t('forgotPassword')}</h2><p class="subtitle">${t('forgotSubtitle')}</p><div id="authAlert" class="alert"></div><div class="form-group"><label>${t('emailLabel')}</label><input type="email" class="form-input" id="email" placeholder="you@company.com"></div><button class="btn btn-primary" style="width:100%;justify-content:center" id="resetBtn" onclick="resetPassword()">${t('sendLink')}</button><p style="text-align:center;margin-top:16px;font-size:13px"><span class="text-link" onclick="showModal('login')">${t('backToLogin')}</span></p>`;
+  }
+  modal.classList.add('active');
+}
 
-        async function loginWithGoogle() {
-            showAuthAlert(t('connectingGoogle'), 'info');
-            const { error } = await supabaseClient.auth.signInWithOAuth({
-                provider: 'google',
-                options: { redirectTo: DOMAIN + '/app.html' }
-            });
-            if (error) showAuthAlert(error.message, 'error');
-        }
+document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active')});
 
-        async function register() {
-            const company = document.getElementById('companyName')?.value;
-            const email = document.getElementById('email')?.value;
-            const password = document.getElementById('password')?.value;
-            if (!company || !email || !password) { showAuthAlert(t('fillAllFields'), 'error'); return; }
-            if (password.length < 6) { document.getElementById('passwordError').classList.add('show'); return; }
-            setLoading('registerBtn', true); showAuthAlert(t('creatingAccount'), 'info');
-            const { data, error } = await supabaseClient.auth.signUp({
-                email, password,
-                options: { data: { company_name: company }, emailRedirectTo: DOMAIN + '/app.html' }
-            });
-            setLoading('registerBtn', false);
-            if (error) showAuthAlert(error.message, 'error');
-            else {
-                showAuthAlert(t('accountCreated'), 'success');
-                if (data.user) {
-                    await supabaseClient.from('companies').insert({ user_id: data.user.id, company_name: company, plan: 'free' });
-                }
-            }
-        }
+function showAuthAlert(msg,type){
+  const el=document.getElementById('authAlert');if(el){el.textContent=msg;el.className='alert alert-'+type+' show';}
+}
 
-                    async function resetPassword() {
-            const email = document.getElementById('email')?.value;
-            if (!email) { 
-                showAuthAlert(t('fillAllFields'), 'error'); 
-                return; 
-            }
-            showAuthAlert(t('sendingLink'), 'info');
-            
-            const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { 
-                redirectTo: 'https://declarcloudeployed.top/app.html' 
-            });
-            
-            // CORRECCIÓN PARA LEER EL MENSAJE REAL DEL ERROR
-            if (error) {
-                // Si el error tiene un mensaje, lo mostramos. Si no, mostramos "Unknown error"
-                const errorMsg = error.message ? error.message : 'Error desconocido';
-                showAuthAlert(`❌ ${errorMsg}`, 'error');
-            } else {
-                showAuthAlert(t('linkSent'), 'success');
-            }
-        }
+function validateEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)}
 
-        // ============================================
-        // INIT
-        // ============================================
-        window.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('complylog_lang');
-            currentLang = saved || (navigator.language.startsWith('es') ? 'es' : 'en');
-            switchLang(currentLang);
-            renderFeatures();
-            renderPricing();
-            renderFAQ();
-            initSupabase();
-            
-            // Cookie consent
-            if (!localStorage.getItem('cookies_accepted')) {
-                document.getElementById('cookieBanner').classList.add('show');
-            }
-        });
+async function login(){
+  const email=document.getElementById('email')?.value?.trim();
+  const password=document.getElementById('password')?.value;
+  if(!email||!password){showAuthAlert(t('fillAllFields'),'error');return;}
+  if(!validateEmail(email)){showAuthAlert('Please enter a valid email','error');return;}
+  const btn=document.getElementById('loginBtn');btn.disabled=true;btn.textContent=t('loggingIn');
+  const{error}=await supabaseClient.auth.signInWithPassword({email,password});
+  btn.disabled=false;btn.textContent=t('loginAction');
+  if(error){showAuthAlert(error.message,'error');return;}
+  const{data:aal}=await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
+  if(aal&&aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){showMFAChallenge();return;}
+  showAuthAlert(t('loginSuccess'),'success');setTimeout(()=>location.href='/app.html',500);
+}
 
-        window.switchLang = switchLang;
-        window.showModal = showModal;
-        window.login = login;
-        window.register = register;
-        window.loginWithGoogle = loginWithGoogle;
-        window.resetPassword = resetPassword;
-        window.togglePricing = togglePricing;
-        window.acceptCookies = acceptCookies;
-        window.declineCookies = declineCookies;
-    </script>
+async function showMFAChallenge(){
+  const{data:factors}=await supabaseClient.auth.mfa.listFactors();
+  const factor=factors?.totp?.[0];
+  if(!factor){showAuthAlert('Could not find your 2FA method. Contact support.','error');return;}
+  window._mfaChallengeFactorId=factor.id;
+  document.getElementById('authContent').innerHTML=`<h2>Two-Factor Authentication</h2><p class="subtitle">Enter the 6-digit code from your authenticator app.</p><div id="authAlert" class="alert"></div><div class="form-group"><label>Code</label><input class="form-input" id="mfaCode" placeholder="123456" maxlength="6" inputmode="numeric" autofocus></div><button class="btn btn-primary" style="width:100%;justify-content:center" id="mfaSubmitBtn" onclick="verifyMFALogin()">Verify</button>`;
+}
+
+async function verifyMFALogin(){
+  const code=document.getElementById('mfaCode')?.value?.trim();
+  if(!code){showAuthAlert('Enter the 6-digit code','error');return;}
+  const btn=document.getElementById('mfaSubmitBtn');btn.disabled=true;btn.textContent='Verifying...';
+  const{data:challenge,error:challengeErr}=await supabaseClient.auth.mfa.challenge({factorId:window._mfaChallengeFactorId});
+  if(challengeErr){btn.disabled=false;btn.textContent='Verify';showAuthAlert(challengeErr.message,'error');return;}
+  const{error:verifyErr}=await supabaseClient.auth.mfa.verify({factorId:window._mfaChallengeFactorId,challengeId:challenge.id,code});
+  if(verifyErr){btn.disabled=false;btn.textContent='Verify';showAuthAlert(verifyErr.message,'error');return;}
+  window.location.href='/app.html';
+}
+
+async function loginWithGoogle(){
+  showAuthAlert(t('connectingGoogle'),'info');
+  const{error}=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/app.html'}});
+  if(error)showAuthAlert(error.message,'error');
+}
+
+async function register(){
+  const company=document.getElementById('companyName')?.value?.trim();
+  const email=document.getElementById('email')?.value?.trim();
+  const password=document.getElementById('password')?.value;
+  if(!company||!email||!password){showAuthAlert(t('fillAllFields'),'error');return;}
+  if(!validateEmail(email)){showAuthAlert('Please enter a valid email','error');return;}
+  if(password.length<6){showAuthAlert(t('passwordMin'),'error');return;}
+  if(!document.getElementById('agreeTermsCheckbox')?.checked){showAuthAlert(t('mustAgreeTerms'),'error');return;}
+  const btn=document.getElementById('registerBtn');btn.disabled=true;btn.textContent=t('creatingAccount');
+  const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{company_name:company,language:currentLang},emailRedirectTo:window.location.origin+'/app.html'}});
+  btn.disabled=false;btn.textContent=t('registerAction');
+  if(error)showAuthAlert(error.message,'error');
+  else{showAuthAlert(t('accountCreated'),'success');}
+}
+
+async function resetPassword(){
+  const email=document.getElementById('email')?.value?.trim();
+  if(!email){showAuthAlert(t('fillAllFields'),'error');return;}
+  if(!validateEmail(email)){showAuthAlert('Please enter a valid email','error');return;}
+  const btn=document.getElementById('resetBtn');btn.disabled=true;btn.textContent=t('sendingLink');
+  const{error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/app.html'});
+  btn.disabled=false;btn.textContent=t('sendLink');
+  if(error)showAuthAlert(error.message,'error');
+  else showAuthAlert(t('linkSent'),'success');
+}
+
+function acceptCookies(){localStorage.setItem('cookies_accepted','true');document.getElementById('cookieBanner').classList.remove('show');}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const saved=localStorage.getItem('complylog_lang');
+  currentLang=saved||detectLanguage();
+  switchLang(currentLang);
+  initSupabase();
+  if(!localStorage.getItem('cookies_accepted'))document.getElementById('cookieBanner').classList.add('show');
+  let shownSticky=false;
+  window.addEventListener('scroll',()=>{if(window.scrollY>600&&!shownSticky){document.getElementById('stickyCTA').classList.add('show');shownSticky=true;}});
+});
+
+window.switchLang=switchLang;
+window.showModal=showModal;
+window.login=login;
+window.register=register;
+window.loginWithGoogle=loginWithGoogle;
+window.resetPassword=resetPassword;
+window.acceptCookies=acceptCookies;
+window.showMFAChallenge=showMFAChallenge;
+window.verifyMFALogin=verifyMFALogin;
+</script>
 </body>
 </html>
