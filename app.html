@@ -418,22 +418,22 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
         <p style="color:var(--text-secondary);margin:12px 0;font-size:14px" data-i18n="upgradeChooseText">Choose how you want to pay. All plans include a 14-day money-back guarantee.</p>
 
         <div style="display:flex;gap:10px;margin:16px 0">
-          <button class="btn btn-outline" id="btnPlanPro" onclick="selectPlan('pro')" style="flex:1;justify-content:center;border-color:var(--accent)">
+          <button class="btn btn-outline" id="btnPlanPro" onclick="selectPlan('pro')" style="flex:1;justify-content:center;border-color:var(--accent);white-space:normal;text-align:center;height:auto">
             <div><div style="font-weight:700">Pro</div><div style="font-size:12px;color:var(--text-tertiary)">$29/mo</div></div>
           </button>
-          <button class="btn btn-outline" id="btnPlanEnterprise" onclick="selectPlan('enterprise')" style="flex:1;justify-content:center">
+          <button class="btn btn-outline" id="btnPlanEnterprise" onclick="selectPlan('enterprise')" style="flex:1;justify-content:center;white-space:normal;text-align:center;height:auto">
             <div><div style="font-weight:700">Enterprise</div><div style="font-size:12px;color:var(--text-tertiary)">$79/mo</div></div>
           </button>
         </div>
 
         <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
-          <button class="btn btn-primary" id="btnPayCard" onclick="payWithCard()" style="justify-content:center">
-            <span>💳</span> <span data-i18n="payWithCardBtn">Pay with Card / Apple Pay / Google Pay</span>
+          <button class="btn btn-primary" id="btnPayCard" onclick="payWithCard()" style="justify-content:center;white-space:normal;text-align:center;height:auto;line-height:1.4">
+            <span>⚡</span> <span data-i18n="payWithCardBtn">Pay with Card / Apple Pay / Google Pay</span>
           </button>
-          <button class="btn btn-outline" onclick="openPaymentModal('cryptobot')" style="justify-content:center">
+          <button class="btn btn-outline" onclick="openPaymentModal('cryptobot')" style="justify-content:center;white-space:normal;text-align:center;height:auto;line-height:1.4">
             <span>🤖</span> <span data-i18n="payCryptoBotBtn">Pay via CryptoBot (Telegram)</span>
           </button>
-          <button class="btn btn-outline" onclick="openPaymentModal('p2p')" style="justify-content:center">
+          <button class="btn btn-outline" onclick="openPaymentModal('p2p')" style="justify-content:center;white-space:normal;text-align:center;height:auto;line-height:1.4">
             <span>💱</span> <span data-i18n="payP2PBtn">Pay via P2P USDT Transfer</span>
           </button>
         </div>
@@ -625,7 +625,7 @@ const translations={
     yourDataTitle:'Your Data',yourDataDesc:'Download everything stored for your company, or permanently delete your account.',downloadData:'⬇️ Download My Data (JSON)',
     dangerZoneTitle:'Danger Zone',dangerZoneDesc:'Permanently deletes your account and any companies you own. Team members you invited will lose access. This cannot be undone.',deleteAccountBtn:'🗑️ Delete My Account',
     currentPlanLabel:'Current Plan:',upgradeUnlockText:'Upgrade to unlock unlimited tasks, AI suggestions, team features, and more.',tasksUsedLabel:'Tasks used',teamMembersLabel:'Team members',renewsLabel:'📅 Renews:',
-    upgradePlanTitle:'💎 Upgrade Your Plan',upgradeChooseText:'Choose how you want to pay. All plans include a 14-day money-back guarantee.',payWithCardBtn:'Pay with Card / Apple Pay / Google Pay',payCryptoBotBtn:'Pay via CryptoBot (Telegram)',payP2PBtn:'Pay via P2P USDT Transfer',paymentDisclaimer:'🔒 Card payments are processed instantly by NOWPayments. CryptoBot/P2P payments are reviewed manually and usually activate within minutes.',paymentHistoryTitle:'📜 Payment History',loadingText:'Loading...',
+    upgradePlanTitle:'💎 Upgrade Your Plan',upgradeChooseText:'Choose how you want to pay. All plans include a 14-day money-back guarantee.',payWithCardBtn:'Pay with Crypto — Instant (USDT, BTC & more)',payCryptoBotBtn:'Pay via CryptoBot (Telegram)',payP2PBtn:'Pay via P2P USDT Transfer',paymentDisclaimer:'🔒 This option activates instantly via NOWPayments — no card or Apple/Google Pay support yet, crypto only. CryptoBot/P2P payments are reviewed manually and usually activate within a few hours.',paymentHistoryTitle:'📜 Payment History',loadingText:'Loading...',
     tasksOverview:'Tasks Overview (Last 30 Days)',complianceByCategory:'Compliance by Category',recentTasks:'Recent Tasks',skipBtn:'Skip',
     optFood:'🍽️ Food',optCannabis:'🌿 Cannabis',optPharma:'💊 Pharma',optLaboratory:'🧪 Laboratory',optConstruction:'🏗️ Construction',optUSA:'🇺🇸 USA',optSpain:'🇪🇸 Spain',optMexico:'🇲🇽 Mexico',optBrazil:'🇧🇷 Brazil',
     aiAdvisorTitle:'🧠 Ask AI',aiAdvisorSubtitle:"Ask a compliance question — our AI answers with your country's regulations in mind. Not a substitute for professional advice.",aiAdvisorPlaceholder:'e.g., What temperature should I keep dairy storage at?',aiAdvisorSendBtn:'💬 Ask',aiAdvisorAsking:'⏳ Thinking...',aiAdvisorEmptyError:'Please type a question first',aiAdvisorError:'Could not get an answer. Please try again.',aiAdvisorNoAnswer:'No answer returned.',
@@ -645,7 +645,8 @@ const translations={
     noPaymentsYet:'No payments yet.',colPlan:'Plan',colAmount:'Amount',colMethod:'Method',colStatus:'Status',processingBtn:'Processing...',completePaymentNewTab:'Complete the payment in the new tab. This page will update automatically.',paymentErrorPrefix:'Payment error: ',paymentStillProcessing:'Payment still processing. Check your email or refresh this page later.',paymentSuccessfulActivated:'Payment successful! Your plan has been activated.',paymentSuccessfulToast:'Payment successful! Plan activated 🎉',paymentFailedTryAgain:'Payment failed. Please try again.',
     cryptoBotTitle:'Pay with CryptoBot',cryptoBotSubtitle:'Pay securely with USDT via Telegram in 3 steps.',openCryptoBotStep:'Open @CryptoBot',clickToOpenCryptoBot:'Click below to open @CryptoBot in Telegram.',sendAmountStep:'Send {amount} USDT',networkLabel:'Network: TRC20 (Tron) or BEP20 (BSC).',amountLabel:'Amount:',memoLabel:'Memo:',pasteTxidStep:'Paste the TxID',cryptoBotTxidHint:"CryptoBot shows a transaction ID after you send. Paste it below — we'll verify manually and activate your plan.",includeMemoWarning:'Include the memo so we can match your payment.',
     p2pTitle:'P2P USDT Transfer',p2pSubtitle:'Send USDT directly to our wallet.',walletTRC20Label:'USDT Wallet Address (TRC20 / Tron) — usually the lowest fee',walletBEP20Label:'USDT Wallet Address (BEP20 / BSC)',copyBtn:'Copy',buyUsdtStep:'Buy USDT',buyUsdtHint:'Get {amount} USDT from your preferred P2P exchange.',sendToWalletStep:'Send to Our Wallet',sendToWalletHint:"Transfer exactly {amount} USDT using either network above — pick whichever has the lower fee on your exchange.",shareTxidStep:'Share Transaction ID',shareTxidHint:'Paste your transaction hash (TxID) below.',p2pBestForRegions:"Best for regions where card payments don't go through — no VPN needed for P2P transfers.",
-    pasteTxidFirst:'Please paste your transaction ID first',sentPaymentBtn:"✅ I've Sent the Payment",paymentSubmittedToast:'Payment submitted for review!',verificationFailedError:'Verification failed. Please try again or contact support.',errorSubmittingPayment:'Error submitting payment. Please contact support.',walletCopiedToast:'Wallet address copied!',
+    pasteTxidFirst:'Please paste your transaction ID first',sentPaymentBtn:"✅ I've Sent the Payment",paymentSubmittedToast:'Submitted — NOT active yet. A human checks the blockchain before your plan activates, usually within a few hours.',verificationFailedError:'Verification failed. Please try again or contact support.',errorSubmittingPayment:'Error submitting payment. Please contact support.',walletCopiedToast:'Wallet address copied!',
+    statusFinished:'Paid',statusPendingPay:'Pending',statusAwaitingPayment:'Awaiting payment',statusConfirming:'Confirming on blockchain',statusSending:'Sending',statusPartiallyPaid:'Partially paid',statusPendingReview:'Pending manual review — not active yet',statusFailed:'Failed',statusRejected:'Rejected',
     planTaskLimitReached:"You've reached your plan's limit of {max} tasks. Upgrade in Billing to add more.",planTaskLimitReachedShort:"You've reached your plan's task limit. Upgrade in Billing to add more.",taskUpdatedToast:'Task updated!',taskCreatedToast:'Task created!',taskCompletedRecurErr:'Task completed! (Could not schedule the next occurrence — check your plan limits.)',taskCompletedNextOccurrence:'Task completed! 🎉 Next occurrence scheduled for {date}.',taskCompletedRecurLimit:"Task completed! 🎉 (Recurring task limit reached — next occurrence wasn't created. Upgrade to keep recurrence going.)",taskCompletedToast:'Task completed! 🎉',deleteTaskConfirm:'Delete this task? This action can be undone later.',taskDeletedToast:'Task deleted',
     nothingToExport:'Nothing to export yet',csvExportedToast:'CSV exported!',
     switchedToCompany:'Switched to {company}',
@@ -673,7 +674,7 @@ const translations={
     yourDataTitle:'Tus Datos',yourDataDesc:'Descarga todo lo almacenado para tu empresa, o elimina tu cuenta permanentemente.',downloadData:'⬇️ Descargar Mis Datos (JSON)',
     dangerZoneTitle:'Zona de Peligro',dangerZoneDesc:'Elimina permanentemente tu cuenta y cualquier empresa que poseas. Los miembros del equipo que invitaste perderán acceso. Esto no se puede deshacer.',deleteAccountBtn:'🗑️ Eliminar Mi Cuenta',
     currentPlanLabel:'Plan Actual:',upgradeUnlockText:'Actualiza para desbloquear tareas ilimitadas, sugerencias de IA, funciones de equipo y más.',tasksUsedLabel:'Tareas usadas',teamMembersLabel:'Miembros del equipo',renewsLabel:'📅 Se renueva:',
-    upgradePlanTitle:'💎 Actualiza Tu Plan',upgradeChooseText:'Elige cómo quieres pagar. Todos los planes incluyen garantía de devolución de 14 días.',payWithCardBtn:'Pagar con Tarjeta / Apple Pay / Google Pay',payCryptoBotBtn:'Pagar vía CryptoBot (Telegram)',payP2PBtn:'Pagar vía Transferencia P2P USDT',paymentDisclaimer:'🔒 Los pagos con tarjeta se procesan al instante con NOWPayments. Los pagos por CryptoBot/P2P se revisan manualmente y suelen activarse en minutos.',paymentHistoryTitle:'📜 Historial de Pagos',loadingText:'Cargando...',
+    upgradePlanTitle:'💎 Actualiza Tu Plan',upgradeChooseText:'Elige cómo quieres pagar. Todos los planes incluyen garantía de devolución de 14 días.',payWithCardBtn:'Pagar con Cripto — Instantáneo (USDT, BTC y más)',payCryptoBotBtn:'Pagar vía CryptoBot (Telegram)',payP2PBtn:'Pagar vía Transferencia P2P USDT',paymentDisclaimer:'🔒 Esta opción activa tu plan al instante vía NOWPayments — aún no soporta tarjeta ni Apple/Google Pay, solo cripto. Los pagos por CryptoBot/P2P se revisan manualmente y suelen activarse en unas horas.',paymentHistoryTitle:'📜 Historial de Pagos',loadingText:'Cargando...',
     tasksOverview:'Resumen de Tareas (Últimos 30 Días)',complianceByCategory:'Cumplimiento por Categoría',recentTasks:'Tareas Recientes',skipBtn:'Omitir',
     optFood:'🍽️ Alimentos',optCannabis:'🌿 Cannabis',optPharma:'💊 Farmacia',optLaboratory:'🧪 Laboratorio',optConstruction:'🏗️ Construcción',optUSA:'🇺🇸 EE.UU.',optSpain:'🇪🇸 España',optMexico:'🇲🇽 México',optBrazil:'🇧🇷 Brasil',
     aiAdvisorTitle:'🧠 Preguntar a la IA',aiAdvisorSubtitle:'Haz una pregunta de cumplimiento — nuestra IA responde considerando la normativa de tu país. No sustituye la asesoría profesional.',aiAdvisorPlaceholder:'ej., ¿A qué temperatura debo mantener el almacenamiento de lácteos?',aiAdvisorSendBtn:'💬 Preguntar',aiAdvisorAsking:'⏳ Pensando...',aiAdvisorEmptyError:'Escribe una pregunta primero',aiAdvisorError:'No se pudo obtener respuesta. Intenta de nuevo.',aiAdvisorNoAnswer:'No se recibió respuesta.',
@@ -693,7 +694,8 @@ const translations={
     noPaymentsYet:'Aún no hay pagos.',colPlan:'Plan',colAmount:'Monto',colMethod:'Método',colStatus:'Estado',processingBtn:'Procesando...',completePaymentNewTab:'Completa el pago en la nueva pestaña. Esta página se actualizará automáticamente.',paymentErrorPrefix:'Error de pago: ',paymentStillProcessing:'El pago sigue en proceso. Revisa tu email o recarga esta página más tarde.',paymentSuccessfulActivated:'¡Pago exitoso! Tu plan ha sido activado.',paymentSuccessfulToast:'¡Pago exitoso! Plan activado 🎉',paymentFailedTryAgain:'El pago falló. Por favor intenta de nuevo.',
     cryptoBotTitle:'Pagar con CryptoBot',cryptoBotSubtitle:'Paga de forma segura con USDT vía Telegram en 3 pasos.',openCryptoBotStep:'Abrir @CryptoBot',clickToOpenCryptoBot:'Haz click abajo para abrir @CryptoBot en Telegram.',sendAmountStep:'Enviar {amount} USDT',networkLabel:'Red: TRC20 (Tron) o BEP20 (BSC).',amountLabel:'Monto:',memoLabel:'Memo:',pasteTxidStep:'Pega el TxID',cryptoBotTxidHint:'CryptoBot muestra un ID de transacción después de enviar. Pégalo abajo — lo verificaremos manualmente y activaremos tu plan.',includeMemoWarning:'Incluye el memo para poder identificar tu pago.',
     p2pTitle:'Transferencia P2P USDT',p2pSubtitle:'Envía USDT directo a nuestra wallet.',walletTRC20Label:'Dirección USDT (TRC20 / Tron) — normalmente la comisión más baja',walletBEP20Label:'Dirección USDT (BEP20 / BSC)',copyBtn:'Copiar',buyUsdtStep:'Compra USDT',buyUsdtHint:'Consigue {amount} USDT en tu exchange P2P preferido.',sendToWalletStep:'Envía a Nuestra Wallet',sendToWalletHint:'Transfiere exactamente {amount} USDT usando cualquiera de las dos redes — elige la que tenga menor comisión en tu exchange.',shareTxidStep:'Comparte el ID de Transacción',shareTxidHint:'Pega tu hash de transacción (TxID) abajo.',p2pBestForRegions:'Ideal para regiones donde los pagos con tarjeta no funcionan — no necesitas VPN para transferencias P2P.',
-    pasteTxidFirst:'Por favor pega tu ID de transacción primero',sentPaymentBtn:'✅ Ya Envié el Pago',paymentSubmittedToast:'¡Pago enviado para revisión!',verificationFailedError:'La verificación falló. Intenta de nuevo o contacta soporte.',errorSubmittingPayment:'Error al enviar el pago. Por favor contacta soporte.',walletCopiedToast:'¡Dirección de wallet copiada!',
+    pasteTxidFirst:'Por favor pega tu ID de transacción primero',sentPaymentBtn:'✅ Ya Envié el Pago',paymentSubmittedToast:'Enviado — TODAVÍA NO está activo. Una persona verifica la blockchain antes de activar tu plan, normalmente en unas horas.',verificationFailedError:'La verificación falló. Intenta de nuevo o contacta soporte.',errorSubmittingPayment:'Error al enviar el pago. Por favor contacta soporte.',walletCopiedToast:'¡Dirección de wallet copiada!',
+    statusFinished:'Pagado',statusPendingPay:'Pendiente',statusAwaitingPayment:'Esperando pago',statusConfirming:'Confirmando en blockchain',statusSending:'Enviando',statusPartiallyPaid:'Pago parcial',statusPendingReview:'Pendiente de revisión manual — aún no activo',statusFailed:'Fallido',statusRejected:'Rechazado',
     planTaskLimitReached:'Alcanzaste el límite de tu plan de {max} tareas. Actualiza en Facturación para agregar más.',planTaskLimitReachedShort:'Alcanzaste el límite de tareas de tu plan. Actualiza en Facturación para agregar más.',taskUpdatedToast:'¡Tarea actualizada!',taskCreatedToast:'¡Tarea creada!',taskCompletedRecurErr:'¡Tarea completada! (No se pudo programar la siguiente ocurrencia — revisa los límites de tu plan.)',taskCompletedNextOccurrence:'¡Tarea completada! 🎉 Siguiente ocurrencia programada para {date}.',taskCompletedRecurLimit:'¡Tarea completada! 🎉 (Límite de tareas recurrentes alcanzado — no se creó la siguiente ocurrencia. Actualiza tu plan para mantener la recurrencia.)',taskCompletedToast:'¡Tarea completada! 🎉',deleteTaskConfirm:'¿Eliminar esta tarea? Esta acción se puede deshacer después.',taskDeletedToast:'Tarea eliminada',
     nothingToExport:'Aún no hay nada para exportar',csvExportedToast:'¡CSV exportado!',
     switchedToCompany:'Cambiado a {company}',
@@ -1739,6 +1741,11 @@ function selectPlan(plan){
   document.getElementById('btnPlanEnterprise').style.borderColor=plan==='enterprise'?'var(--accent)':'var(--border)';
 }
 
+function paymentStatusLabel(status){
+  const map={finished:'statusFinished',pending:'statusPendingPay',awaiting_payment:'statusAwaitingPayment',confirming:'statusConfirming',sending:'statusSending',partially_paid:'statusPartiallyPaid',pending_review:'statusPendingReview',failed:'statusFailed',rejected:'statusRejected'};
+  return map[status]?t(map[status]):status;
+}
+
 async function loadBilling(){
   if(!currentCompany)return;
 
@@ -1747,10 +1754,10 @@ async function loadBilling(){
   if(!payments||payments.length===0){
     historyEl.innerHTML=`<p style="color:var(--text-tertiary);font-size:14px">${t('noPaymentsYet')}</p>`;
   }else{
-    const statusColors={finished:'var(--success)',pending:'var(--warning)',awaiting_payment:'var(--accent)',confirming:'var(--warning)',pending_review:'var(--warning)',failed:'var(--danger)',rejected:'var(--danger)'};
+    const statusColors={finished:'var(--success)',pending:'var(--warning)',awaiting_payment:'var(--accent)',confirming:'var(--warning)',sending:'var(--warning)',partially_paid:'var(--warning)',pending_review:'var(--warning)',failed:'var(--danger)',rejected:'var(--danger)'};
     historyEl.innerHTML='<table style="width:100%;font-size:13px;border-collapse:collapse">'+
       `<thead><tr style="color:var(--text-tertiary);text-align:left;border-bottom:1px solid var(--border)"><th style="padding:8px 0">${t('fieldDate')}</th><th style="padding:8px 0">${t('colPlan')}</th><th style="padding:8px 0">${t('colAmount')}</th><th style="padding:8px 0">${t('colMethod')}</th><th style="padding:8px 0">${t('colStatus')}</th></tr></thead><tbody>`+
-      payments.map(p=>`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 0">${new Date(p.created_at).toLocaleDateString()}</td><td style="padding:8px 0;text-transform:capitalize">${p.plan}</td><td style="padding:8px 0">$${p.amount} ${p.currency}</td><td style="padding:8px 0;text-transform:capitalize">${p.provider}</td><td style="padding:8px 0;color:${statusColors[p.status]||'var(--text-secondary)'};text-transform:capitalize">${p.status.replace(/_/g,' ')}</td></tr>`).join('')+
+      payments.map(p=>`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 0">${new Date(p.created_at).toLocaleDateString()}</td><td style="padding:8px 0;text-transform:capitalize">${p.plan}</td><td style="padding:8px 0">$${p.amount} ${p.currency}</td><td style="padding:8px 0;text-transform:capitalize">${p.provider}</td><td style="padding:8px 0;color:${statusColors[p.status]||'var(--text-secondary)'}">${paymentStatusLabel(p.status)}</td></tr>`).join('')+
       '</tbody></table>';
   }
 
@@ -1770,14 +1777,14 @@ async function payWithCard(){
     const{data:{session}}=await supabaseClient.auth.getSession();
     const res=await fetch(`${EDGE_BASE}/create-payment`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({plan:selectedPlan,companyId:currentCompany.id})});
     const data=await res.json();
-    if(data.error){toast(data.error,'error');btn.disabled=false;btn.innerHTML=`<span>💳</span> ${t('payWithCardBtn')}`;return;}
+    if(data.error){toast(data.error,'error');btn.disabled=false;btn.innerHTML=`<span>⚡</span> ${t('payWithCardBtn')}`;return;}
     window.open(data.invoice_url,'_blank');
     const statusEl=document.getElementById('paymentStatus');
     statusEl.style.display='block';
     statusEl.innerHTML=`<div class="alert-box alert-info"><span>⏳</span> ${t('completePaymentNewTab')}</div>`;
     pollPaymentStatus(data.payment_id);
   }catch(err){toast(t('paymentErrorPrefix')+err.message,'error');}
-  finally{btn.disabled=false;btn.innerHTML=`<span>💳</span> ${t('payWithCardBtn')}`;}
+  finally{btn.disabled=false;btn.innerHTML=`<span>⚡</span> ${t('payWithCardBtn')}`;}
 }
 
 async function pollPaymentStatus(paymentId){
@@ -1836,7 +1843,7 @@ async function verifyManualPayment(){
     const{data:{session}}=await supabaseClient.auth.getSession();
     const res=await fetch(`${EDGE_BASE}/telegram-payment`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({manual_payment:{company_id:currentCompany.id,plan:selectedPlan,tx_hash:txHash,provider:currentPaymentMethod}})});
     const data=await res.json();
-    if(data.success){toast(data.message||t('paymentSubmittedToast'),'success',6000);closePaymentModal();loadBilling();}
+    if(data.success){toast(t('paymentSubmittedToast'),'info',8000);closePaymentModal();loadBilling();}
     else{toast(data.error||t('verificationFailedError'),'error');}
   }catch(err){toast(t('errorSubmittingPayment'),'error');}
   finally{btn.disabled=false;btn.textContent=t('sentPaymentBtn');}
