@@ -201,7 +201,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
     <p id="onboardingText">Let's set up your compliance workspace in 3 simple steps.</p>
     <div id="onboardingContent"></div>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:24px">
-      <button class="btn btn-outline" onclick="skipOnboarding()">Skip</button>
+      <button class="btn btn-outline" onclick="skipOnboarding()" data-i18n="skipBtn">Skip</button>
       <button class="btn btn-primary" id="onboardingNext" onclick="nextOnboarding()">Get Started</button>
     </div>
   </div>
@@ -210,33 +210,39 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
   <div class="sidebar-logo">🛡️ <span>ComplyLog</span></div>
   <select id="companySwitcher" class="filter-select" style="margin:0 12px 12px;width:calc(100% - 24px);display:none" onchange="switchCompany(this.value)"></select>
   <nav class="sidebar-nav">
-    <a class="active" data-section="dashboard" title="Dashboard"><span>📊</span> <span>Dashboard</span></a>
-    <a data-section="calendar" title="Calendar"><span>📅</span> <span>Calendar</span></a>
-    <a data-section="tasks" title="Tasks"><span>📋</span> <span>Tasks</span><span class="nav-badge" id="navBadgeTasks"></span></a>
-    <a data-section="haccp" title="HACCP"><span>🌡️</span> <span>HACCP</span></a>
-    <a data-section="templates" title="Templates"><span>📦</span> <span>Templates</span></a>
-    <a data-section="checklists" title="Checklists"><span>🧩</span> <span>Checklists</span></a>
-    <a data-section="documents" title="Documents"><span>📁</span> <span>Documents</span></a>
-    <a data-section="activity" title="Activity"><span>🕒</span> <span>Activity</span></a>
-    <a data-section="team" title="Team"><span>👥</span> <span>Team</span></a>
-    <a data-section="settings" title="Settings"><span>⚙️</span> <span>Settings</span></a>
-    <a data-section="billing" title="Billing"><span>💳</span> <span>Billing</span></a>
+    <a class="active" data-section="dashboard" title="Dashboard"><span>📊</span> <span data-i18n="navDashboard">Dashboard</span></a>
+    <a data-section="calendar" title="Calendar"><span>📅</span> <span data-i18n="navCalendar">Calendar</span></a>
+    <a data-section="tasks" title="Tasks"><span>📋</span> <span data-i18n="navTasks">Tasks</span><span class="nav-badge" id="navBadgeTasks"></span></a>
+    <a data-section="haccp" title="HACCP"><span>🌡️</span> <span data-i18n="navHaccp">HACCP</span></a>
+    <a data-section="templates" title="Templates"><span>📦</span> <span data-i18n="navTemplates">Templates</span></a>
+    <a data-section="checklists" title="Checklists"><span>🧩</span> <span data-i18n="navChecklists">Checklists</span></a>
+    <a data-section="documents" title="Documents"><span>📁</span> <span data-i18n="navDocuments">Documents</span></a>
+    <a data-section="activity" title="Activity"><span>🕒</span> <span data-i18n="navActivity">Activity</span></a>
+    <a data-section="team" title="Team"><span>👥</span> <span data-i18n="navTeam">Team</span></a>
+    <a data-section="settings" title="Settings"><span>⚙️</span> <span data-i18n="navSettings">Settings</span></a>
+    <a data-section="billing" title="Billing"><span>💳</span> <span data-i18n="navBilling">Billing</span></a>
   </nav>
-  <div class="sidebar-footer"><button onclick="logout()"><span>🚪</span> <span>Sign Out</span></button></div>
+  <div class="sidebar-footer">
+    <div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px">
+      <button class="lang-btn-app" data-lang-btn="en" onclick="switchAppLang('en')" style="padding:4px 8px;border:1px solid var(--border);background:transparent;color:var(--text-secondary);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">EN</button>
+      <button class="lang-btn-app" data-lang-btn="es" onclick="switchAppLang('es')" style="padding:4px 8px;border:1px solid var(--border);background:transparent;color:var(--text-secondary);border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">ES</button>
+    </div>
+    <button onclick="logout()"><span>🚪</span> <span data-i18n="signOut">Sign Out</span></button>
+  </div>
 </aside>
 <main class="main">
   <div class="section active" id="dashboard">
     <div class="page-header">
-      <h1>Dashboard</h1>
+      <h1 data-i18n="hdrDashboard">Dashboard</h1>
       <div class="page-header-actions">
         <div class="notif-bell" onclick="toggleNotifDropdown()">
           🔔<span class="notif-badge" id="notifBadge"></span>
           <div class="notif-dropdown" id="notifDropdown">
-            <div class="notif-header"><span>Notifications</span><span style="color:var(--accent);cursor:pointer;font-size:12px;font-weight:500" onclick="markAllRead(event)">Mark all read</span></div>
-            <div class="notif-list" id="notifList"><p style="padding:20px;text-align:center;color:var(--text-tertiary);font-size:13px">No notifications</p></div>
+            <div class="notif-header"><span data-i18n="notifications">Notifications</span><span style="color:var(--accent);cursor:pointer;font-size:12px;font-weight:500" onclick="markAllRead(event)" data-i18n="markAllRead">Mark all read</span></div>
+            <div class="notif-list" id="notifList"><p style="padding:20px;text-align:center;color:var(--text-tertiary);font-size:13px" data-i18n="noNotifications">No notifications</p></div>
           </div>
         </div>
-        <button class="btn btn-primary" onclick="openTaskModal()">+ New Task</button>
+        <button class="btn btn-primary" onclick="openTaskModal()" data-i18n="newTask">+ New Task</button>
       </div>
     </div>
     <div class="stats-grid" id="statsGrid">
@@ -246,48 +252,48 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
       <div class="stat-card skeleton skeleton-stat"></div>
     </div>
     <div class="chart-grid">
-      <div class="chart-card"><h3>Tasks Overview (Last 30 Days)</h3><div class="chart-container"><canvas id="tasksChart"></canvas></div></div>
-      <div class="chart-card"><h3>Compliance by Category</h3><div class="chart-container"><canvas id="categoryChart"></canvas></div></div>
+      <div class="chart-card"><h3 data-i18n="tasksOverview">Tasks Overview (Last 30 Days)</h3><div class="chart-container"><canvas id="tasksChart"></canvas></div></div>
+      <div class="chart-card"><h3 data-i18n="complianceByCategory">Compliance by Category</h3><div class="chart-container"><canvas id="categoryChart"></canvas></div></div>
     </div>
-    <h2 style="margin-bottom:16px;font-size:16px">Recent Tasks</h2>
+    <h2 style="margin-bottom:16px;font-size:16px" data-i18n="recentTasks">Recent Tasks</h2>
     <div class="task-list" id="recentTasks"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
   </div>
   <div class="section" id="calendar">
     <div class="page-header">
-      <h1>Regulatory Calendar</h1>
+      <h1 data-i18n="hdrCalendar">Regulatory Calendar</h1>
       <div class="page-header-actions">
         <button class="btn btn-outline btn-sm" onclick="calendarPrevMonth()">←</button>
         <span id="calendarMonthLabel" style="font-weight:600;min-width:140px;text-align:center;display:inline-block"></span>
         <button class="btn btn-outline btn-sm" onclick="calendarNextMonth()">→</button>
-        <button class="btn btn-outline btn-sm" onclick="calendarGoToday()">Today</button>
+        <button class="btn btn-outline btn-sm" onclick="calendarGoToday()" data-i18n="today">Today</button>
       </div>
     </div>
     <div id="calendarGrid" class="calendar-grid"></div>
   </div>
   <div class="section" id="tasks">
-    <div class="page-header"><h1>Tasks</h1><div class="page-header-actions"><button class="btn btn-outline" onclick="exportTasksCSV()">📊 Export CSV</button><button class="btn btn-primary" onclick="openTaskModal()">+ New Task</button></div></div>
+    <div class="page-header"><h1 data-i18n="hdrTasks">Tasks</h1><div class="page-header-actions"><button class="btn btn-outline" onclick="exportTasksCSV()" data-i18n="exportCsv">📊 Export CSV</button><button class="btn btn-primary" onclick="openTaskModal()" data-i18n="newTask">+ New Task</button></div></div>
     <div class="toolbar">
-      <div class="search-box"><input type="text" id="taskSearch" placeholder="Search tasks..." oninput="debounceLoadTasks()"></div>
-      <select class="filter-select" id="filterStatus" onchange="loadTasks()"><option value="">All Status</option><option value="pendiente">Pending</option><option value="en_progreso">In Progress</option><option value="completado">Completed</option><option value="vencido">Overdue</option></select>
-      <select class="filter-select" id="filterCategory" onchange="loadTasks()"><option value="">All Categories</option><option value="legal">Legal</option><option value="fiscal">Fiscal</option><option value="seguridad">Safety</option><option value="ambiental">Environmental</option><option value="calidad">Quality</option><option value="otro">Other</option></select>
-      <select class="filter-select" id="filterPriority" onchange="loadTasks()"><option value="">All Priorities</option><option value="alta">High</option><option value="media">Medium</option><option value="baja">Low</option></select>
+      <div class="search-box"><input type="text" id="taskSearch" placeholder="Search tasks..." data-i18n-placeholder="searchTasks" oninput="debounceLoadTasks()"></div>
+      <select class="filter-select" id="filterStatus" onchange="loadTasks()"><option value="" data-i18n="allStatus">All Status</option><option value="pendiente" data-i18n="statusPending">Pending</option><option value="en_progreso" data-i18n="statusInProgress">In Progress</option><option value="completado" data-i18n="statusCompleted">Completed</option><option value="vencido" data-i18n="statusOverdue">Overdue</option></select>
+      <select class="filter-select" id="filterCategory" onchange="loadTasks()"><option value="" data-i18n="allCategories">All Categories</option><option value="legal" data-i18n="catLegal">Legal</option><option value="fiscal" data-i18n="catFiscal">Fiscal</option><option value="seguridad" data-i18n="catSafety">Safety</option><option value="ambiental" data-i18n="catEnvironmental">Environmental</option><option value="calidad" data-i18n="catQuality">Quality</option><option value="otro" data-i18n="catOther">Other</option></select>
+      <select class="filter-select" id="filterPriority" onchange="loadTasks()"><option value="" data-i18n="allPriorities">All Priorities</option><option value="alta" data-i18n="prioHigh">High</option><option value="media" data-i18n="prioMedium">Medium</option><option value="baja" data-i18n="prioLow">Low</option></select>
     </div>
     <div class="task-list" id="taskList"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
     <div class="pagination" id="taskPagination"></div>
   </div>
   <div class="section" id="haccp">
-    <div class="page-header"><h1>HACCP / GMP Monitoring</h1></div>
+    <div class="page-header"><h1 data-i18n="hdrHaccp">HACCP / GMP Monitoring</h1></div>
     <div id="haccpAlert"></div>
     <div class="toolbar">
-      <div class="search-box"><input type="text" id="haccpSearch" placeholder="Search equipment or area..." oninput="debounceLoadHACCP()"></div>
+      <div class="search-box"><input type="text" id="haccpSearch" placeholder="Search equipment or area..." data-i18n-placeholder="searchEquipment" oninput="debounceLoadHACCP()"></div>
       <input type="date" class="filter-select" id="haccpDate" onchange="loadHACCP()">
-      <button class="btn btn-primary" onclick="openHACCPModal()">+ New Entry</button>
+      <button class="btn btn-primary" onclick="openHACCPModal()" data-i18n="newEntry">+ New Entry</button>
     </div>
     <div class="haccp-grid" id="haccpChecklists"><div class="skeleton" style="height:140px"></div><div class="skeleton" style="height:140px"></div></div>
     <div style="margin-top:20px;display:flex;gap:10px">
-      <button class="btn btn-primary" onclick="generateHACCPPDF()">📄 Generate Audit PDF</button>
-      <button class="btn btn-outline" onclick="exportHACCPCSV()">📊 Export CSV</button>
-      <button class="btn btn-outline" onclick="loadHACCPHistory()">📈 View History</button>
+      <button class="btn btn-primary" onclick="generateHACCPPDF()" data-i18n="generateAuditPdf">📄 Generate Audit PDF</button>
+      <button class="btn btn-outline" onclick="exportHACCPCSV()" data-i18n="exportCsv">📊 Export CSV</button>
+      <button class="btn btn-outline" onclick="loadHACCPHistory()" data-i18n="viewHistory">📈 View History</button>
     </div>
     <div id="aiSuggestion" class="alert-box" style="margin-top:16px;display:none"></div>
     <div id="haccpHistory" style="margin-top:20px;display:none">
@@ -296,61 +302,61 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
     </div>
   </div>
   <div class="section" id="templates">
-    <div class="page-header"><h1>Template Marketplace</h1></div>
+    <div class="page-header"><h1 data-i18n="hdrTemplates">Template Marketplace</h1></div>
     <div class="toolbar">
-      <div class="search-box"><input type="text" id="templateSearch" placeholder="Search templates..." oninput="debounceLoadTemplates()"></div>
-      <select class="filter-select" id="templateIndustry" onchange="loadTemplates()"><option value="">All Industries</option><option value="food">🍽️ Food</option><option value="cannabis">🌿 Cannabis</option><option value="pharma">💊 Pharma</option><option value="laboratory">🧪 Laboratory</option><option value="construction">🏗️ Construction</option></select>
-      <select class="filter-select" id="templateCountry" onchange="loadTemplates()"><option value="">All Countries</option><option value="US">🇺🇸 USA</option><option value="ES">🇪🇸 Spain</option><option value="MX">🇲🇽 Mexico</option><option value="BR">🇧🇷 Brazil</option></select>
+      <div class="search-box"><input type="text" id="templateSearch" placeholder="Search templates..." data-i18n-placeholder="searchTemplates" oninput="debounceLoadTemplates()"></div>
+      <select class="filter-select" id="templateIndustry" onchange="loadTemplates()"><option value="" data-i18n="allIndustries">All Industries</option><option value="food" data-i18n="optFood">🍽️ Food</option><option value="cannabis" data-i18n="optCannabis">🌿 Cannabis</option><option value="pharma" data-i18n="optPharma">💊 Pharma</option><option value="laboratory" data-i18n="optLaboratory">🧪 Laboratory</option><option value="construction" data-i18n="optConstruction">🏗️ Construction</option></select>
+      <select class="filter-select" id="templateCountry" onchange="loadTemplates()"><option value="" data-i18n="allCountries">All Countries</option><option value="US" data-i18n="optUSA">🇺🇸 USA</option><option value="ES" data-i18n="optSpain">🇪🇸 Spain</option><option value="MX" data-i18n="optMexico">🇲🇽 Mexico</option><option value="BR" data-i18n="optBrazil">🇧🇷 Brazil</option></select>
     </div>
     <div id="templatesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"><div class="skeleton" style="height:160px"></div><div class="skeleton" style="height:160px"></div><div class="skeleton" style="height:160px"></div></div>
   </div>
   <div class="section" id="checklists">
     <div id="checklistListView">
-      <div class="page-header"><h1>Custom Checklists</h1><button class="btn btn-primary" onclick="openChecklistModal()">+ New Checklist</button></div>
-      <p style="color:var(--text-secondary);font-size:13px;margin:-16px 0 20px">Build your own report with whatever fields you need — not limited to HACCP.</p>
+      <div class="page-header"><h1 data-i18n="hdrChecklists">Custom Checklists</h1><button class="btn btn-primary" onclick="openChecklistModal()" data-i18n="newChecklist">+ New Checklist</button></div>
+      <p style="color:var(--text-secondary);font-size:13px;margin:-16px 0 20px" data-i18n="checklistsSubtitle">Build your own report with whatever fields you need — not limited to HACCP.</p>
       <div id="checklistsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"><div class="skeleton" style="height:160px"></div><div class="skeleton" style="height:160px"></div></div>
     </div>
     <div id="checklistDetailView" style="display:none">
       <div class="page-header">
         <h1 id="checklistDetailTitle">Checklist</h1>
         <div class="page-header-actions">
-          <button class="btn btn-ghost btn-sm" onclick="showChecklistList()">← Back</button>
-          <button class="btn btn-outline btn-sm" onclick="openChecklistModal(currentChecklist)">✏️ Edit Fields</button>
-          <button class="btn btn-outline btn-sm" onclick="generateChecklistPDF()">📄 Generate PDF</button>
-          <button class="btn btn-outline btn-sm" onclick="exportChecklistCSV()">📊 Export CSV</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteChecklist(currentChecklist.id)">🗑️ Delete</button>
-          <button class="btn btn-primary" onclick="openChecklistEntryModal()">+ New Entry</button>
+          <button class="btn btn-ghost btn-sm" onclick="showChecklistList()" data-i18n="backBtn">← Back</button>
+          <button class="btn btn-outline btn-sm" onclick="openChecklistModal(currentChecklist)" data-i18n="editFields">✏️ Edit Fields</button>
+          <button class="btn btn-outline btn-sm" onclick="generateChecklistPDF()" data-i18n="generatePdf">📄 Generate PDF</button>
+          <button class="btn btn-outline btn-sm" onclick="exportChecklistCSV()" data-i18n="exportCsv">📊 Export CSV</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteChecklist(currentChecklist.id)" data-i18n="deleteBtn">🗑️ Delete</button>
+          <button class="btn btn-primary" onclick="openChecklistEntryModal()" data-i18n="newEntry">+ New Entry</button>
         </div>
       </div>
       <div id="checklistEntriesContainer"></div>
     </div>
   </div>
   <div class="section" id="documents">
-    <div class="page-header"><h1>Documents</h1><button class="btn btn-primary" onclick="openDocumentUploadModal()">+ Upload Document</button></div>
-    <p style="color:var(--text-secondary);font-size:13px;margin:-16px 0 20px">Permits, supplier certificates, insurance policies — anything you want on hand for an audit.</p>
-    <div class="toolbar"><div class="search-box"><input type="text" id="documentSearch" placeholder="Search documents..." oninput="debounceLoadDocuments()"></div></div>
+    <div class="page-header"><h1 data-i18n="hdrDocuments">Documents</h1><button class="btn btn-primary" onclick="openDocumentUploadModal()" data-i18n="uploadDocument">+ Upload Document</button></div>
+    <p style="color:var(--text-secondary);font-size:13px;margin:-16px 0 20px" data-i18n="documentsSubtitle">Permits, supplier certificates, insurance policies — anything you want on hand for an audit.</p>
+    <div class="toolbar"><div class="search-box"><input type="text" id="documentSearch" placeholder="Search documents..." data-i18n-placeholder="searchDocuments" oninput="debounceLoadDocuments()"></div></div>
     <div id="documentsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px"></div>
   </div>
   <div class="section" id="activity">
-    <div class="page-header"><h1>Activity Log</h1></div>
-    <p style="color:var(--text-secondary);font-size:13px;margin:-16px 0 20px">Every change and deletion to your compliance records, for audit purposes.</p>
+    <div class="page-header"><h1 data-i18n="hdrActivity">Activity Log</h1></div>
+    <p style="color:var(--text-secondary);font-size:13px;margin:-16px 0 20px" data-i18n="activitySubtitle">Every change and deletion to your compliance records, for audit purposes.</p>
     <div id="activityList" style="overflow-x:auto"></div>
   </div>
   <div class="section" id="team">
-    <div class="page-header"><h1>Team</h1><button class="btn btn-primary" onclick="openInviteModal()">+ Invite Member</button></div>
+    <div class="page-header"><h1 data-i18n="hdrTeam">Team</h1><button class="btn btn-primary" onclick="openInviteModal()" data-i18n="inviteMember">+ Invite Member</button></div>
     <div id="teamList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px"><div class="skeleton" style="height:100px"></div><div class="skeleton" style="height:100px"></div></div>
   </div>
   <div class="section" id="settings">
-    <div class="page-header"><h1>Settings</h1></div>
+    <div class="page-header"><h1 data-i18n="hdrSettings">Settings</h1></div>
     <div class="settings-grid" style="max-width:700px">
       <div>
-        <div class="form-group"><label>Company Name</label><input class="form-input" id="settingsCompany" placeholder="Your Company"></div>
-        <div class="form-group"><label>Country</label><select class="form-select" id="settingsCountry"></select></div>
-        <div class="form-group"><label>Industry</label><select class="form-select" id="settingsIndustry"></select></div>
-        <div class="form-group"><label>Timezone</label><select class="form-select" id="settingsTimezone"></select></div>
+        <div class="form-group"><label data-i18n="settingsCompanyName">Company Name</label><input class="form-input" id="settingsCompany" placeholder="Your Company"></div>
+        <div class="form-group"><label data-i18n="settingsCountry">Country</label><select class="form-select" id="settingsCountry"></select></div>
+        <div class="form-group"><label data-i18n="settingsIndustry">Industry</label><select class="form-select" id="settingsIndustry"></select></div>
+        <div class="form-group"><label data-i18n="settingsTimezone">Timezone</label><select class="form-select" id="settingsTimezone"></select></div>
       </div>
       <div>
-        <div class="form-group"><label>Accent Color</label><div class="color-picker" id="colorPicker">
+        <div class="form-group"><label data-i18n="settingsAccentColor">Accent Color</label><div class="color-picker" id="colorPicker">
           <div class="color-option active" style="background:#3b82f6" data-color="#3b82f6"></div>
           <div class="color-option" style="background:#8b5cf6" data-color="#8b5cf6"></div>
           <div class="color-option" style="background:#10b981" data-color="#10b981"></div>
@@ -359,57 +365,57 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
           <div class="color-option" style="background:#ec4899" data-color="#ec4899"></div>
           <div class="color-option" style="background:#06b6d4" data-color="#06b6d4"></div>
         </div></div>
-        <div class="form-group"><label>PDF Title Template</label><input class="form-input" id="settingsPdfTitle" placeholder="{{company_name}} — Compliance Report"></div>
-        <div class="form-group"><label>Logo URL</label><input class="form-input" id="settingsLogo" placeholder="https://..."></div>
-        <div class="form-group"><label>Signature URL</label><input class="form-input" id="settingsSignature" placeholder="https://..."></div>
+        <div class="form-group"><label data-i18n="settingsPdfTitle">PDF Title Template</label><input class="form-input" id="settingsPdfTitle" placeholder="{{company_name}} — Compliance Report"></div>
+        <div class="form-group"><label data-i18n="settingsLogo">Logo URL</label><input class="form-input" id="settingsLogo" placeholder="https://..."></div>
+        <div class="form-group"><label data-i18n="settingsSignature">Signature URL</label><input class="form-input" id="settingsSignature" placeholder="https://..."></div>
       </div>
     </div>
-    <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:16px">💾 Save Settings</button>
+    <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:16px" data-i18n="saveSettingsBtn">💾 Save Settings</button>
 
     <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border);max-width:700px">
-      <h2 style="font-size:16px;margin-bottom:6px">Two-Factor Authentication</h2>
-      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px">Require a code from an authenticator app (Google Authenticator, Authy, etc.) in addition to your password.</p>
-      <p style="font-size:13px;margin-bottom:12px">Status: <strong id="mfaStatusText">Checking...</strong></p>
-      <button class="btn btn-outline" id="mfaEnableBtn" style="display:none" onclick="startMFAEnroll()">🔐 Enable 2FA</button>
-      <button class="btn btn-outline" id="mfaDisableBtn" style="display:none" onclick="disableMFA()">Disable 2FA</button>
+      <h2 style="font-size:16px;margin-bottom:6px" data-i18n="twoFATitle">Two-Factor Authentication</h2>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px" data-i18n="twoFADesc">Require a code from an authenticator app (Google Authenticator, Authy, etc.) in addition to your password.</p>
+      <p style="font-size:13px;margin-bottom:12px"><span data-i18n="twoFAStatus">Status:</span> <strong id="mfaStatusText" data-i18n="twoFAChecking">Checking...</strong></p>
+      <button class="btn btn-outline" id="mfaEnableBtn" style="display:none" onclick="startMFAEnroll()" data-i18n="enable2FA">🔐 Enable 2FA</button>
+      <button class="btn btn-outline" id="mfaDisableBtn" style="display:none" onclick="disableMFA()" data-i18n="disable2FA">Disable 2FA</button>
     </div>
 
     <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--border);max-width:700px">
-      <h2 style="font-size:16px;margin-bottom:6px">Your Data</h2>
-      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px">Download everything stored for your company, or permanently delete your account.</p>
-      <button class="btn btn-outline" onclick="downloadMyData()">⬇️ Download My Data (JSON)</button>
+      <h2 style="font-size:16px;margin-bottom:6px" data-i18n="yourDataTitle">Your Data</h2>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px" data-i18n="yourDataDesc">Download everything stored for your company, or permanently delete your account.</p>
+      <button class="btn btn-outline" onclick="downloadMyData()" data-i18n="downloadData">⬇️ Download My Data (JSON)</button>
     </div>
 
     <div style="margin-top:24px;padding:16px;border:1px solid var(--danger);border-radius:var(--radius);max-width:700px">
-      <h2 style="font-size:16px;margin-bottom:6px;color:var(--danger)">Danger Zone</h2>
-      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px">Permanently deletes your account and any companies you own. Team members you invited will lose access. This cannot be undone.</p>
-      <button class="btn btn-danger" onclick="openDeleteAccountConfirm()">🗑️ Delete My Account</button>
+      <h2 style="font-size:16px;margin-bottom:6px;color:var(--danger)" data-i18n="dangerZoneTitle">Danger Zone</h2>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px" data-i18n="dangerZoneDesc">Permanently deletes your account and any companies you own. Team members you invited will lose access. This cannot be undone.</p>
+      <button class="btn btn-danger" onclick="openDeleteAccountConfirm()" data-i18n="deleteAccountBtn">🗑️ Delete My Account</button>
     </div>
   </div>
   <div class="section" id="billing">
-    <div class="page-header"><h1>Billing</h1></div>
+    <div class="page-header"><h1 data-i18n="hdrBilling">Billing</h1></div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;">
       <!-- Plan Actual -->
       <div class="stat-card">
-        <h3>Current Plan: <span id="currentPlan">Free</span></h3>
-        <p style="color:var(--text-secondary);margin:12px 0;font-size:14px">Upgrade to unlock unlimited tasks, AI suggestions, team features, and more.</p>
+        <h3><span data-i18n="currentPlanLabel">Current Plan:</span> <span id="currentPlan">Free</span></h3>
+        <p style="color:var(--text-secondary);margin:12px 0;font-size:14px" data-i18n="upgradeUnlockText">Upgrade to unlock unlimited tasks, AI suggestions, team features, and more.</p>
         <div style="margin:16px 0">
-          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>Tasks used</span><span id="tasksUsed">0 / 10</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span data-i18n="tasksUsedLabel">Tasks used</span><span id="tasksUsed">0 / 10</span></div>
           <div style="height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden"><div id="tasksBar" style="height:100%;width:0%;background:var(--accent);transition:width .3s"></div></div>
         </div>
         <div style="margin:16px 0">
-          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>Team members</span><span id="membersUsed">1 / 1</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span data-i18n="teamMembersLabel">Team members</span><span id="membersUsed">1 / 1</span></div>
           <div style="height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden"><div id="membersBar" style="height:100%;width:0%;background:var(--accent);transition:width .3s"></div></div>
         </div>
         <div id="subscriptionInfo" style="margin-top:12px;padding:10px;background:var(--bg-tertiary);border-radius:8px;font-size:13px;color:var(--text-secondary);display:none">
-          <div>📅 Renews: <span id="renewDate">—</span></div>
+          <div><span data-i18n="renewsLabel">📅 Renews:</span> <span id="renewDate">—</span></div>
         </div>
       </div>
 
       <!-- Upgrade Options -->
       <div class="stat-card" id="upgradeCard">
-        <h3>💎 Upgrade Your Plan</h3>
-        <p style="color:var(--text-secondary);margin:12px 0;font-size:14px">Choose how you want to pay. All plans include a 14-day money-back guarantee.</p>
+        <h3 data-i18n="upgradePlanTitle">💎 Upgrade Your Plan</h3>
+        <p style="color:var(--text-secondary);margin:12px 0;font-size:14px" data-i18n="upgradeChooseText">Choose how you want to pay. All plans include a 14-day money-back guarantee.</p>
 
         <div style="display:flex;gap:10px;margin:16px 0">
           <button class="btn btn-outline" id="btnPlanPro" onclick="selectPlan('pro')" style="flex:1;justify-content:center;border-color:var(--accent)">
@@ -422,140 +428,140 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 
         <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
           <button class="btn btn-primary" id="btnPayCard" onclick="payWithCard()" style="justify-content:center">
-            <span>💳</span> Pay with Card / Apple Pay / Google Pay
+            <span>💳</span> <span data-i18n="payWithCardBtn">Pay with Card / Apple Pay / Google Pay</span>
           </button>
           <button class="btn btn-outline" onclick="openPaymentModal('cryptobot')" style="justify-content:center">
-            <span>🤖</span> Pay via CryptoBot (Telegram)
+            <span>🤖</span> <span data-i18n="payCryptoBotBtn">Pay via CryptoBot (Telegram)</span>
           </button>
           <button class="btn btn-outline" onclick="openPaymentModal('p2p')" style="justify-content:center">
-            <span>💱</span> Pay via P2P USDT Transfer
+            <span>💱</span> <span data-i18n="payP2PBtn">Pay via P2P USDT Transfer</span>
           </button>
         </div>
 
         <div id="paymentStatus" style="margin-top:12px;font-size:13px;display:none"></div>
 
-        <p style="color:var(--text-tertiary);margin-top:12px;font-size:11px;text-align:center">
+        <p style="color:var(--text-tertiary);margin-top:12px;font-size:11px;text-align:center" data-i18n="paymentDisclaimer">
           🔒 Card payments are processed instantly by NOWPayments. CryptoBot/P2P payments are reviewed manually and usually activate within minutes.
         </p>
       </div>
 
       <!-- Payment History -->
       <div class="stat-card" style="grid-column:1/-1">
-        <h3>📜 Payment History</h3>
+        <h3 data-i18n="paymentHistoryTitle">📜 Payment History</h3>
         <div id="paymentHistory" style="margin-top:12px">
-          <p style="color:var(--text-tertiary);font-size:14px">Loading...</p>
+          <p style="color:var(--text-tertiary);font-size:14px" data-i18n="loadingText">Loading...</p>
         </div>
       </div>
     </div>
   </div>
 <div class="modal" id="taskModal">
   <div class="modal-content">
-    <h2 id="taskModalTitle">New Task</h2>
-    <p class="modal-subtitle">Create a new compliance task with deadline and priority.</p>
-    <div class="form-group"><label>Title *</label><input class="form-input" id="taskTitle" placeholder="e.g., Renew FDA registration"><div class="form-error" id="taskTitleError">Title is required</div></div>
-    <div class="form-group"><label>Description</label><textarea class="form-textarea" id="taskDesc" placeholder="Details, requirements, links..."></textarea></div>
+    <h2 id="taskModalTitle" data-i18n="taskModalNewTitle">New Task</h2>
+    <p class="modal-subtitle" data-i18n="taskModalSubtitle">Create a new compliance task with deadline and priority.</p>
+    <div class="form-group"><label data-i18n="fieldTitle">Title *</label><input class="form-input" id="taskTitle" placeholder="e.g., Renew FDA registration"><div class="form-error" id="taskTitleError" data-i18n="titleRequired">Title is required</div></div>
+    <div class="form-group"><label data-i18n="fieldDescription">Description</label><textarea class="form-textarea" id="taskDesc" placeholder="Details, requirements, links..."></textarea></div>
     <div class="form-row">
-      <div class="form-group"><label>Category</label><select class="form-select" id="taskCategory"><option value="legal">Legal</option><option value="fiscal">Fiscal</option><option value="laboral">Labor</option><option value="seguridad">Safety</option><option value="ambiental">Environmental</option><option value="calidad">Quality</option><option value="otro">Other</option></select></div>
-      <div class="form-group"><label>Priority</label><select class="form-select" id="taskPriority"><option value="alta">🔴 High</option><option value="media" selected>🟡 Medium</option><option value="baja">🟢 Low</option></select></div>
+      <div class="form-group"><label data-i18n="fieldCategory">Category</label><select class="form-select" id="taskCategory"><option value="legal" data-i18n="catLegal">Legal</option><option value="fiscal" data-i18n="catFiscal">Fiscal</option><option value="laboral" data-i18n="catLabor">Labor</option><option value="seguridad" data-i18n="catSafety">Safety</option><option value="ambiental" data-i18n="catEnvironmental">Environmental</option><option value="calidad" data-i18n="catQuality">Quality</option><option value="otro" data-i18n="catOther">Other</option></select></div>
+      <div class="form-group"><label data-i18n="fieldPriority">Priority</label><select class="form-select" id="taskPriority"><option value="alta" data-i18n="prioHigh">🔴 High</option><option value="media" selected data-i18n="prioMedium">🟡 Medium</option><option value="baja" data-i18n="prioLow">🟢 Low</option></select></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Due Date *</label><input type="date" class="form-input" id="taskDueDate"><div class="form-error" id="taskDateError">Due date is required</div></div>
-      <div class="form-group"><label>Assigned To</label><select class="form-select" id="taskAssigned"><option value="">Unassigned</option></select></div>
+      <div class="form-group"><label data-i18n="fieldDueDate">Due Date *</label><input type="date" class="form-input" id="taskDueDate"><div class="form-error" id="taskDateError" data-i18n="dueDateRequired">Due date is required</div></div>
+      <div class="form-group"><label data-i18n="fieldAssignedTo">Assigned To</label><select class="form-select" id="taskAssigned"><option value="" data-i18n="unassigned">Unassigned</option></select></div>
     </div>
-    <div class="form-group"><label>Tags (comma separated)</label><input class="form-input" id="taskTags" placeholder="annual, audit, urgent"></div>
-    <div class="form-group"><label>Recurrence</label><select class="form-select" id="taskRecurrence"><option value="none">None</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="yearly">Yearly</option></select></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="closeTaskModal()">Cancel</button><button class="btn btn-primary" id="taskSaveBtn" onclick="saveTask()">💾 Save Task</button></div>
+    <div class="form-group"><label data-i18n="fieldTags">Tags (comma separated)</label><input class="form-input" id="taskTags" placeholder="annual, audit, urgent"></div>
+    <div class="form-group"><label data-i18n="fieldRecurrence">Recurrence</label><select class="form-select" id="taskRecurrence"><option value="none" data-i18n="recurNone">None</option><option value="daily" data-i18n="recurDaily">Daily</option><option value="weekly" data-i18n="recurWeekly">Weekly</option><option value="monthly" data-i18n="recurMonthly">Monthly</option><option value="quarterly" data-i18n="recurQuarterly">Quarterly</option><option value="yearly" data-i18n="recurYearly">Yearly</option></select></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeTaskModal()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="taskSaveBtn" onclick="saveTask()" data-i18n="saveTaskBtn">💾 Save Task</button></div>
   </div>
 </div>
 <div class="modal" id="haccpModal">
   <div class="modal-content">
-    <h2>New HACCP Entry</h2>
-    <p class="modal-subtitle">Record a critical control point measurement.</p>
+    <h2 data-i18n="haccpModalTitle">New HACCP Entry</h2>
+    <p class="modal-subtitle" data-i18n="haccpModalSubtitle">Record a critical control point measurement.</p>
     <div class="form-row">
-      <div class="form-group"><label>Date</label><input type="date" class="form-input" id="haccpDateInput"></div>
-      <div class="form-group"><label>Time</label><input type="time" class="form-input" id="haccpTimeInput"></div>
+      <div class="form-group"><label data-i18n="fieldDate">Date</label><input type="date" class="form-input" id="haccpDateInput"></div>
+      <div class="form-group"><label data-i18n="fieldTime">Time</label><input type="time" class="form-input" id="haccpTimeInput"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Area</label><input class="form-input" id="haccpArea" placeholder="e.g., Refrigeration North"></div>
-      <div class="form-group"><label>Equipment</label><input class="form-input" id="haccpEquipment" placeholder="e.g., Cooler A"></div>
+      <div class="form-group"><label data-i18n="fieldArea">Area</label><input class="form-input" id="haccpArea" placeholder="e.g., Refrigeration North"></div>
+      <div class="form-group"><label data-i18n="fieldEquipment">Equipment</label><input class="form-input" id="haccpEquipment" placeholder="e.g., Cooler A"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Parameter</label><select class="form-select" id="haccpParameter"><option value="temperature">Temperature</option><option value="ph">pH</option><option value="humidity">Humidity</option><option value="pressure">Pressure</option><option value="other">Other</option></select></div>
-      <div class="form-group"><label>Unit</label><select class="form-select" id="haccpUnit"><option value="°F">°F</option><option value="°C">°C</option><option value="pH">pH</option><option value="%">%</option><option value="psi">psi</option></select></div>
+      <div class="form-group"><label data-i18n="fieldParameter">Parameter</label><select class="form-select" id="haccpParameter"><option value="temperature" data-i18n="paramTemp">Temperature</option><option value="ph" data-i18n="paramPh">pH</option><option value="humidity" data-i18n="paramHumidity">Humidity</option><option value="pressure" data-i18n="paramPressure">Pressure</option><option value="other" data-i18n="paramOther">Other</option></select></div>
+      <div class="form-group"><label data-i18n="fieldUnit">Unit</label><select class="form-select" id="haccpUnit"><option value="°F">°F</option><option value="°C">°C</option><option value="pH">pH</option><option value="%">%</option><option value="psi">psi</option></select></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Value *</label><input type="number" step="0.1" class="form-input" id="haccpValue" placeholder="38.0"></div>
-      <div class="form-group"><label>Limit Low</label><input type="number" step="0.1" class="form-input" id="haccpLimitLow" placeholder=""></div>
+      <div class="form-group"><label data-i18n="fieldValue">Value *</label><input type="number" step="0.1" class="form-input" id="haccpValue" placeholder="38.0"></div>
+      <div class="form-group"><label data-i18n="fieldLimitLow">Limit Low</label><input type="number" step="0.1" class="form-input" id="haccpLimitLow" placeholder=""></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Limit High *</label><input type="number" step="0.1" class="form-input" id="haccpLimitHigh" placeholder="40.0"></div>
-      <div class="form-group"><label>Initials</label><input class="form-input" id="haccpInitials" placeholder="JM" maxlength="3"></div>
+      <div class="form-group"><label data-i18n="fieldLimitHigh">Limit High *</label><input type="number" step="0.1" class="form-input" id="haccpLimitHigh" placeholder="40.0"></div>
+      <div class="form-group"><label data-i18n="fieldInitials">Initials</label><input class="form-input" id="haccpInitials" placeholder="JM" maxlength="3"></div>
     </div>
-    <div class="form-group"><label>Corrective Action (if deviation)</label><input class="form-input" id="haccpCorrective" placeholder="e.g., Adjusted thermostat"></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="closeHACCPModal()">Cancel</button><button class="btn btn-primary" id="haccpSaveBtn" onclick="saveHACCPEntry()">💾 Save Entry</button></div>
+    <div class="form-group"><label data-i18n="fieldCorrective">Corrective Action (if deviation)</label><input class="form-input" id="haccpCorrective" placeholder="e.g., Adjusted thermostat"></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeHACCPModal()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="haccpSaveBtn" onclick="saveHACCPEntry()" data-i18n="saveEntryBtn">💾 Save Entry</button></div>
   </div>
 </div>
 <div class="modal" id="inviteModal">
   <div class="modal-content">
-    <h2>Invite Team Member</h2>
-    <p class="modal-subtitle">Send an invitation to collaborate on compliance tasks.</p>
-    <div class="form-group"><label>Email *</label><input type="email" class="form-input" id="inviteEmail" placeholder="colleague@company.com"></div>
-    <div class="form-group"><label>Role</label><select class="form-select" id="inviteRole"><option value="editor">Editor — Can create and edit tasks</option><option value="admin">Admin — Can manage team and settings</option><option value="viewer">Viewer — Read-only access</option></select></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="closeInviteModal()">Cancel</button><button class="btn btn-primary" id="inviteSendBtn" onclick="sendInvite()">📧 Send Invite</button></div>
+    <h2 data-i18n="inviteModalTitle">Invite Team Member</h2>
+    <p class="modal-subtitle" data-i18n="inviteModalSubtitle">Send an invitation to collaborate on compliance tasks.</p>
+    <div class="form-group"><label data-i18n="fieldEmail">Email *</label><input type="email" class="form-input" id="inviteEmail" placeholder="colleague@company.com"></div>
+    <div class="form-group"><label data-i18n="fieldRole">Role</label><select class="form-select" id="inviteRole"><option value="editor" data-i18n="roleEditor">Editor — Can create and edit tasks</option><option value="admin" data-i18n="roleAdmin">Admin — Can manage team and settings</option><option value="viewer" data-i18n="roleViewer">Viewer — Read-only access</option></select></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeInviteModal()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="inviteSendBtn" onclick="sendInvite()" data-i18n="sendInviteBtn">📧 Send Invite</button></div>
   </div>
 </div>
 <div class="modal" id="checklistModal">
   <div class="modal-content" style="max-width:640px">
-    <h2 id="checklistModalTitle">New Checklist</h2>
-    <p class="modal-subtitle">Define the fields you want to track. Add as many as you need.</p>
-    <div class="form-group"><label>Name *</label><input class="form-input" id="checklistName" placeholder="e.g., Equipment Maintenance Log"></div>
-    <div class="form-group"><label>Description</label><textarea class="form-textarea" id="checklistDescription" placeholder="What is this checklist for?"></textarea></div>
+    <h2 id="checklistModalTitle" data-i18n="checklistModalNewTitle">New Checklist</h2>
+    <p class="modal-subtitle" data-i18n="checklistModalSubtitle">Define the fields you want to track. Add as many as you need.</p>
+    <div class="form-group"><label data-i18n="fieldName">Name *</label><input class="form-input" id="checklistName" placeholder="e.g., Equipment Maintenance Log"></div>
+    <div class="form-group"><label data-i18n="fieldDescription">Description</label><textarea class="form-textarea" id="checklistDescription" placeholder="What is this checklist for?"></textarea></div>
     <div class="form-row">
-      <div class="form-group"><label>Industry</label><select class="form-select" id="checklistIndustry"><option value="">—</option><option value="food">Food & Beverage</option><option value="cannabis">Cannabis</option><option value="pharma">Pharmaceutical</option><option value="laboratory">Laboratory</option><option value="construction">Construction</option><option value="cosmetics">Cosmetics</option><option value="medical_devices">Medical Devices</option><option value="otro">Other</option></select></div>
-      <div class="form-group"><label>Country</label><select class="form-select" id="checklistCountry"><option value="">—</option></select></div>
+      <div class="form-group"><label data-i18n="fieldCategory">Industry</label><select class="form-select" id="checklistIndustry"><option value="">—</option><option value="food" data-i18n="indFood">Food & Beverage</option><option value="cannabis" data-i18n="indCannabis">Cannabis</option><option value="pharma" data-i18n="indPharma">Pharmaceutical</option><option value="laboratory" data-i18n="indLab">Laboratory</option><option value="construction" data-i18n="indConstruction">Construction</option><option value="cosmetics" data-i18n="indCosmetics">Cosmetics</option><option value="medical_devices" data-i18n="indMedical">Medical Devices</option><option value="otro" data-i18n="catOther">Other</option></select></div>
+      <div class="form-group"><label data-i18n="settingsCountry">Country</label><select class="form-select" id="checklistCountry"><option value="">—</option></select></div>
     </div>
-    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em">Fields</label>
+    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em" data-i18n="fieldsLabel">Fields</label>
     <div id="checklistFieldsBuilder" style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px"></div>
-    <button class="btn btn-outline btn-sm" onclick="addChecklistField()">+ Add Field</button>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="closeChecklistModal()">Cancel</button><button class="btn btn-primary" id="checklistSaveBtn" onclick="saveChecklist()">💾 Save Checklist</button></div>
+    <button class="btn btn-outline btn-sm" onclick="addChecklistField()" data-i18n="addField">+ Add Field</button>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeChecklistModal()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="checklistSaveBtn" onclick="saveChecklist()" data-i18n="saveChecklistBtn">💾 Save Checklist</button></div>
   </div>
 </div>
 <div class="modal" id="checklistEntryModal">
   <div class="modal-content">
-    <h2 id="checklistEntryModalTitle">New Entry</h2>
-    <p class="modal-subtitle">Fill in the fields for this record.</p>
-    <div class="form-group"><label>Date</label><input type="date" class="form-input" id="checklistEntryDate"></div>
+    <h2 id="checklistEntryModalTitle" data-i18n="checklistEntryModalTitle">New Entry</h2>
+    <p class="modal-subtitle" data-i18n="checklistEntryModalSubtitle">Fill in the fields for this record.</p>
+    <div class="form-group"><label data-i18n="fieldDate">Date</label><input type="date" class="form-input" id="checklistEntryDate"></div>
     <div id="checklistEntryFields" style="display:flex;flex-direction:column;gap:14px"></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="closeChecklistEntryModal()">Cancel</button><button class="btn btn-primary" id="checklistEntrySaveBtn" onclick="saveChecklistEntry()">💾 Save Entry</button></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeChecklistEntryModal()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="checklistEntrySaveBtn" onclick="saveChecklistEntry()" data-i18n="saveEntryBtn">💾 Save Entry</button></div>
   </div>
 </div>
 <div class="modal" id="mfaEnrollModal">
   <div class="modal-content" style="max-width:420px">
-    <h2>Enable Two-Factor Authentication</h2>
-    <p class="modal-subtitle">Scan this QR code with your authenticator app (Google Authenticator, Authy, 1Password, etc.), then enter the 6-digit code it shows.</p>
+    <h2 data-i18n="mfaModalTitle">Enable Two-Factor Authentication</h2>
+    <p class="modal-subtitle" data-i18n="mfaModalSubtitle">Scan this QR code with your authenticator app (Google Authenticator, Authy, 1Password, etc.), then enter the 6-digit code it shows.</p>
     <div id="mfaQrContainer" style="display:flex;justify-content:center;background:white;padding:16px;border-radius:8px;margin-bottom:12px"></div>
-    <p style="font-size:11px;color:var(--text-tertiary);margin-bottom:12px">Can't scan? Enter this key manually: <code id="mfaSecret" style="word-break:break-all"></code></p>
-    <div class="form-group"><label>6-Digit Code</label><input class="form-input" id="mfaVerifyCode" placeholder="123456" maxlength="6" inputmode="numeric"></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="closeMFAEnrollModal()">Cancel</button><button class="btn btn-primary" id="mfaConfirmBtn" onclick="confirmMFAEnroll()">Confirm & Enable</button></div>
+    <p style="font-size:11px;color:var(--text-tertiary);margin-bottom:12px"><span data-i18n="mfaCantScan">Can't scan? Enter this key manually:</span> <code id="mfaSecret" style="word-break:break-all"></code></p>
+    <div class="form-group"><label data-i18n="field6Digit">6-Digit Code</label><input class="form-input" id="mfaVerifyCode" placeholder="123456" maxlength="6" inputmode="numeric"></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeMFAEnrollModal()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="mfaConfirmBtn" onclick="confirmMFAEnroll()" data-i18n="confirmEnable">Confirm & Enable</button></div>
   </div>
 </div>
 <div class="modal" id="signaturePadModal">
   <div class="modal-content" style="max-width:420px">
-    <h2>Sign Record</h2>
-    <p class="modal-subtitle">Draw your signature below to certify this record as accurate. This creates a timestamped, tamper-evident record — a simple electronic signature.</p>
+    <h2 data-i18n="signModalTitle">Sign Record</h2>
+    <p class="modal-subtitle" data-i18n="signModalSubtitle">Draw your signature below to certify this record as accurate. This creates a timestamped, tamper-evident record — a simple electronic signature.</p>
     <canvas id="signatureCanvas" width="360" height="150" style="background:white;border-radius:8px;border:1px solid var(--border);width:100%;touch-action:none;cursor:crosshair"></canvas>
-    <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-outline btn-sm" onclick="clearSignaturePad()">Clear</button></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="closeSignaturePad()">Cancel</button><button class="btn btn-primary" id="signatureSaveBtn" onclick="saveSignature()">✍️ Sign</button></div>
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-outline btn-sm" onclick="clearSignaturePad()" data-i18n="clearBtn">Clear</button></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeSignaturePad()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="signatureSaveBtn" onclick="saveSignature()" data-i18n="signBtn">✍️ Sign</button></div>
   </div>
 </div>
 <div class="modal" id="documentUploadModal">
   <div class="modal-content">
-    <h2>Upload Document</h2>
-    <p class="modal-subtitle">Permits, certificates, policies — anything for the audit binder.</p>
-    <div class="form-group"><label>File *</label><input type="file" class="form-input" id="documentFile" style="padding:8px"></div>
-    <div class="form-group"><label>Name</label><input class="form-input" id="documentName" placeholder="Defaults to the file name"></div>
-    <div class="form-group"><label>Tags (comma separated)</label><input class="form-input" id="documentTags" placeholder="permit, supplier, insurance"></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="closeDocumentUploadModal()">Cancel</button><button class="btn btn-primary" id="documentUploadBtn" onclick="uploadDocument()">📤 Upload</button></div>
+    <h2 data-i18n="uploadModalTitle">Upload Document</h2>
+    <p class="modal-subtitle" data-i18n="uploadModalSubtitle">Permits, certificates, policies — anything for the audit binder.</p>
+    <div class="form-group"><label data-i18n="fieldFile">File *</label><input type="file" class="form-input" id="documentFile" style="padding:8px"></div>
+    <div class="form-group"><label data-i18n="fieldNameOpt">Name</label><input class="form-input" id="documentName" placeholder="Defaults to the file name"></div>
+    <div class="form-group"><label data-i18n="fieldTags">Tags (comma separated)</label><input class="form-input" id="documentTags" placeholder="permit, supplier, insurance"></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeDocumentUploadModal()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="documentUploadBtn" onclick="uploadDocument()" data-i18n="uploadBtn">📤 Upload</button></div>
   </div>
 </div>
 <div class="modal" id="paymentModal">
@@ -564,9 +570,19 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
     <p class="modal-subtitle" id="paymentModalSubtitle"></p>
     <div id="paymentSteps"></div>
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closePaymentModal()">Cancel</button>
+      <button class="btn btn-outline" onclick="closePaymentModal()" data-i18n="cancelBtn">Cancel</button>
       <button class="btn btn-primary" id="paymentVerifyBtn" style="display:none" onclick="verifyManualPayment()">✅ I've Sent the Payment</button>
     </div>
+  </div>
+</div>
+<button id="aiAdvisorFab" onclick="openAIAdvisorModal()" title="Ask AI" style="position:fixed;bottom:24px;right:24px;z-index:500;width:56px;height:56px;border-radius:50%;background:var(--accent);color:white;border:none;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;transition:var(--transition)" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">🧠</button>
+<div class="modal" id="aiAdvisorModal">
+  <div class="modal-content" style="max-width:520px">
+    <h2 data-i18n="aiAdvisorTitle">🧠 Ask AI</h2>
+    <p class="modal-subtitle" data-i18n="aiAdvisorSubtitle">Ask a compliance question — our AI answers with your country's regulations in mind. Not a substitute for professional advice.</p>
+    <div class="form-group"><textarea class="form-textarea" id="aiAdvisorPrompt" style="min-height:100px" placeholder="e.g., What temperature should I keep dairy storage at?" data-i18n-placeholder="aiAdvisorPlaceholder"></textarea></div>
+    <div id="aiAdvisorAnswer" style="display:none;background:var(--bg-tertiary);border-radius:8px;padding:14px;font-size:13px;line-height:1.6;margin-bottom:8px;max-height:280px;overflow-y:auto;white-space:pre-wrap"></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeAIAdvisorModal()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="aiAdvisorSendBtn" onclick="askAI()" data-i18n="aiAdvisorSendBtn">💬 Ask</button></div>
   </div>
 </div>
 <script>
@@ -578,6 +594,76 @@ const SUPABASE_URL='https://rgyriiyaxpdqikuslkph.supabase.co';
 const SUPABASE_KEY='sb_publishable_MmaGLbeVvVGIG1dUPXMTIw_IVePYLqM';
 const EDGE_BASE=`${SUPABASE_URL}/functions/v1`;
 let supabaseClient,currentUser,currentCompany,currentSettings;
+
+/* ========== i18n (EN/ES) — shell only for now: nav, headers, buttons,
+   form labels/placeholders, select options, modal copy. Dynamic JS-built
+   content (toasts, tables, calendar month names, PDF/CSV text) stays in
+   English pending a follow-up pass. Reads the same localStorage key
+   index.html writes, so the language picked on the landing page carries
+   into the dashboard. ========== */
+const translations={
+  en:{navDashboard:'Dashboard',navCalendar:'Calendar',navTasks:'Tasks',navHaccp:'HACCP',navTemplates:'Templates',navChecklists:'Checklists',navDocuments:'Documents',navActivity:'Activity',navTeam:'Team',navSettings:'Settings',navBilling:'Billing',signOut:'Sign Out',
+    hdrDashboard:'Dashboard',hdrCalendar:'Regulatory Calendar',hdrTasks:'Tasks',hdrHaccp:'HACCP / GMP Monitoring',hdrTemplates:'Template Marketplace',hdrChecklists:'Custom Checklists',hdrDocuments:'Documents',hdrActivity:'Activity Log',hdrTeam:'Team',hdrSettings:'Settings',hdrBilling:'Billing',
+    newTask:'+ New Task',exportCsv:'📊 Export CSV',newEntry:'+ New Entry',generateAuditPdf:'📄 Generate Audit PDF',viewHistory:'📈 View History',newChecklist:'+ New Checklist',uploadDocument:'+ Upload Document',inviteMember:'+ Invite Member',saveSettingsBtn:'💾 Save Settings',today:'Today',backBtn:'← Back',editFields:'✏️ Edit Fields',generatePdf:'📄 Generate PDF',deleteBtn:'🗑️ Delete',cancelBtn:'Cancel',
+    checklistsSubtitle:'Build your own report with whatever fields you need — not limited to HACCP.',documentsSubtitle:'Permits, supplier certificates, insurance policies — anything you want on hand for an audit.',activitySubtitle:'Every change and deletion to your compliance records, for audit purposes.',
+    searchTasks:'Search tasks...',searchEquipment:'Search equipment or area...',searchTemplates:'Search templates...',searchDocuments:'Search documents...',
+    allStatus:'All Status',statusPending:'Pending',statusInProgress:'In Progress',statusCompleted:'Completed',statusOverdue:'Overdue',
+    allCategories:'All Categories',catLegal:'Legal',catFiscal:'Fiscal',catLabor:'Labor',catSafety:'Safety',catEnvironmental:'Environmental',catQuality:'Quality',catOther:'Other',
+    allPriorities:'All Priorities',prioHigh:'🔴 High',prioMedium:'🟡 Medium',prioLow:'🟢 Low',
+    allIndustries:'All Industries',allCountries:'All Countries',
+    notifications:'Notifications',markAllRead:'Mark all read',noNotifications:'No notifications',
+    taskModalNewTitle:'New Task',taskModalEditTitle:'Edit Task',taskModalSubtitle:'Create a new compliance task with deadline and priority.',fieldTitle:'Title *',fieldDescription:'Description',fieldCategory:'Category',fieldPriority:'Priority',fieldDueDate:'Due Date *',fieldAssignedTo:'Assigned To',unassigned:'Unassigned',fieldTags:'Tags (comma separated)',fieldRecurrence:'Recurrence',recurNone:'None',recurDaily:'Daily',recurWeekly:'Weekly',recurMonthly:'Monthly',recurQuarterly:'Quarterly',recurYearly:'Yearly',saveTaskBtn:'💾 Save Task',titleRequired:'Title is required',dueDateRequired:'Due date is required',
+    haccpModalTitle:'New HACCP Entry',haccpModalSubtitle:'Record a critical control point measurement.',fieldDate:'Date',fieldTime:'Time',fieldArea:'Area',fieldEquipment:'Equipment',fieldParameter:'Parameter',fieldUnit:'Unit',fieldValue:'Value *',fieldLimitLow:'Limit Low',fieldLimitHigh:'Limit High *',fieldInitials:'Initials',fieldCorrective:'Corrective Action (if deviation)',saveEntryBtn:'💾 Save Entry',paramTemp:'Temperature',paramPh:'pH',paramHumidity:'Humidity',paramPressure:'Pressure',paramOther:'Other',
+    inviteModalTitle:'Invite Team Member',inviteModalSubtitle:'Send an invitation to collaborate on compliance tasks.',fieldEmail:'Email *',fieldRole:'Role',roleEditor:'Editor — Can create and edit tasks',roleAdmin:'Admin — Can manage team and settings',roleViewer:'Viewer — Read-only access',sendInviteBtn:'📧 Send Invite',
+    checklistModalNewTitle:'New Checklist',checklistModalEditTitle:'Edit Checklist',checklistModalSubtitle:'Define the fields you want to track. Add as many as you need.',fieldName:'Name *',fieldsLabel:'Fields',addField:'+ Add Field',saveChecklistBtn:'💾 Save Checklist',indFood:'Food & Beverage',indCannabis:'Cannabis',indPharma:'Pharmaceutical',indLab:'Laboratory',indConstruction:'Construction',indCosmetics:'Cosmetics',indMedical:'Medical Devices',
+    checklistEntryModalTitle:'New Entry',checklistEntryModalSubtitle:'Fill in the fields for this record.',
+    mfaModalTitle:'Enable Two-Factor Authentication',mfaModalSubtitle:"Scan this QR code with your authenticator app (Google Authenticator, Authy, 1Password, etc.), then enter the 6-digit code it shows.",mfaCantScan:"Can't scan? Enter this key manually:",field6Digit:'6-Digit Code',confirmEnable:'Confirm & Enable',
+    signModalTitle:'Sign Record',signModalSubtitle:'Draw your signature below to certify this record as accurate. This creates a timestamped, tamper-evident record — a simple electronic signature.',clearBtn:'Clear',signBtn:'✍️ Sign',
+    uploadModalTitle:'Upload Document',uploadModalSubtitle:'Permits, certificates, policies — anything for the audit binder.',fieldFile:'File *',fieldNameOpt:'Name',uploadBtn:'📤 Upload',
+    settingsCompanyName:'Company Name',settingsCountry:'Country',settingsIndustry:'Industry',settingsTimezone:'Timezone',settingsAccentColor:'Accent Color',settingsPdfTitle:'PDF Title Template',settingsLogo:'Logo URL',settingsSignature:'Signature URL',
+    twoFATitle:'Two-Factor Authentication',twoFADesc:'Require a code from an authenticator app (Google Authenticator, Authy, etc.) in addition to your password.',twoFAStatus:'Status:',twoFAChecking:'Checking...',enable2FA:'🔐 Enable 2FA',disable2FA:'Disable 2FA',
+    yourDataTitle:'Your Data',yourDataDesc:'Download everything stored for your company, or permanently delete your account.',downloadData:'⬇️ Download My Data (JSON)',
+    dangerZoneTitle:'Danger Zone',dangerZoneDesc:'Permanently deletes your account and any companies you own. Team members you invited will lose access. This cannot be undone.',deleteAccountBtn:'🗑️ Delete My Account',
+    currentPlanLabel:'Current Plan:',upgradeUnlockText:'Upgrade to unlock unlimited tasks, AI suggestions, team features, and more.',tasksUsedLabel:'Tasks used',teamMembersLabel:'Team members',renewsLabel:'📅 Renews:',
+    upgradePlanTitle:'💎 Upgrade Your Plan',upgradeChooseText:'Choose how you want to pay. All plans include a 14-day money-back guarantee.',payWithCardBtn:'Pay with Card / Apple Pay / Google Pay',payCryptoBotBtn:'Pay via CryptoBot (Telegram)',payP2PBtn:'Pay via P2P USDT Transfer',paymentDisclaimer:'🔒 Card payments are processed instantly by NOWPayments. CryptoBot/P2P payments are reviewed manually and usually activate within minutes.',paymentHistoryTitle:'📜 Payment History',loadingText:'Loading...',
+    tasksOverview:'Tasks Overview (Last 30 Days)',complianceByCategory:'Compliance by Category',recentTasks:'Recent Tasks',skipBtn:'Skip',
+    optFood:'🍽️ Food',optCannabis:'🌿 Cannabis',optPharma:'💊 Pharma',optLaboratory:'🧪 Laboratory',optConstruction:'🏗️ Construction',optUSA:'🇺🇸 USA',optSpain:'🇪🇸 Spain',optMexico:'🇲🇽 Mexico',optBrazil:'🇧🇷 Brazil',
+    aiAdvisorTitle:'🧠 Ask AI',aiAdvisorSubtitle:"Ask a compliance question — our AI answers with your country's regulations in mind. Not a substitute for professional advice.",aiAdvisorPlaceholder:'e.g., What temperature should I keep dairy storage at?',aiAdvisorSendBtn:'💬 Ask',aiAdvisorAsking:'⏳ Thinking...',aiAdvisorEmptyError:'Please type a question first',aiAdvisorError:'Could not get an answer. Please try again.',aiAdvisorNoAnswer:'No answer returned.'},
+  es:{navDashboard:'Dashboard',navCalendar:'Calendario',navTasks:'Tareas',navHaccp:'HACCP',navTemplates:'Templates',navChecklists:'Checklists',navDocuments:'Documentos',navActivity:'Actividad',navTeam:'Equipo',navSettings:'Configuración',navBilling:'Facturación',signOut:'Cerrar Sesión',
+    hdrDashboard:'Dashboard',hdrCalendar:'Calendario Regulatorio',hdrTasks:'Tareas',hdrHaccp:'Monitoreo HACCP / GMP',hdrTemplates:'Marketplace de Templates',hdrChecklists:'Checklists Personalizados',hdrDocuments:'Documentos',hdrActivity:'Registro de Actividad',hdrTeam:'Equipo',hdrSettings:'Configuración',hdrBilling:'Facturación',
+    newTask:'+ Nueva Tarea',exportCsv:'📊 Exportar CSV',newEntry:'+ Nuevo Registro',generateAuditPdf:'📄 Generar PDF de Auditoría',viewHistory:'📈 Ver Historial',newChecklist:'+ Nuevo Checklist',uploadDocument:'+ Subir Documento',inviteMember:'+ Invitar Miembro',saveSettingsBtn:'💾 Guardar Configuración',today:'Hoy',backBtn:'← Volver',editFields:'✏️ Editar Campos',generatePdf:'📄 Generar PDF',deleteBtn:'🗑️ Eliminar',cancelBtn:'Cancelar',
+    checklistsSubtitle:'Crea tu propio reporte con los campos que necesites — no limitado a HACCP.',documentsSubtitle:'Permisos, certificados de proveedores, pólizas de seguro — todo lo que quieras tener a mano para una auditoría.',activitySubtitle:'Cada cambio y eliminación en tus registros de cumplimiento, para fines de auditoría.',
+    searchTasks:'Buscar tareas...',searchEquipment:'Buscar equipo o área...',searchTemplates:'Buscar templates...',searchDocuments:'Buscar documentos...',
+    allStatus:'Todos los Estados',statusPending:'Pendiente',statusInProgress:'En Progreso',statusCompleted:'Completado',statusOverdue:'Vencido',
+    allCategories:'Todas las Categorías',catLegal:'Legal',catFiscal:'Fiscal',catLabor:'Laboral',catSafety:'Seguridad',catEnvironmental:'Ambiental',catQuality:'Calidad',catOther:'Otro',
+    allPriorities:'Todas las Prioridades',prioHigh:'🔴 Alta',prioMedium:'🟡 Media',prioLow:'🟢 Baja',
+    allIndustries:'Todas las Industrias',allCountries:'Todos los Países',
+    notifications:'Notificaciones',markAllRead:'Marcar todo leído',noNotifications:'Sin notificaciones',
+    taskModalNewTitle:'Nueva Tarea',taskModalEditTitle:'Editar Tarea',taskModalSubtitle:'Crea una nueva tarea de cumplimiento con fecha límite y prioridad.',fieldTitle:'Título *',fieldDescription:'Descripción',fieldCategory:'Categoría',fieldPriority:'Prioridad',fieldDueDate:'Fecha Límite *',fieldAssignedTo:'Asignado a',unassigned:'Sin asignar',fieldTags:'Etiquetas (separadas por coma)',fieldRecurrence:'Recurrencia',recurNone:'Ninguna',recurDaily:'Diaria',recurWeekly:'Semanal',recurMonthly:'Mensual',recurQuarterly:'Trimestral',recurYearly:'Anual',saveTaskBtn:'💾 Guardar Tarea',titleRequired:'El título es obligatorio',dueDateRequired:'La fecha límite es obligatoria',
+    haccpModalTitle:'Nuevo Registro HACCP',haccpModalSubtitle:'Registra una medición de punto crítico de control.',fieldDate:'Fecha',fieldTime:'Hora',fieldArea:'Área',fieldEquipment:'Equipo',fieldParameter:'Parámetro',fieldUnit:'Unidad',fieldValue:'Valor *',fieldLimitLow:'Límite Inferior',fieldLimitHigh:'Límite Superior *',fieldInitials:'Iniciales',fieldCorrective:'Acción Correctiva (si hay desviación)',saveEntryBtn:'💾 Guardar Registro',paramTemp:'Temperatura',paramPh:'pH',paramHumidity:'Humedad',paramPressure:'Presión',paramOther:'Otro',
+    inviteModalTitle:'Invitar Miembro del Equipo',inviteModalSubtitle:'Envía una invitación para colaborar en tareas de cumplimiento.',fieldEmail:'Email *',fieldRole:'Rol',roleEditor:'Editor — Puede crear y editar tareas',roleAdmin:'Admin — Puede administrar equipo y configuración',roleViewer:'Solo lectura — Acceso de solo lectura',sendInviteBtn:'📧 Enviar Invitación',
+    checklistModalNewTitle:'Nuevo Checklist',checklistModalEditTitle:'Editar Checklist',checklistModalSubtitle:'Define los campos que quieres rastrear. Agrega tantos como necesites.',fieldName:'Nombre *',fieldsLabel:'Campos',addField:'+ Agregar Campo',saveChecklistBtn:'💾 Guardar Checklist',indFood:'Alimentos y Bebidas',indCannabis:'Cannabis',indPharma:'Farmacéutica',indLab:'Laboratorio',indConstruction:'Construcción',indCosmetics:'Cosmética',indMedical:'Dispositivos Médicos',
+    checklistEntryModalTitle:'Nuevo Registro',checklistEntryModalSubtitle:'Completa los campos para este registro.',
+    mfaModalTitle:'Activar Autenticación de Dos Factores',mfaModalSubtitle:'Escanea este código QR con tu app de autenticación (Google Authenticator, Authy, 1Password, etc.), luego ingresa el código de 6 dígitos que muestra.',mfaCantScan:'¿No puedes escanear? Ingresa esta clave manualmente:',field6Digit:'Código de 6 Dígitos',confirmEnable:'Confirmar y Activar',
+    signModalTitle:'Firmar Registro',signModalSubtitle:'Dibuja tu firma abajo para certificar este registro como preciso. Esto crea un registro con marca de tiempo a prueba de manipulaciones — una firma electrónica simple.',clearBtn:'Borrar',signBtn:'✍️ Firmar',
+    uploadModalTitle:'Subir Documento',uploadModalSubtitle:'Permisos, certificados, pólizas — todo lo que necesites para el expediente de auditoría.',fieldFile:'Archivo *',fieldNameOpt:'Nombre',uploadBtn:'📤 Subir',
+    settingsCompanyName:'Nombre de la Empresa',settingsCountry:'País',settingsIndustry:'Industria',settingsTimezone:'Zona Horaria',settingsAccentColor:'Color de Acento',settingsPdfTitle:'Plantilla de Título del PDF',settingsLogo:'URL del Logo',settingsSignature:'URL de la Firma',
+    twoFATitle:'Autenticación de Dos Factores',twoFADesc:'Requiere un código de una app de autenticación (Google Authenticator, Authy, etc.) además de tu contraseña.',twoFAStatus:'Estado:',twoFAChecking:'Verificando...',enable2FA:'🔐 Activar 2FA',disable2FA:'Desactivar 2FA',
+    yourDataTitle:'Tus Datos',yourDataDesc:'Descarga todo lo almacenado para tu empresa, o elimina tu cuenta permanentemente.',downloadData:'⬇️ Descargar Mis Datos (JSON)',
+    dangerZoneTitle:'Zona de Peligro',dangerZoneDesc:'Elimina permanentemente tu cuenta y cualquier empresa que poseas. Los miembros del equipo que invitaste perderán acceso. Esto no se puede deshacer.',deleteAccountBtn:'🗑️ Eliminar Mi Cuenta',
+    currentPlanLabel:'Plan Actual:',upgradeUnlockText:'Actualiza para desbloquear tareas ilimitadas, sugerencias de IA, funciones de equipo y más.',tasksUsedLabel:'Tareas usadas',teamMembersLabel:'Miembros del equipo',renewsLabel:'📅 Se renueva:',
+    upgradePlanTitle:'💎 Actualiza Tu Plan',upgradeChooseText:'Elige cómo quieres pagar. Todos los planes incluyen garantía de devolución de 14 días.',payWithCardBtn:'Pagar con Tarjeta / Apple Pay / Google Pay',payCryptoBotBtn:'Pagar vía CryptoBot (Telegram)',payP2PBtn:'Pagar vía Transferencia P2P USDT',paymentDisclaimer:'🔒 Los pagos con tarjeta se procesan al instante con NOWPayments. Los pagos por CryptoBot/P2P se revisan manualmente y suelen activarse en minutos.',paymentHistoryTitle:'📜 Historial de Pagos',loadingText:'Cargando...',
+    tasksOverview:'Resumen de Tareas (Últimos 30 Días)',complianceByCategory:'Cumplimiento por Categoría',recentTasks:'Tareas Recientes',skipBtn:'Omitir',
+    optFood:'🍽️ Alimentos',optCannabis:'🌿 Cannabis',optPharma:'💊 Farmacia',optLaboratory:'🧪 Laboratorio',optConstruction:'🏗️ Construcción',optUSA:'🇺🇸 EE.UU.',optSpain:'🇪🇸 España',optMexico:'🇲🇽 México',optBrazil:'🇧🇷 Brasil',
+    aiAdvisorTitle:'🧠 Preguntar a la IA',aiAdvisorSubtitle:'Haz una pregunta de cumplimiento — nuestra IA responde considerando la normativa de tu país. No sustituye la asesoría profesional.',aiAdvisorPlaceholder:'ej., ¿A qué temperatura debo mantener el almacenamiento de lácteos?',aiAdvisorSendBtn:'💬 Preguntar',aiAdvisorAsking:'⏳ Pensando...',aiAdvisorEmptyError:'Escribe una pregunta primero',aiAdvisorError:'No se pudo obtener respuesta. Intenta de nuevo.',aiAdvisorNoAnswer:'No se recibió respuesta.'}
+};
+let currentLang=localStorage.getItem('complylog_lang')||'en';
+if(!translations[currentLang])currentLang='en';
+function t(key){return translations[currentLang]?.[key]||translations['en'][key]||key}
+function applyLang(){document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.getAttribute('data-i18n');if(translations[currentLang]?.[key])el.textContent=t(key);});document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.getAttribute('data-i18n-placeholder');if(translations[currentLang]?.[key])el.placeholder=t(key);});document.querySelectorAll('.lang-btn-app').forEach(btn=>{const active=btn.dataset.langBtn===currentLang;btn.style.background=active?'var(--accent-soft)':'transparent';btn.style.color=active?'var(--text-primary)':'var(--text-secondary)';});}
+function switchAppLang(lang){currentLang=lang;localStorage.setItem('complylog_lang',lang);applyLang();}
+window.switchAppLang=switchAppLang;
+
 let editingTaskId=null,taskPage=1,taskPerPage=10,allTasks=[];
 let tasksChartInst=null,categoryChartInst=null,haccpTrendInst=null;
 let onboardingStep=0;
@@ -598,7 +684,7 @@ async function init(){
   await loadCompany();
   if(!currentCompany){window.location.href='/index.html';return;}
   await checkPendingInvites();
-  setupNavigation();setupKeyboardShortcuts();setupColorPicker();populateSelects();
+  applyLang();setupNavigation();setupKeyboardShortcuts();setupColorPicker();populateSelects();
   if(!localStorage.getItem('complylog_onboarded'))showOnboarding();
   loadDashboard();loadNotifications();checkMFAStatus();
   setInterval(loadNotifications,60000);
@@ -1702,6 +1788,35 @@ window.openPaymentModal=openPaymentModal;
 window.closePaymentModal=closePaymentModal;
 window.verifyManualPayment=verifyManualPayment;
 window.copyWallet=copyWallet;
+
+/* ========== AI ADVISOR (general-purpose "Ask AI", not tied to HACCP
+   deviations — closes the gap where the landing page markets AI Suggestions
+   but the dashboard only ever surfaced it inside a HACCP deviation alert) */
+function openAIAdvisorModal(){
+  document.getElementById('aiAdvisorPrompt').value='';
+  document.getElementById('aiAdvisorAnswer').style.display='none';
+  document.getElementById('aiAdvisorModal').classList.add('active');
+}
+function closeAIAdvisorModal(){document.getElementById('aiAdvisorModal').classList.remove('active');}
+async function askAI(){
+  const prompt=document.getElementById('aiAdvisorPrompt').value.trim();
+  if(!prompt){toast(t('aiAdvisorEmptyError'),'error');return;}
+  const btn=document.getElementById('aiAdvisorSendBtn');
+  btn.disabled=true;btn.textContent=t('aiAdvisorAsking');
+  const answerBox=document.getElementById('aiAdvisorAnswer');
+  try{
+    const{data:{session}}=await supabaseClient.auth.getSession();
+    const res=await fetch(`${EDGE_BASE}/deepseek`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({prompt,company_id:currentCompany.id,context:'compliance'})});
+    const data=await res.json();
+    if(!res.ok){toast(data.error||t('aiAdvisorError'),'error');return;}
+    answerBox.textContent=data.answer||data.suggestion||t('aiAdvisorNoAnswer');
+    answerBox.style.display='block';
+  }catch(err){toast(t('aiAdvisorError'),'error');}
+  finally{btn.disabled=false;btn.textContent=t('aiAdvisorSendBtn');}
+}
+window.openAIAdvisorModal=openAIAdvisorModal;
+window.closeAIAdvisorModal=closeAIAdvisorModal;
+window.askAI=askAI;
 
 async function logout(){await supabaseClient.auth.signOut();window.location.href='/index.html';}
 
