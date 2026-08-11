@@ -1445,7 +1445,22 @@ async function checkPendingInvites(){
     if(confirm(t('inviteAcceptConfirm').replace('{company}',companyName).replace('{role}',inv.role))){
       const{error:mErr}=await supabaseClient.from('company_members').insert({company_id:inv.company_id,user_id:currentUser.id,role:inv.role});
       if(!mErr){await supabaseClient.from('invitations').update({accepted_at:new Date().toISOString()}).eq('id',inv.id);toast(t('joinedCompanyToast').replace('{company}',companyName),'success',7000);joinedAny=true;}
-      else{toast(mErr.message.includes('plan_limit_reached')?t('companyMemberLimitError').replace('{company}',companyName):t('couldNotJoinError')+mErr.message,'error');}
+      else{
+        // Only a real failure (e.g. the target company is at its member
+        // limit) leaves accepted_at untouched, so it's retried next login —
+        // an explicit "no thanks" below always resolves the row so it can't
+        // nag forever either way.
+        toast(mErr.message.includes('plan_limit_reached')?t('companyMemberLimitError').replace('{company}',companyName):t('couldNotJoinError')+mErr.message,'error');
+      }
+    }else{
+      // Declined — mark it handled (same accepted_at field, just without a
+      // company_members row) so this exact invite never asks again. This was
+      // the actual bug: Cancel used to leave the row untouched, so it kept
+      // re-prompting on every single login — and with 2+ pending invites
+      // stacked, the browser starts appending its own "stop asking me"
+      // checkbox to the native confirm() dialogs, which is what looked like
+      // a mysterious second/repeating notification.
+      await supabaseClient.from('invitations').update({accepted_at:new Date().toISOString()}).eq('id',inv.id);
     }
   }
   if(joinedAny)await loadCompany();
