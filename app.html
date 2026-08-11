@@ -96,6 +96,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .pagination button{padding:8px 14px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:var(--radius-xs);cursor:pointer;font-size:13px;font-family:inherit;transition:var(--transition)}
 .pagination button:hover{background:var(--bg-tertiary);color:var(--text-primary)}
 .pagination button.active{background:var(--accent);color:white;border-color:var(--accent)}
+.admin-gran-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
 .pagination button:disabled{opacity:.4;cursor:not-allowed}
 .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
 .modal.active{display:flex;opacity:1}
@@ -456,7 +457,14 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
     </div>
   </div>
   <div class="section" id="admin">
-    <div class="page-header"><h1 data-i18n="hdrAdmin">Admin</h1></div>
+    <div class="page-header">
+      <h1 data-i18n="hdrAdmin">Admin</h1>
+      <div class="page-header-actions">
+        <button class="btn btn-outline btn-sm admin-gran-btn active" data-gran="day" data-i18n="granDay">Day</button>
+        <button class="btn btn-outline btn-sm admin-gran-btn" data-gran="month" data-i18n="granMonth">Month</button>
+        <button class="btn btn-outline btn-sm admin-gran-btn" data-gran="year" data-i18n="granYear">Year</button>
+      </div>
+    </div>
     <div class="stats-grid" id="adminStatsGrid">
       <div class="stat-card skeleton skeleton-stat"></div>
       <div class="stat-card skeleton skeleton-stat"></div>
@@ -464,10 +472,18 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
       <div class="stat-card skeleton skeleton-stat"></div>
     </div>
 
+    <div class="chart-grid" style="margin-top:16px">
+      <div class="chart-card"><h3 data-i18n="adminRevenueChartTitle">Revenue Over Time</h3><div class="chart-container"><canvas id="adminRevenueChart"></canvas></div></div>
+      <div class="chart-card"><h3 data-i18n="adminSignupsChartTitle">New Companies Over Time</h3><div class="chart-container"><canvas id="adminSignupsChart"></canvas></div></div>
+    </div>
+
     <h2 style="margin:24px 0 12px;font-size:16px" data-i18n="adminPendingPaymentsTitle">Pending Manual Payments</h2>
     <div id="adminPendingPayments"></div>
 
-    <h2 style="margin:24px 0 12px;font-size:16px" data-i18n="adminCompaniesTitle">All Companies</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px">
+      <h2 style="font-size:16px" data-i18n="adminCompaniesTitle">All Companies</h2>
+      <button class="btn btn-danger btn-sm" id="adminBulkDeleteBtn" style="display:none"></button>
+    </div>
     <div id="adminCompanies" style="overflow-x:auto"></div>
   </div>
 <div class="modal" id="taskModal">
@@ -666,6 +682,7 @@ const translations={
     planTaskLimitReached:"You've reached your plan's limit of {max} tasks. Upgrade in Billing to add more.",planTaskLimitReachedShort:"You've reached your plan's task limit. Upgrade in Billing to add more.",taskUpdatedToast:'Task updated!',taskCreatedToast:'Task created!',taskCompletedRecurErr:'Task completed! (Could not schedule the next occurrence — check your plan limits.)',taskCompletedNextOccurrence:'Task completed! 🎉 Next occurrence scheduled for {date}.',taskCompletedRecurLimit:"Task completed! 🎉 (Recurring task limit reached — next occurrence wasn't created. Upgrade to keep recurrence going.)",taskCompletedToast:'Task completed! 🎉',deleteTaskConfirm:'Delete this task? This action can be undone later.',taskDeletedToast:'Task deleted',
     nothingToExport:'Nothing to export yet',csvExportedToast:'CSV exported!',deleteHaccpConfirm:'Delete this HACCP entry? This cannot be undone.',haccpDeletedToast:'HACCP entry deleted',
     navAdmin:'Admin',hdrAdmin:'Admin',adminPendingPaymentsTitle:'Pending Manual Payments',adminCompaniesTitle:'All Companies',adminCompaniesLabel:'Companies',adminUsersLabel:'Users',adminRevenueLabel:'Revenue (confirmed)',adminPendingLabel:'Pending Review',adminNewThisWeekLabel:'New This Week',adminNoPendingPayments:'No payments waiting for review.',approveBtn:'Approve',rejectBtn:'Reject',adminApproveConfirm:"Approve this payment? This activates the company's plan immediately — only do this after confirming the funds actually arrived.",adminPaymentApprovedToast:'Payment approved — plan activated!',adminRejectConfirm:'Reject this payment? The company will need to submit a new one.',adminPaymentRejectedToast:'Payment rejected',adminColCompany:'Company',adminColTasks:'Tasks',adminColCreated:'Created',adminDeleteCompanyPrompt:'This permanently deletes "{name}" and ALL its data (tasks, HACCP logs, documents, everything). This cannot be undone.\n\nType the company name exactly to confirm:',adminCompanyDeletedToast:'Company deleted',
+    granDay:'Day',granMonth:'Month',granYear:'Year',adminRevenueChartTitle:'Revenue Over Time',adminSignupsChartTitle:'New Companies Over Time',adminDeleteSelectedBtn:'Delete Selected ({n})',adminBulkDeleteConfirm:'Permanently delete {n} companies and ALL their data? This cannot be undone.\n\n{names}',adminCompaniesDeletedToast:'{n} companies deleted',
     switchedToCompany:'Switched to {company}',
     onbWelcomeTitle:'Welcome to ComplyLog Pro',onbWelcomeText:"Your all-in-one compliance management platform. Let's get you set up in 3 steps.",onbGetStarted:'Get Started',onbProfileTitle:'Set Your Profile',onbProfileText:'Tell us about your company so we can personalize your experience.',onbContinue:'Continue',onbAllSetTitle:"You're All Set!",onbAllSetText:'Start tracking your compliance tasks and HACCP logs. Use the sidebar to navigate.',onbGoToDashboard:'Go to Dashboard',welcomeAboardToast:'Welcome aboard! 🚀'},
   es:{navDashboard:'Dashboard',navCalendar:'Calendario',navTasks:'Tareas',navHaccp:'HACCP',navTemplates:'Templates',navChecklists:'Checklists',navDocuments:'Documentos',navActivity:'Actividad',navTeam:'Equipo',navSettings:'Configuración',navBilling:'Facturación',signOut:'Cerrar Sesión',
@@ -716,6 +733,7 @@ const translations={
     planTaskLimitReached:'Alcanzaste el límite de tu plan de {max} tareas. Actualiza en Facturación para agregar más.',planTaskLimitReachedShort:'Alcanzaste el límite de tareas de tu plan. Actualiza en Facturación para agregar más.',taskUpdatedToast:'¡Tarea actualizada!',taskCreatedToast:'¡Tarea creada!',taskCompletedRecurErr:'¡Tarea completada! (No se pudo programar la siguiente ocurrencia — revisa los límites de tu plan.)',taskCompletedNextOccurrence:'¡Tarea completada! 🎉 Siguiente ocurrencia programada para {date}.',taskCompletedRecurLimit:'¡Tarea completada! 🎉 (Límite de tareas recurrentes alcanzado — no se creó la siguiente ocurrencia. Actualiza tu plan para mantener la recurrencia.)',taskCompletedToast:'¡Tarea completada! 🎉',deleteTaskConfirm:'¿Eliminar esta tarea? Esta acción se puede deshacer después.',taskDeletedToast:'Tarea eliminada',
     nothingToExport:'Aún no hay nada para exportar',csvExportedToast:'¡CSV exportado!',deleteHaccpConfirm:'¿Eliminar este registro HACCP? Esto no se puede deshacer.',haccpDeletedToast:'Registro HACCP eliminado',
     navAdmin:'Admin',hdrAdmin:'Administración',adminPendingPaymentsTitle:'Pagos Manuales Pendientes',adminCompaniesTitle:'Todas las Empresas',adminCompaniesLabel:'Empresas',adminUsersLabel:'Usuarios',adminRevenueLabel:'Ingresos (confirmados)',adminPendingLabel:'Pendientes de Revisión',adminNewThisWeekLabel:'Nuevas Esta Semana',adminNoPendingPayments:'No hay pagos esperando revisión.',approveBtn:'Aprobar',rejectBtn:'Rechazar',adminApproveConfirm:'¿Aprobar este pago? Esto activa el plan de la empresa de inmediato — solo hazlo después de confirmar que el dinero realmente llegó.',adminPaymentApprovedToast:'¡Pago aprobado — plan activado!',adminRejectConfirm:'¿Rechazar este pago? La empresa tendrá que enviar uno nuevo.',adminPaymentRejectedToast:'Pago rechazado',adminColCompany:'Empresa',adminColTasks:'Tareas',adminColCreated:'Creada',adminDeleteCompanyPrompt:'Esto elimina permanentemente "{name}" y TODOS sus datos (tareas, registros HACCP, documentos, todo). Esto no se puede deshacer.\n\nEscribe el nombre exacto de la empresa para confirmar:',adminCompanyDeletedToast:'Empresa eliminada',
+    granDay:'Día',granMonth:'Mes',granYear:'Año',adminRevenueChartTitle:'Ingresos en el Tiempo',adminSignupsChartTitle:'Empresas Nuevas en el Tiempo',adminDeleteSelectedBtn:'Eliminar Seleccionadas ({n})',adminBulkDeleteConfirm:'¿Eliminar permanentemente {n} empresas y TODOS sus datos? Esto no se puede deshacer.\n\n{names}',adminCompaniesDeletedToast:'{n} empresas eliminadas',
     switchedToCompany:'Cambiado a {company}',
     onbWelcomeTitle:'Bienvenido a ComplyLog Pro',onbWelcomeText:'Tu plataforma todo-en-uno de gestión de cumplimiento. Vamos a configurarte en 3 pasos.',onbGetStarted:'Comenzar',onbProfileTitle:'Configura tu Perfil',onbProfileText:'Cuéntanos sobre tu empresa para personalizar tu experiencia.',onbContinue:'Continuar',onbAllSetTitle:'¡Todo Listo!',onbAllSetText:'Empieza a rastrear tus tareas de cumplimiento y registros HACCP. Usa el sidebar para navegar.',onbGoToDashboard:'Ir al Dashboard',welcomeAboardToast:'¡Bienvenido a bordo! 🚀'}
 };
@@ -1936,8 +1954,17 @@ window.askAI=askAI;
 
 /* ========== PLATFORM ADMIN PANEL (only visible to rows in platform_admins —
    gated server-side in the admin-panel Edge Function, this client-side flag
-   is just a UI convenience, not the real security boundary) ========== */
+   is just a UI convenience, not the real security boundary).
+   Rebuilt 2026-08-11: checkbox multi-select + bulk delete, revenue/signups
+   charts with a day/month/year granularity toggle. Company rows use
+   data-attributes + event delegation instead of inline onclick with
+   string-interpolated names — the old version broke (silently, no error
+   surfaced) on any company name containing a single quote, since it embedded
+   the raw name into an onclick="...('...')" JS-string argument. ========== */
 let isPlatformAdmin=false;
+let adminGranularity='day';
+let adminRevenueChartInst=null,adminSignupsChartInst=null;
+const adminSelectedCompanies=new Set();
 
 async function callAdminPanel(payload){
   const{data:{session}}=await supabaseClient.auth.getSession();
@@ -1953,9 +1980,20 @@ async function checkPlatformAdmin(){
     isPlatformAdmin=true;
     document.getElementById('navAdmin').style.display='';
     renderAdminStats(stats);
+    setupAdminGranularityButtons();
   }catch(e){
     isPlatformAdmin=false; // not an admin (403) or the call failed — either way, hide the section
   }
+}
+
+function setupAdminGranularityButtons(){
+  document.querySelectorAll('.admin-gran-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      adminGranularity=btn.dataset.gran;
+      document.querySelectorAll('.admin-gran-btn').forEach(b=>b.classList.toggle('active',b===btn));
+      loadAdminCharts();
+    });
+  });
 }
 
 async function loadAdmin(){
@@ -1964,6 +2002,7 @@ async function loadAdmin(){
     const stats=await callAdminPanel({action:'stats'});
     renderAdminStats(stats);
   }catch(e){toast(e.message,'error');}
+  loadAdminCharts();
   loadAdminPendingPayments();
   loadAdminCompanies();
 }
@@ -1983,16 +2022,38 @@ function renderAdminStats(s){
     <div class="stat-card"><div class="stat-header"><div class="stat-icon" style="background:rgba(139,92,246,.1)">🚀</div></div><div class="stat-value">${s.plan_breakdown.enterprise||0}</div><div class="stat-label">Enterprise</div></div>`;
 }
 
+async function loadAdminCharts(){
+  try{
+    const[revenue,signups]=await Promise.all([
+      callAdminPanel({action:'timeseries',metric:'revenue',granularity:adminGranularity}),
+      callAdminPanel({action:'timeseries',metric:'signups',granularity:adminGranularity}),
+    ]);
+    renderAdminChart('adminRevenueChart','adminRevenueChartInst',revenue.labels,revenue.values,'#22c55e',v=>'$'+v);
+    renderAdminChart('adminSignupsChart','adminSignupsChartInst',signups.labels,signups.values,'#3b82f6',v=>v);
+  }catch(e){toast(e.message,'error');}
+}
+
+function renderAdminChart(canvasId,instVarName,labels,values,color,yFormat){
+  const ctx=document.getElementById(canvasId);if(!ctx)return;
+  if(instVarName==='adminRevenueChartInst'&&adminRevenueChartInst)adminRevenueChartInst.destroy();
+  if(instVarName==='adminSignupsChartInst'&&adminSignupsChartInst)adminSignupsChartInst.destroy();
+  const inst=new Chart(ctx,{type:'bar',data:{labels,datasets:[{data:values,backgroundColor:color+'33',borderColor:color,borderWidth:1.5,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:(c)=>yFormat(c.raw)}}},scales:{x:{ticks:{color:'#71717a',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#71717a',font:{size:10},callback:yFormat},grid:{color:'#2a2a2e'}}}}});
+  if(instVarName==='adminRevenueChartInst')adminRevenueChartInst=inst;else adminSignupsChartInst=inst;
+}
+
 async function loadAdminPendingPayments(){
   const container=document.getElementById('adminPendingPayments');
   if(!container)return;
   try{
     const{payments}=await callAdminPanel({action:'list_pending_payments'});
     if(!payments.length){container.innerHTML=`<p style="color:var(--text-tertiary);font-size:13px">${t('adminNoPendingPayments')}</p>`;return;}
-    container.innerHTML=payments.map(p=>`<div class="task-card"><div class="task-header"><span class="task-title">${p.companies?.company_name||'—'} — ${p.plan.toUpperCase()} ($${p.amount})</span></div><div class="task-meta"><span>💳 ${p.provider}</span><span>🔑 ${p.tx_hash||'—'}</span><span>📅 ${new Date(p.created_at).toLocaleString()}</span></div><div class="task-actions"><button class="btn btn-primary btn-sm" onclick="adminApprovePayment('${p.id}')">✅ ${t('approveBtn')}</button><button class="btn btn-danger btn-sm" onclick="adminRejectPayment('${p.id}')">❌ ${t('rejectBtn')}</button></div></div>`).join('');
+    container.innerHTML=payments.map(p=>`<div class="task-card"><div class="task-header"><span class="task-title">${escapeAttr(p.companies?.company_name||'—')} — ${p.plan.toUpperCase()} ($${p.amount})</span></div><div class="task-meta"><span>💳 ${p.provider}</span><span>🔑 ${escapeAttr(p.tx_hash||'—')}</span><span>📅 ${new Date(p.created_at).toLocaleString()}</span></div><div class="task-actions"><button class="btn btn-primary btn-sm" onclick="adminApprovePayment('${p.id}')">✅ ${t('approveBtn')}</button><button class="btn btn-danger btn-sm" onclick="adminRejectPayment('${p.id}')">❌ ${t('rejectBtn')}</button></div></div>`).join('');
   }catch(e){container.innerHTML=`<p style="color:var(--danger);font-size:13px">${e.message}</p>`;}
 }
 
+// Payment IDs are always server-generated UUIDs (never user-typed text), so
+// interpolating them straight into onclick="...('${id}')" is safe — unlike
+// company names below, there's no free-text value in this string.
 window.adminApprovePayment=async function(id){
   if(!confirm(t('adminApproveConfirm')))return;
   try{
@@ -2018,25 +2079,79 @@ window.adminRejectPayment=async function(id){
 async function loadAdminCompanies(){
   const container=document.getElementById('adminCompanies');
   if(!container)return;
+  adminSelectedCompanies.clear();updateAdminBulkDeleteBtn();
   try{
     const{companies}=await callAdminPanel({action:'list_companies'});
-    let html=`<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="color:var(--text-tertiary);text-align:left;border-bottom:1px solid var(--border)"><th style="padding:8px">${t('adminColCompany')}</th><th style="padding:8px">${t('colPlan')}</th><th style="padding:8px">${t('adminColTasks')}</th><th style="padding:8px">${t('adminColCreated')}</th><th style="padding:8px"></th></tr></thead><tbody>`;
+    let html=`<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="color:var(--text-tertiary);text-align:left;border-bottom:1px solid var(--border)"><th style="padding:8px"><input type="checkbox" id="adminSelectAllCb"></th><th style="padding:8px">${t('adminColCompany')}</th><th style="padding:8px">${t('colPlan')}</th><th style="padding:8px">${t('adminColTasks')}</th><th style="padding:8px">${t('adminColCreated')}</th><th style="padding:8px"></th></tr></thead><tbody>`;
     companies.forEach(c=>{
-      html+=`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">${c.company_name}</td><td style="padding:8px;text-transform:capitalize">${c.plan||'free'}</td><td style="padding:8px">${c.task_count}</td><td style="padding:8px">${new Date(c.created_at).toLocaleDateString()}</td><td style="padding:8px"><button class="btn btn-danger btn-sm" onclick="adminDeleteCompany('${c.id}','${escapeAttr(c.company_name)}')">🗑️</button></td></tr>`;
+      html+=`<tr style="border-bottom:1px solid var(--border)" data-id="${c.id}" data-name="${escapeAttr(c.company_name)}"><td style="padding:8px"><input type="checkbox" class="admin-company-cb"></td><td style="padding:8px">${escapeAttr(c.company_name)}</td><td style="padding:8px;text-transform:capitalize">${c.plan||'free'}</td><td style="padding:8px">${c.task_count}</td><td style="padding:8px">${new Date(c.created_at).toLocaleDateString()}</td><td style="padding:8px"><button class="btn btn-danger btn-sm admin-delete-company-btn">🗑️</button></td></tr>`;
     });
     html+='</tbody></table>';
     container.innerHTML=html;
+    setupAdminCompaniesInteractions(container);
   }catch(e){container.innerHTML=`<p style="color:var(--danger);font-size:13px">${e.message}</p>`;}
 }
 
-window.adminDeleteCompany=async function(id,name){
-  const typed=prompt(t('adminDeleteCompanyPrompt').replace('{name}',name));
-  if(typed!==name)  {if(typed!==null)toast(t('confirmationMismatch'),'info');return;}
+function setupAdminCompaniesInteractions(container){
+  const selectAll=document.getElementById('adminSelectAllCb');
+  selectAll?.addEventListener('change',()=>{
+    container.querySelectorAll('.admin-company-cb').forEach(cb=>{
+      cb.checked=selectAll.checked;
+      const tr=cb.closest('tr');
+      if(selectAll.checked)adminSelectedCompanies.add(tr.dataset.id);else adminSelectedCompanies.delete(tr.dataset.id);
+    });
+    updateAdminBulkDeleteBtn();
+  });
+  container.addEventListener('change',(e)=>{
+    if(!e.target.classList.contains('admin-company-cb'))return;
+    const tr=e.target.closest('tr');
+    if(e.target.checked)adminSelectedCompanies.add(tr.dataset.id);else adminSelectedCompanies.delete(tr.dataset.id);
+    updateAdminBulkDeleteBtn();
+  });
+  container.addEventListener('click',(e)=>{
+    const btn=e.target.closest('.admin-delete-company-btn');
+    if(!btn)return;
+    const tr=btn.closest('tr');
+    adminDeleteCompanies([tr.dataset.id],[tr.dataset.name]);
+  });
+}
+
+function updateAdminBulkDeleteBtn(){
+  const btn=document.getElementById('adminBulkDeleteBtn');
+  if(!btn)return;
+  const n=adminSelectedCompanies.size;
+  if(n===0){btn.style.display='none';return;}
+  btn.style.display='inline-flex';
+  btn.textContent=`🗑️ ${t('adminDeleteSelectedBtn').replace('{n}',n)}`;
+}
+document.getElementById('adminBulkDeleteBtn')?.addEventListener('click',()=>{
+  const ids=[...adminSelectedCompanies];
+  const rows=ids.map(id=>document.querySelector(`#adminCompanies tr[data-id="${id}"]`));
+  const names=rows.map(r=>r?.dataset.name||'?');
+  adminDeleteCompanies(ids,names);
+});
+
+// Single deletes and bulk deletes share this path — for a single company it
+// still requires typing the exact name (same friction as the old version,
+// deliberately — this is a destructive, unrecoverable action). For 2+, the
+// confirmation is a count + list instead of re-typing every name.
+async function adminDeleteCompanies(ids,names){
+  if(!ids.length)return;
+  let confirmed;
+  if(ids.length===1){
+    const typed=prompt(t('adminDeleteCompanyPrompt').replace('{name}',names[0]));
+    confirmed=typed===names[0];
+    if(!confirmed&&typed!==null)toast(t('confirmationMismatch'),'info');
+  }else{
+    confirmed=confirm(t('adminBulkDeleteConfirm').replace('{n}',ids.length).replace('{names}',names.join(', ')));
+  }
+  if(!confirmed)return;
   try{
-    await callAdminPanel({action:'delete_company',company_id:id});
-    toast(t('adminCompanyDeletedToast'),'info');loadAdminCompanies();loadAdmin();
+    await callAdminPanel({action:'bulk_delete_companies',company_ids:ids});
+    toast(ids.length===1?t('adminCompanyDeletedToast'):t('adminCompaniesDeletedToast').replace('{n}',ids.length),'info');
+    loadAdminCompanies();loadAdmin();
   }catch(e){toast(e.message,'error');}
-};
+}
 
 window.checkPlatformAdmin=checkPlatformAdmin;
 window.loadAdmin=loadAdmin;
