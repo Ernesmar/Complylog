@@ -221,6 +221,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
     <a data-section="team" title="Team"><span>👥</span> <span data-i18n="navTeam">Team</span></a>
     <a data-section="settings" title="Settings"><span>⚙️</span> <span data-i18n="navSettings">Settings</span></a>
     <a data-section="billing" title="Billing"><span>💳</span> <span data-i18n="navBilling">Billing</span></a>
+    <a data-section="admin" title="Admin" id="navAdmin" style="display:none"><span>🛡️</span> <span data-i18n="navAdmin">Admin</span></a>
   </nav>
   <div class="sidebar-footer">
     <div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px">
@@ -454,6 +455,21 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
       </div>
     </div>
   </div>
+  <div class="section" id="admin">
+    <div class="page-header"><h1 data-i18n="hdrAdmin">Admin</h1></div>
+    <div class="stats-grid" id="adminStatsGrid">
+      <div class="stat-card skeleton skeleton-stat"></div>
+      <div class="stat-card skeleton skeleton-stat"></div>
+      <div class="stat-card skeleton skeleton-stat"></div>
+      <div class="stat-card skeleton skeleton-stat"></div>
+    </div>
+
+    <h2 style="margin:24px 0 12px;font-size:16px" data-i18n="adminPendingPaymentsTitle">Pending Manual Payments</h2>
+    <div id="adminPendingPayments"></div>
+
+    <h2 style="margin:24px 0 12px;font-size:16px" data-i18n="adminCompaniesTitle">All Companies</h2>
+    <div id="adminCompanies" style="overflow-x:auto"></div>
+  </div>
 <div class="modal" id="taskModal">
   <div class="modal-content">
     <h2 id="taskModalTitle" data-i18n="taskModalNewTitle">New Task</h2>
@@ -648,7 +664,8 @@ const translations={
     pasteTxidFirst:'Please paste your transaction ID first',sentPaymentBtn:"✅ I've Sent the Payment",paymentSubmittedToast:'Submitted — NOT active yet. A human checks the blockchain before your plan activates, usually within a few hours.',verificationFailedError:'Verification failed. Please try again or contact support.',errorSubmittingPayment:'Error submitting payment. Please contact support.',walletCopiedToast:'Wallet address copied!',
     statusFinished:'Paid',statusPendingPay:'Pending',statusAwaitingPayment:'Awaiting payment',statusConfirming:'Confirming on blockchain',statusSending:'Sending',statusPartiallyPaid:'Partially paid',statusPendingReview:'Pending manual review — not active yet',statusFailed:'Failed',statusRejected:'Rejected',
     planTaskLimitReached:"You've reached your plan's limit of {max} tasks. Upgrade in Billing to add more.",planTaskLimitReachedShort:"You've reached your plan's task limit. Upgrade in Billing to add more.",taskUpdatedToast:'Task updated!',taskCreatedToast:'Task created!',taskCompletedRecurErr:'Task completed! (Could not schedule the next occurrence — check your plan limits.)',taskCompletedNextOccurrence:'Task completed! 🎉 Next occurrence scheduled for {date}.',taskCompletedRecurLimit:"Task completed! 🎉 (Recurring task limit reached — next occurrence wasn't created. Upgrade to keep recurrence going.)",taskCompletedToast:'Task completed! 🎉',deleteTaskConfirm:'Delete this task? This action can be undone later.',taskDeletedToast:'Task deleted',
-    nothingToExport:'Nothing to export yet',csvExportedToast:'CSV exported!',
+    nothingToExport:'Nothing to export yet',csvExportedToast:'CSV exported!',deleteHaccpConfirm:'Delete this HACCP entry? This cannot be undone.',haccpDeletedToast:'HACCP entry deleted',
+    navAdmin:'Admin',hdrAdmin:'Admin',adminPendingPaymentsTitle:'Pending Manual Payments',adminCompaniesTitle:'All Companies',adminCompaniesLabel:'Companies',adminUsersLabel:'Users',adminRevenueLabel:'Revenue (confirmed)',adminPendingLabel:'Pending Review',adminNewThisWeekLabel:'New This Week',adminNoPendingPayments:'No payments waiting for review.',approveBtn:'Approve',rejectBtn:'Reject',adminApproveConfirm:"Approve this payment? This activates the company's plan immediately — only do this after confirming the funds actually arrived.",adminPaymentApprovedToast:'Payment approved — plan activated!',adminRejectConfirm:'Reject this payment? The company will need to submit a new one.',adminPaymentRejectedToast:'Payment rejected',adminColCompany:'Company',adminColTasks:'Tasks',adminColCreated:'Created',adminDeleteCompanyPrompt:'This permanently deletes "{name}" and ALL its data (tasks, HACCP logs, documents, everything). This cannot be undone.\n\nType the company name exactly to confirm:',adminCompanyDeletedToast:'Company deleted',
     switchedToCompany:'Switched to {company}',
     onbWelcomeTitle:'Welcome to ComplyLog Pro',onbWelcomeText:"Your all-in-one compliance management platform. Let's get you set up in 3 steps.",onbGetStarted:'Get Started',onbProfileTitle:'Set Your Profile',onbProfileText:'Tell us about your company so we can personalize your experience.',onbContinue:'Continue',onbAllSetTitle:"You're All Set!",onbAllSetText:'Start tracking your compliance tasks and HACCP logs. Use the sidebar to navigate.',onbGoToDashboard:'Go to Dashboard',welcomeAboardToast:'Welcome aboard! 🚀'},
   es:{navDashboard:'Dashboard',navCalendar:'Calendario',navTasks:'Tareas',navHaccp:'HACCP',navTemplates:'Templates',navChecklists:'Checklists',navDocuments:'Documentos',navActivity:'Actividad',navTeam:'Equipo',navSettings:'Configuración',navBilling:'Facturación',signOut:'Cerrar Sesión',
@@ -697,7 +714,8 @@ const translations={
     pasteTxidFirst:'Por favor pega tu ID de transacción primero',sentPaymentBtn:'✅ Ya Envié el Pago',paymentSubmittedToast:'Enviado — TODAVÍA NO está activo. Una persona verifica la blockchain antes de activar tu plan, normalmente en unas horas.',verificationFailedError:'La verificación falló. Intenta de nuevo o contacta soporte.',errorSubmittingPayment:'Error al enviar el pago. Por favor contacta soporte.',walletCopiedToast:'¡Dirección de wallet copiada!',
     statusFinished:'Pagado',statusPendingPay:'Pendiente',statusAwaitingPayment:'Esperando pago',statusConfirming:'Confirmando en blockchain',statusSending:'Enviando',statusPartiallyPaid:'Pago parcial',statusPendingReview:'Pendiente de revisión manual — aún no activo',statusFailed:'Fallido',statusRejected:'Rechazado',
     planTaskLimitReached:'Alcanzaste el límite de tu plan de {max} tareas. Actualiza en Facturación para agregar más.',planTaskLimitReachedShort:'Alcanzaste el límite de tareas de tu plan. Actualiza en Facturación para agregar más.',taskUpdatedToast:'¡Tarea actualizada!',taskCreatedToast:'¡Tarea creada!',taskCompletedRecurErr:'¡Tarea completada! (No se pudo programar la siguiente ocurrencia — revisa los límites de tu plan.)',taskCompletedNextOccurrence:'¡Tarea completada! 🎉 Siguiente ocurrencia programada para {date}.',taskCompletedRecurLimit:'¡Tarea completada! 🎉 (Límite de tareas recurrentes alcanzado — no se creó la siguiente ocurrencia. Actualiza tu plan para mantener la recurrencia.)',taskCompletedToast:'¡Tarea completada! 🎉',deleteTaskConfirm:'¿Eliminar esta tarea? Esta acción se puede deshacer después.',taskDeletedToast:'Tarea eliminada',
-    nothingToExport:'Aún no hay nada para exportar',csvExportedToast:'¡CSV exportado!',
+    nothingToExport:'Aún no hay nada para exportar',csvExportedToast:'¡CSV exportado!',deleteHaccpConfirm:'¿Eliminar este registro HACCP? Esto no se puede deshacer.',haccpDeletedToast:'Registro HACCP eliminado',
+    navAdmin:'Admin',hdrAdmin:'Administración',adminPendingPaymentsTitle:'Pagos Manuales Pendientes',adminCompaniesTitle:'Todas las Empresas',adminCompaniesLabel:'Empresas',adminUsersLabel:'Usuarios',adminRevenueLabel:'Ingresos (confirmados)',adminPendingLabel:'Pendientes de Revisión',adminNewThisWeekLabel:'Nuevas Esta Semana',adminNoPendingPayments:'No hay pagos esperando revisión.',approveBtn:'Aprobar',rejectBtn:'Rechazar',adminApproveConfirm:'¿Aprobar este pago? Esto activa el plan de la empresa de inmediato — solo hazlo después de confirmar que el dinero realmente llegó.',adminPaymentApprovedToast:'¡Pago aprobado — plan activado!',adminRejectConfirm:'¿Rechazar este pago? La empresa tendrá que enviar uno nuevo.',adminPaymentRejectedToast:'Pago rechazado',adminColCompany:'Empresa',adminColTasks:'Tareas',adminColCreated:'Creada',adminDeleteCompanyPrompt:'Esto elimina permanentemente "{name}" y TODOS sus datos (tareas, registros HACCP, documentos, todo). Esto no se puede deshacer.\n\nEscribe el nombre exacto de la empresa para confirmar:',adminCompanyDeletedToast:'Empresa eliminada',
     switchedToCompany:'Cambiado a {company}',
     onbWelcomeTitle:'Bienvenido a ComplyLog Pro',onbWelcomeText:'Tu plataforma todo-en-uno de gestión de cumplimiento. Vamos a configurarte en 3 pasos.',onbGetStarted:'Comenzar',onbProfileTitle:'Configura tu Perfil',onbProfileText:'Cuéntanos sobre tu empresa para personalizar tu experiencia.',onbContinue:'Continuar',onbAllSetTitle:'¡Todo Listo!',onbAllSetText:'Empieza a rastrear tus tareas de cumplimiento y registros HACCP. Usa el sidebar para navegar.',onbGoToDashboard:'Ir al Dashboard',welcomeAboardToast:'¡Bienvenido a bordo! 🚀'}
 };
@@ -714,7 +732,7 @@ function loadDashboardIfActive(){
   const active=document.querySelector('.section.active');
   if(!active)return;
   const id=active.id;
-  if(id==='dashboard')loadDashboard();else if(id==='calendar')renderCalendar();else if(id==='tasks')loadTasks();else if(id==='haccp')loadHACCP();else if(id==='templates')loadTemplates();else if(id==='checklists'&&currentChecklist)renderChecklistEntriesTable();else if(id==='checklists')loadChecklists();else if(id==='documents')loadDocuments();else if(id==='activity')loadActivity();else if(id==='team')loadTeam();else if(id==='billing')loadBilling();
+  if(id==='dashboard')loadDashboard();else if(id==='calendar')renderCalendar();else if(id==='tasks')loadTasks();else if(id==='haccp')loadHACCP();else if(id==='templates')loadTemplates();else if(id==='checklists'&&currentChecklist)renderChecklistEntriesTable();else if(id==='checklists')loadChecklists();else if(id==='documents')loadDocuments();else if(id==='activity')loadActivity();else if(id==='team')loadTeam();else if(id==='billing')loadBilling();else if(id==='admin')loadAdmin();
 }
 const MONTH_NAMES={
   en:['January','February','March','April','May','June','July','August','September','October','November','December'],
@@ -747,7 +765,7 @@ async function init(){
   await checkPendingInvites();
   applyLang();setupNavigation();setupKeyboardShortcuts();setupColorPicker();populateSelects();
   if(!localStorage.getItem('complylog_onboarded'))showOnboarding();
-  loadDashboard();loadNotifications();checkMFAStatus();
+  loadDashboard();loadNotifications();checkMFAStatus();checkPlatformAdmin();
   setInterval(loadNotifications,60000);
 }
 
@@ -836,14 +854,14 @@ function skipOnboarding(){localStorage.setItem('complylog_onboarded','true');doc
 
 function setupNavigation(){
   document.querySelectorAll('.sidebar-nav a').forEach(link=>{
-    link.addEventListener('click',(e)=>{e.preventDefault();document.querySelectorAll('.sidebar-nav a').forEach(l=>l.classList.remove('active'));link.classList.add('active');const sid=link.dataset.section;document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(sid).classList.add('active');if(sid==='tasks')loadTasks();if(sid==='haccp')loadHACCP();if(sid==='dashboard')loadDashboard();if(sid==='calendar')loadCalendar();if(sid==='templates')loadTemplates();if(sid==='checklists'){showChecklistList();loadChecklists();}if(sid==='documents')loadDocuments();if(sid==='activity')loadActivity();if(sid==='team')loadTeam();if(sid==='billing')loadBilling();});
+    link.addEventListener('click',(e)=>{e.preventDefault();document.querySelectorAll('.sidebar-nav a').forEach(l=>l.classList.remove('active'));link.classList.add('active');const sid=link.dataset.section;document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(sid).classList.add('active');if(sid==='tasks')loadTasks();if(sid==='haccp')loadHACCP();if(sid==='dashboard')loadDashboard();if(sid==='calendar')loadCalendar();if(sid==='templates')loadTemplates();if(sid==='checklists'){showChecklistList();loadChecklists();}if(sid==='documents')loadDocuments();if(sid==='activity')loadActivity();if(sid==='team')loadTeam();if(sid==='billing')loadBilling();if(sid==='admin')loadAdmin();});
   });
 }
 
 function setupKeyboardShortcuts(){
   document.addEventListener('keydown',(e)=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;if(e.key==='Escape'){closeTaskModal();closeHACCPModal();closeInviteModal();closePaymentModal();}if(e.key==='n'||e.key==='N')openTaskModal();if(e.key==='d'||e.key==='D')switchSection('dashboard');if(e.key==='t'||e.key==='T')switchSection('tasks');if(e.key==='h'||e.key==='H')switchSection('haccp');});
 }
-function switchSection(id){document.querySelectorAll('.sidebar-nav a').forEach(l=>l.classList.toggle('active',l.dataset.section===id));document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));if(id==='tasks')loadTasks();if(id==='haccp')loadHACCP();if(id==='dashboard')loadDashboard();if(id==='calendar')loadCalendar();if(id==='templates')loadTemplates();if(id==='checklists'){showChecklistList();loadChecklists();}if(id==='documents')loadDocuments();if(id==='activity')loadActivity();if(id==='team')loadTeam();if(id==='billing')loadBilling();}
+function switchSection(id){document.querySelectorAll('.sidebar-nav a').forEach(l=>l.classList.toggle('active',l.dataset.section===id));document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));if(id==='tasks')loadTasks();if(id==='haccp')loadHACCP();if(id==='dashboard')loadDashboard();if(id==='calendar')loadCalendar();if(id==='templates')loadTemplates();if(id==='checklists'){showChecklistList();loadChecklists();}if(id==='documents')loadDocuments();if(id==='activity')loadActivity();if(id==='team')loadTeam();if(id==='billing')loadBilling();if(id==='admin')loadAdmin();}
 
 async function loadDashboard(){
   if(!currentCompany)return;
@@ -1276,6 +1294,13 @@ window.completeTask=async function(id){
 };
 window.deleteTask=async function(id){if(!confirm(t('deleteTaskConfirm')))return;await supabaseClient.from('tasks').update({deleted_at:new Date().toISOString()}).eq('id',id);toast(t('taskDeletedToast'),'info');loadTasks();loadDashboard();};
 
+window.deleteHACCPEntry=async function(id){
+  if(!confirm(t('deleteHaccpConfirm')))return;
+  const{error}=await supabaseClient.from('haccp_logs').delete().eq('id',id);
+  if(error){toast(error.message,'error');return;}
+  toast(t('haccpDeletedToast'),'info');loadHACCP();
+};
+
 async function loadHACCP(){
   if(!currentCompany)return;
   const date=document.getElementById('haccpDate').value||new Date().toISOString().split('T')[0];
@@ -1286,7 +1311,7 @@ async function loadHACCP(){
   const{data:sigs}=logIds.length?await supabaseClient.from('signatures').select('record_id,signed_at,user_profiles(full_name)').eq('record_type','haccp_log').in('record_id',logIds):{data:[]};
   const sigByRecord={};(sigs||[]).forEach(s=>{sigByRecord[s.record_id]=s;});
   const container=document.getElementById('haccpChecklists');
-  container.innerHTML=list.length?list.map(e=>{const isDev=e.limit_high!==null&&e.value>e.limit_high||e.limit_low!==null&&e.value<e.limit_low;const sig=sigByRecord[e.id];const sigHtml=sig?`<span style="color:var(--success)">✍️ ${t('signedByLabel')} ${sig.user_profiles?.full_name||'—'}</span>`:`<span class="text-link" onclick="openSignaturePad('haccp_log','${e.id}')" style="cursor:pointer">✍️ ${t('signThisEntry')}</span>`;return`<div class="haccp-card ${isDev?'deviation':''}"><div class="task-header"><span class="task-title">${e.entry_time?.slice(0,5)||'--:--'} — ${e.equipment}</span>${isDev?`<span class="badge badge-vencido">${t('deviationBadge')}</span>`:''}</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;font-size:13px"><div><span style="color:var(--text-tertiary)">${t('fieldArea')}</span><div style="font-weight:600">${e.area||'-'}</div></div><div><span style="color:var(--text-tertiary)">${t('fieldValue').replace(' *','')}</span><div style="font-weight:600">${e.value} ${e.unit}</div></div><div><span style="color:var(--text-tertiary)">${t('limitLabel')}</span><div style="font-weight:600">${e.limit_low!==null?e.limit_low+' - ':'≤ '}${e.limit_high!==null?e.limit_high:'—'} ${e.unit}</div></div></div>${isDev?`<div style="margin-top:10px;padding:8px 12px;background:rgba(239,68,68,0.05);border-radius:6px;font-size:12px;color:var(--danger)"><strong>${t('actionLabel')}</strong> ${e.corrective_action||t('noActionRecorded')}</div>`:''}<div style="margin-top:10px;font-size:12px;color:var(--text-tertiary);display:flex;justify-content:space-between"><span>${t('byLabel')} ${e.initials||'—'}</span>${sigHtml}</div></div>`;}).join(''):emptyState('🌡️',t('emptyNoHaccpTitle'),t('emptyNoHaccpSub').replace('{date}',date),'openHACCPModal()');
+  container.innerHTML=list.length?list.map(e=>{const isDev=e.limit_high!==null&&e.value>e.limit_high||e.limit_low!==null&&e.value<e.limit_low;const sig=sigByRecord[e.id];const sigHtml=sig?`<span style="color:var(--success)">✍️ ${t('signedByLabel')} ${sig.user_profiles?.full_name||'—'}</span>`:`<span class="text-link" onclick="openSignaturePad('haccp_log','${e.id}')" style="cursor:pointer">✍️ ${t('signThisEntry')}</span>`;return`<div class="haccp-card ${isDev?'deviation':''}"><div class="task-header"><span class="task-title">${e.entry_time?.slice(0,5)||'--:--'} — ${e.equipment}</span>${isDev?`<span class="badge badge-vencido">${t('deviationBadge')}</span>`:''}</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;font-size:13px"><div><span style="color:var(--text-tertiary)">${t('fieldArea')}</span><div style="font-weight:600">${e.area||'-'}</div></div><div><span style="color:var(--text-tertiary)">${t('fieldValue').replace(' *','')}</span><div style="font-weight:600">${e.value} ${e.unit}</div></div><div><span style="color:var(--text-tertiary)">${t('limitLabel')}</span><div style="font-weight:600">${e.limit_low!==null?e.limit_low+' - ':'≤ '}${e.limit_high!==null?e.limit_high:'—'} ${e.unit}</div></div></div>${isDev?`<div style="margin-top:10px;padding:8px 12px;background:rgba(239,68,68,0.05);border-radius:6px;font-size:12px;color:var(--danger)"><strong>${t('actionLabel')}</strong> ${e.corrective_action||t('noActionRecorded')}</div>`:''}<div style="margin-top:10px;font-size:12px;color:var(--text-tertiary);display:flex;justify-content:space-between;align-items:center"><span>${t('byLabel')} ${e.initials||'—'}</span>${sigHtml}<button class="btn btn-danger btn-sm" onclick="deleteHACCPEntry('${e.id}')">🗑️</button></div></div>`;}).join(''):emptyState('🌡️',t('emptyNoHaccpTitle'),t('emptyNoHaccpSub').replace('{date}',date),'openHACCPModal()');
   checkDeviations(list);
 }
 
@@ -1630,17 +1655,36 @@ async function generateChecklistPDF(){
   doc.text(`COMPANY: ${currentCompany?.company_name||''}`,margin+3,y+8);
   doc.text(`GENERATED: ${new Date().toISOString().split('T')[0]}`,margin+3,y+15);
   y+=24;
-  const colCount=fields.length+1;const colWidth=contentWidth/colCount;
-  doc.setFillColor(220);doc.rect(margin,y,contentWidth,10,'F');doc.setFontSize(8);doc.setTextColor(0);
-  doc.text('DATE',margin+2,y+7);
-  fields.forEach((f,i)=>doc.text(f.label.toUpperCase().slice(0,20),margin+colWidth*(i+1)+2,y+7));
-  y+=10;
+
+  // Columns split equally, but text is wrapped to the actual measured width
+  // (doc.splitTextToSize) instead of blindly sliced by character count — the
+  // old approach let long labels/values overflow into neighboring columns
+  // once there were more than ~5 fields. Row height now grows to fit however
+  // many lines a cell actually needs.
+  const colCount=fields.length+1;const colWidth=contentWidth/colCount;const cellPad=2;const usableW=colWidth-cellPad*2;
+  const fontSize=8;const lineHeight=4.2;doc.setFontSize(fontSize);
+
+  function wrapRow(cells){
+    const wrapped=cells.map(c=>doc.splitTextToSize(String(c??''),usableW));
+    const lines=Math.max(1,...wrapped.map(w=>w.length));
+    return{wrapped,height:Math.max(9,lines*lineHeight+3)};
+  }
+  function drawRow(wrapped,rowY,height,shaded){
+    if(shaded){doc.setFillColor(220);doc.rect(margin,rowY,contentWidth,height,'F');}
+    doc.rect(margin,rowY,contentWidth,height,'S');
+    wrapped.forEach((lines,i)=>{lines.forEach((line,li)=>{doc.text(line,margin+colWidth*i+cellPad,rowY+5+li*lineHeight);});});
+  }
+
+  doc.setTextColor(0);
+  const headerRow=wrapRow(['DATE',...fields.map(f=>f.label.toUpperCase())]);
+  drawRow(headerRow.wrapped,y,headerRow.height,true);
+  y+=headerRow.height;
+
   currentChecklistEntries.forEach(entry=>{
-    if(y>pageHeight-20){doc.addPage();y=18;}
-    doc.rect(margin,y,contentWidth,9,'S');doc.setFontSize(8);doc.setTextColor(0);
-    doc.text(String(entry.entry_date),margin+2,y+6);
-    fields.forEach((f,i)=>{doc.text(String(fieldDisplayValue(f,entry.field_values?.[f.key])).slice(0,18),margin+colWidth*(i+1)+2,y+6);});
-    y+=9;
+    const row=wrapRow([String(entry.entry_date),...fields.map(f=>String(fieldDisplayValue(f,entry.field_values?.[f.key])))]);
+    if(y+row.height>pageHeight-14){doc.addPage();y=18;}
+    drawRow(row.wrapped,y,row.height,false);
+    y+=row.height;
   });
   doc.save(`${currentChecklist.name.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
   toast(t('pdfGeneratedToast'),'success');
@@ -1889,6 +1933,113 @@ async function askAI(){
 window.openAIAdvisorModal=openAIAdvisorModal;
 window.closeAIAdvisorModal=closeAIAdvisorModal;
 window.askAI=askAI;
+
+/* ========== PLATFORM ADMIN PANEL (only visible to rows in platform_admins —
+   gated server-side in the admin-panel Edge Function, this client-side flag
+   is just a UI convenience, not the real security boundary) ========== */
+let isPlatformAdmin=false;
+
+async function callAdminPanel(payload){
+  const{data:{session}}=await supabaseClient.auth.getSession();
+  const res=await fetch(`${EDGE_BASE}/admin-panel`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify(payload)});
+  const data=await res.json();
+  if(!res.ok)throw new Error(data.error||'Admin request failed');
+  return data;
+}
+
+async function checkPlatformAdmin(){
+  try{
+    const stats=await callAdminPanel({action:'stats'});
+    isPlatformAdmin=true;
+    document.getElementById('navAdmin').style.display='';
+    renderAdminStats(stats);
+  }catch(e){
+    isPlatformAdmin=false; // not an admin (403) or the call failed — either way, hide the section
+  }
+}
+
+async function loadAdmin(){
+  if(!isPlatformAdmin)return;
+  try{
+    const stats=await callAdminPanel({action:'stats'});
+    renderAdminStats(stats);
+  }catch(e){toast(e.message,'error');}
+  loadAdminPendingPayments();
+  loadAdminCompanies();
+}
+
+function renderAdminStats(s){
+  const grid=document.getElementById('adminStatsGrid');
+  if(!grid)return;
+  const revenue=`$${(s.total_revenue||0).toFixed(0)}`;
+  grid.innerHTML=`
+    <div class="stat-card"><div class="stat-header"><div class="stat-icon" style="background:rgba(59,130,246,.1)">🏢</div></div><div class="stat-value">${s.companies_count}</div><div class="stat-label">${t('adminCompaniesLabel')}</div></div>
+    <div class="stat-card"><div class="stat-header"><div class="stat-icon" style="background:rgba(139,92,246,.1)">👤</div></div><div class="stat-value">${s.users_count}</div><div class="stat-label">${t('adminUsersLabel')}</div></div>
+    <div class="stat-card"><div class="stat-header"><div class="stat-icon" style="background:rgba(34,197,94,.1)">💰</div></div><div class="stat-value">${revenue}</div><div class="stat-label">${t('adminRevenueLabel')}</div></div>
+    <div class="stat-card"><div class="stat-header"><div class="stat-icon" style="background:rgba(234,179,8,.1)">🔍</div></div><div class="stat-value">${s.pending_review_count}</div><div class="stat-label">${t('adminPendingLabel')}</div></div>
+    <div class="stat-card"><div class="stat-header"><div class="stat-icon" style="background:rgba(59,130,246,.1)">📈</div></div><div class="stat-value">${s.new_companies_this_week}</div><div class="stat-label">${t('adminNewThisWeekLabel')}</div></div>
+    <div class="stat-card"><div class="stat-header"><div class="stat-icon" style="background:rgba(34,197,94,.1)">🆓</div></div><div class="stat-value">${s.plan_breakdown.free||0}</div><div class="stat-label">Free</div></div>
+    <div class="stat-card"><div class="stat-header"><div class="stat-icon" style="background:rgba(59,130,246,.1)">💎</div></div><div class="stat-value">${s.plan_breakdown.pro||0}</div><div class="stat-label">Pro</div></div>
+    <div class="stat-card"><div class="stat-header"><div class="stat-icon" style="background:rgba(139,92,246,.1)">🚀</div></div><div class="stat-value">${s.plan_breakdown.enterprise||0}</div><div class="stat-label">Enterprise</div></div>`;
+}
+
+async function loadAdminPendingPayments(){
+  const container=document.getElementById('adminPendingPayments');
+  if(!container)return;
+  try{
+    const{payments}=await callAdminPanel({action:'list_pending_payments'});
+    if(!payments.length){container.innerHTML=`<p style="color:var(--text-tertiary);font-size:13px">${t('adminNoPendingPayments')}</p>`;return;}
+    container.innerHTML=payments.map(p=>`<div class="task-card"><div class="task-header"><span class="task-title">${p.companies?.company_name||'—'} — ${p.plan.toUpperCase()} ($${p.amount})</span></div><div class="task-meta"><span>💳 ${p.provider}</span><span>🔑 ${p.tx_hash||'—'}</span><span>📅 ${new Date(p.created_at).toLocaleString()}</span></div><div class="task-actions"><button class="btn btn-primary btn-sm" onclick="adminApprovePayment('${p.id}')">✅ ${t('approveBtn')}</button><button class="btn btn-danger btn-sm" onclick="adminRejectPayment('${p.id}')">❌ ${t('rejectBtn')}</button></div></div>`).join('');
+  }catch(e){container.innerHTML=`<p style="color:var(--danger);font-size:13px">${e.message}</p>`;}
+}
+
+window.adminApprovePayment=async function(id){
+  if(!confirm(t('adminApproveConfirm')))return;
+  try{
+    const{data:{session}}=await supabaseClient.auth.getSession();
+    const res=await fetch(`${EDGE_BASE}/approve-payment`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({payment_id:id,action:'approve'})});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Error');
+    toast(t('adminPaymentApprovedToast'),'success');loadAdminPendingPayments();loadAdmin();
+  }catch(e){toast(e.message,'error');}
+};
+
+window.adminRejectPayment=async function(id){
+  if(!confirm(t('adminRejectConfirm')))return;
+  try{
+    const{data:{session}}=await supabaseClient.auth.getSession();
+    const res=await fetch(`${EDGE_BASE}/approve-payment`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({payment_id:id,action:'reject'})});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Error');
+    toast(t('adminPaymentRejectedToast'),'info');loadAdminPendingPayments();
+  }catch(e){toast(e.message,'error');}
+};
+
+async function loadAdminCompanies(){
+  const container=document.getElementById('adminCompanies');
+  if(!container)return;
+  try{
+    const{companies}=await callAdminPanel({action:'list_companies'});
+    let html=`<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="color:var(--text-tertiary);text-align:left;border-bottom:1px solid var(--border)"><th style="padding:8px">${t('adminColCompany')}</th><th style="padding:8px">${t('colPlan')}</th><th style="padding:8px">${t('adminColTasks')}</th><th style="padding:8px">${t('adminColCreated')}</th><th style="padding:8px"></th></tr></thead><tbody>`;
+    companies.forEach(c=>{
+      html+=`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">${c.company_name}</td><td style="padding:8px;text-transform:capitalize">${c.plan||'free'}</td><td style="padding:8px">${c.task_count}</td><td style="padding:8px">${new Date(c.created_at).toLocaleDateString()}</td><td style="padding:8px"><button class="btn btn-danger btn-sm" onclick="adminDeleteCompany('${c.id}','${escapeAttr(c.company_name)}')">🗑️</button></td></tr>`;
+    });
+    html+='</tbody></table>';
+    container.innerHTML=html;
+  }catch(e){container.innerHTML=`<p style="color:var(--danger);font-size:13px">${e.message}</p>`;}
+}
+
+window.adminDeleteCompany=async function(id,name){
+  const typed=prompt(t('adminDeleteCompanyPrompt').replace('{name}',name));
+  if(typed!==name)  {if(typed!==null)toast(t('confirmationMismatch'),'info');return;}
+  try{
+    await callAdminPanel({action:'delete_company',company_id:id});
+    toast(t('adminCompanyDeletedToast'),'info');loadAdminCompanies();loadAdmin();
+  }catch(e){toast(e.message,'error');}
+};
+
+window.checkPlatformAdmin=checkPlatformAdmin;
+window.loadAdmin=loadAdmin;
 
 async function logout(){await supabaseClient.auth.signOut();window.location.href='/index.html';}
 
