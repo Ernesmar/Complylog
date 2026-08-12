@@ -288,9 +288,37 @@ let supabaseClient=null;
 
 function initSupabase(){if(typeof supabase!=='undefined'){supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);checkSession();}else{console.error('Supabase failed to load');}}
 
+// Same wait-for-settle pattern as app.html's init() (see its comment for the
+// full story) — a raw immediate getSession() call here could see "no
+// session yet" a moment before Supabase finishes parsing a Google OAuth
+// callback or an in-flight token refresh, which is exactly the kind of race
+// that produces an index.html/app.html ping-pong. Both pages now wait for
+// the SDK to actually settle before making a redirect decision, instead of
+// only one side being race-safe.
+function waitForInitialSession(client){
+  return new Promise((resolve)=>{
+    let done=false,subscription=null;
+    const finish=(session)=>{
+      if(done)return;
+      done=true;
+      subscription?.unsubscribe();
+      resolve(session);
+    };
+    const{data}=client.auth.onAuthStateChange((event,session)=>{
+      if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='TOKEN_REFRESHED')finish(session);
+    });
+    subscription=data.subscription;
+    setTimeout(async()=>{
+      if(done)return;
+      const{data:{session}}=await client.auth.getSession();
+      finish(session);
+    },3000);
+  });
+}
+
 async function checkSession(){
   try{
-    const{data:{session}}=await supabaseClient.auth.getSession();
+    const session=await waitForInitialSession(supabaseClient);
     if(!session)return;
     // This was the actual redirect-loop bug: checkSession() used to jump to
     // /app.html for ANY session, with no AAL2 check. app.html's own init()

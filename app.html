@@ -779,19 +779,32 @@ let onboardingStep=0;
 // instead of guessing at a timeout.
 function waitForInitialSession(client){
   return new Promise((resolve)=>{
-    let done=false;
-    const{data:sub}=client.auth.onAuthStateChange((event,session)=>{
+    let done=false,subscription=null;
+    // finish() no longer touches the subscription variable captured by the
+    // listener closure directly — it reads a variable assigned AFTER
+    // onAuthStateChange returns. If that callback ever fires synchronously
+    // (before `const{data}=...` below finishes), referencing it inside the
+    // callback itself would throw (temporal dead zone), which — because the
+    // throw happened after `done=true` but before `resolve()` — meant the
+    // promise never resolved AND the timeout fallback's `if(done)return`
+    // skipped it too. Net effect: this could hang forever, silently, with
+    // no console error a page reload would show you. Using a shared
+    // `finish()` with optional chaining removes that whole hazard.
+    const finish=(session)=>{
       if(done)return;
-      if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='TOKEN_REFRESHED'){
-        done=true;sub.subscription.unsubscribe();resolve(session);
-      }
+      done=true;
+      subscription?.unsubscribe();
+      resolve(session);
+    };
+    const{data}=client.auth.onAuthStateChange((event,session)=>{
+      if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='TOKEN_REFRESHED')finish(session);
     });
+    subscription=data.subscription;
     // Safety net only — INITIAL_SESSION should always fire quickly on its own.
     setTimeout(async()=>{
       if(done)return;
-      done=true;sub.subscription.unsubscribe();
       const{data:{session}}=await client.auth.getSession();
-      resolve(session);
+      finish(session);
     },3000);
   });
 }
