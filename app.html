@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ComplyLog Pro — Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 <meta name="theme-color" content="#0a0a0b">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -765,10 +767,39 @@ let editingTaskId=null,taskPage=1,taskPerPage=10,allTasks=[];
 let tasksChartInst=null,categoryChartInst=null,haccpTrendInst=null;
 let onboardingStep=0;
 
+// Google login sends the browser straight back to app.html with the new
+// session encoded in the URL (#access_token=...) — supabase-js has to parse
+// that and write the session to storage, which is a real async step, not
+// instant. A plain `await getSession()` right on page load can run BEFORE
+// that finishes and see nothing yet, bouncing to index.html — which then
+// sometimes catches the session once it *has* landed and bounces back,
+// producing exactly the index.html/app.html ping-pong reported. Waiting for
+// supabase-js's own INITIAL_SESSION event (fired once it's actually settled
+// the session — from storage OR from a URL callback) avoids the race
+// instead of guessing at a timeout.
+function waitForInitialSession(client){
+  return new Promise((resolve)=>{
+    let done=false;
+    const{data:sub}=client.auth.onAuthStateChange((event,session)=>{
+      if(done)return;
+      if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='TOKEN_REFRESHED'){
+        done=true;sub.subscription.unsubscribe();resolve(session);
+      }
+    });
+    // Safety net only — INITIAL_SESSION should always fire quickly on its own.
+    setTimeout(async()=>{
+      if(done)return;
+      done=true;sub.subscription.unsubscribe();
+      const{data:{session}}=await client.auth.getSession();
+      resolve(session);
+    },3000);
+  });
+}
+
 async function init(){
   if(typeof supabase==='undefined'){document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:var(--text-secondary)"><p>Error loading application. Please reload.</p></div>';return;}
   supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-  const{data:{session}}=await supabaseClient.auth.getSession();
+  const session=await waitForInitialSession(supabaseClient);
   if(!session){window.location.href='/index.html';return;}
   const{data:aal}=await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
   if(aal&&aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){
