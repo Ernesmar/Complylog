@@ -318,7 +318,9 @@ function waitForInitialSession(client){
 
 async function checkSession(){
   try{
+    console.warn('[REDIRECT-DEBUG] index.html checkSession() started, url=',window.location.href);
     const session=await waitForInitialSession(supabaseClient);
+    console.warn('[REDIRECT-DEBUG] index.html waitForInitialSession resolved, session=',session?('yes, user='+session.user.email):'null');
     if(!session)return;
     // This was the actual redirect-loop bug: checkSession() used to jump to
     // /app.html for ANY session, with no AAL2 check. app.html's own init()
@@ -329,9 +331,11 @@ async function checkSession(){
     // either one. Same fix as login() below: show the MFA challenge here
     // instead of redirecting when AAL2 isn't satisfied yet.
     const{data:aal}=await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
-    if(aal&&aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){showMFAChallenge();return;}
+    console.warn('[REDIRECT-DEBUG] index.html AAL check, current=',aal?.currentLevel,'next=',aal?.nextLevel);
+    if(aal&&aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){console.warn('[REDIRECT-DEBUG] index.html showing MFA challenge instead of redirecting');showMFAChallenge();return;}
+    console.warn('[REDIRECT-DEBUG] index.html -> app.html: session+AAL2 OK');
     window.location.href='/app.html';
-  }catch(e){}
+  }catch(e){console.error('[REDIRECT-DEBUG] index.html checkSession() threw:',e);}
 }
 
 function togglePasswordVisibility(btn){
