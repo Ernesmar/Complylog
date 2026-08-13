@@ -810,20 +810,26 @@ function waitForInitialSession(client){
 }
 
 async function init(){
+  console.warn('[REDIRECT-DEBUG] app.html init() started, url=',window.location.href);
   if(typeof supabase==='undefined'){document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:var(--text-secondary)"><p>Error loading application. Please reload.</p></div>';return;}
   supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
   const session=await waitForInitialSession(supabaseClient);
-  if(!session){window.location.href='/index.html';return;}
+  console.warn('[REDIRECT-DEBUG] app.html waitForInitialSession resolved, session=',session?('yes, user='+session.user.email):'null');
+  if(!session){console.warn('[REDIRECT-DEBUG] app.html -> index.html: NO SESSION');window.location.href='/index.html';return;}
   const{data:aal}=await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
+  console.warn('[REDIRECT-DEBUG] app.html AAL check, current=',aal?.currentLevel,'next=',aal?.nextLevel);
   if(aal&&aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){
     // Signed in with password but hasn't completed the 2FA challenge yet —
     // bounce back to index.html, which handles the code prompt.
+    console.warn('[REDIRECT-DEBUG] app.html -> index.html: AAL2 INCOMPLETE');
     window.location.href='/index.html';return;
   }
   currentUser=session.user;
-  supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||!session)window.location.href='/index.html';});
+  supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||!session){console.warn('[REDIRECT-DEBUG] app.html -> index.html: onAuthStateChange event=',event,'session=',!!session);window.location.href='/index.html';}});
   await loadCompany();
-  if(!currentCompany){window.location.href='/index.html';return;}
+  console.warn('[REDIRECT-DEBUG] app.html loadCompany done, currentCompany=',currentCompany?currentCompany.company_name:'NONE');
+  if(!currentCompany){console.warn('[REDIRECT-DEBUG] app.html -> index.html: NO COMPANY');window.location.href='/index.html';return;}
+  console.warn('[REDIRECT-DEBUG] app.html init() completed successfully, staying on app.html');
   await checkPendingInvites();
   applyLang();setupNavigation();setupKeyboardShortcuts();setupColorPicker();populateSelects();
   if(!localStorage.getItem('complylog_onboarded'))showOnboarding();
@@ -834,13 +840,22 @@ async function init(){
 let allUserCompanies=[];
 
 async function loadCompany(){
-  const{data:owned}=await supabaseClient.from('companies').select('*,countries(code,name,timezone),business_types(industry,name)').eq('user_id',currentUser.id).is('deleted_at',null);
-  const{data:memberships}=await supabaseClient.from('company_members').select('role,companies(*,countries(code,name,timezone),business_types(industry,name))').eq('user_id',currentUser.id);
+  const{data:owned,error:ownedErr}=await supabaseClient.from('companies').select('*,countries(code,name,timezone),business_types(industry,name)').eq('user_id',currentUser.id).is('deleted_at',null);
+  const{data:memberships,error:memErr}=await supabaseClient.from('company_members').select('role,companies(*,countries(code,name,timezone),business_types(industry,name))').eq('user_id',currentUser.id);
+  // These errors used to be silently swallowed — only `data` was destructured,
+  // never `error`. If either query failed for ANY reason (a bad embed/join,
+  // an RLS surprise, a network blip), the code just treated it as "owns zero
+  // companies" with no trace of why, which is exactly what made the
+  // index.html/app.html redirect loop look like a phantom "no company" case
+  // even when a real, non-deleted company row existed for that user.
+  if(ownedErr)console.error('[REDIRECT-DEBUG] loadCompany companies query error:',ownedErr);
+  if(memErr)console.error('[REDIRECT-DEBUG] loadCompany company_members query error:',memErr);
 
   allUserCompanies=[
     ...(owned||[]).map(c=>({...c,_role:'owner'})),
     ...(memberships||[]).filter(m=>m.companies&&!m.companies.deleted_at).map(m=>({...m.companies,_role:m.role})),
   ];
+  console.warn('[REDIRECT-DEBUG] loadCompany found',allUserCompanies.length,'companies for user',currentUser.id);
   if(!allUserCompanies.length)return;
 
   const savedId=localStorage.getItem('complylog_active_company');
