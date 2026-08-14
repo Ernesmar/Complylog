@@ -316,6 +316,26 @@ function waitForInitialSession(client){
   });
 }
 
+// Same circuit breaker as app.html — see that file's comment for the full
+// reasoning. Independent counters would defeat the purpose (a loop bounces
+// between BOTH pages), so this uses the same sessionStorage key/name; it's
+// per-tab either way since sessionStorage doesn't cross tabs.
+function guardedRedirect(url,reason){
+  const key='complylog_redirect_guard';
+  const now=Date.now();
+  let hits=[];
+  try{hits=JSON.parse(sessionStorage.getItem(key)||'[]');}catch(e){hits=[];}
+  hits=hits.filter(t=>now-t<8000);
+  hits.push(now);
+  try{sessionStorage.setItem(key,JSON.stringify(hits));}catch(e){}
+  if(hits.length>3){
+    try{sessionStorage.removeItem(key);}catch(e){}
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;font-family:sans-serif;color:#f4f4f5;background:#0a0a0b"><div style="max-width:480px"><div style="font-size:40px;margin-bottom:12px">⚠️</div><h2 style="margin-bottom:12px">Loop de redirección detenido</h2><p style="color:#a1a1aa;font-size:14px;line-height:1.6">La app se estaba redirigiendo repetidamente y se detuvo para evitarlo.</p><p style="color:#71717a;font-size:12px;margin-top:12px">Última razón detectada: <code>${reason||'desconocida'}</code></p><p style="color:#71717a;font-size:12px;margin-top:8px">Abre la consola (F12) y copia los mensajes [REDIRECT-DEBUG].</p><button onclick="sessionStorage.clear();location.reload()" style="margin-top:20px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px">Recargar</button></div></div>`;
+    return;
+  }
+  window.location.href=url;
+}
+
 async function checkSession(){
   try{
     console.warn('[REDIRECT-DEBUG] index.html checkSession() started, url=',window.location.href);
@@ -334,8 +354,18 @@ async function checkSession(){
     console.warn('[REDIRECT-DEBUG] index.html AAL check, current=',aal?.currentLevel,'next=',aal?.nextLevel);
     if(aal&&aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){console.warn('[REDIRECT-DEBUG] index.html showing MFA challenge instead of redirecting');showMFAChallenge();return;}
     console.warn('[REDIRECT-DEBUG] index.html -> app.html: session+AAL2 OK');
-    window.location.href='/app.html';
-  }catch(e){console.error('[REDIRECT-DEBUG] index.html checkSession() threw:',e);}
+    guardedRedirect('/app.html','session+AAL2 OK on index.html');
+  }catch(e){
+    console.error('[REDIRECT-DEBUG] index.html checkSession() threw:',e);
+    // Previously this error just vanished — the user'd see a normal-looking
+    // landing page with no clue anything failed. A visible (dismissable)
+    // banner at least tells them a background check broke instead of
+    // silently leaving them on a page that LOOKS fine but isn't.
+    const banner=document.createElement('div');
+    banner.style.cssText='position:fixed;top:0;left:0;right:0;background:#7f1d1d;color:#fff;padding:10px 16px;font-size:13px;text-align:center;z-index:9999';
+    banner.innerHTML=`⚠️ No se pudo verificar tu sesión (error de red/conexión). <span style="text-decoration:underline;cursor:pointer" onclick="location.reload()">Recargar</span>`;
+    document.body.prepend(banner);
+  }
 }
 
 function togglePasswordVisibility(btn){

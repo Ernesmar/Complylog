@@ -809,32 +809,73 @@ function waitForInitialSession(client){
   });
 }
 
+// Circuit breaker: counts redirects (to either page) within an 8-second
+// window using sessionStorage (survives page loads, resets when the tab
+// closes). If it sees more than 3, it stops redirecting entirely and shows
+// a plain error screen with whatever reason was passed in — instead of
+// continuing to bounce forever. This doesn't fix whatever's actually wrong
+// (network/DNS issues won't go away on their own), but it turns an
+// undebuggable infinite loop into one readable, static screen you can
+// actually screenshot.
+function guardedRedirect(url,reason){
+  const key='complylog_redirect_guard';
+  const now=Date.now();
+  let hits=[];
+  try{hits=JSON.parse(sessionStorage.getItem(key)||'[]');}catch(e){hits=[];}
+  hits=hits.filter(t=>now-t<8000);
+  hits.push(now);
+  try{sessionStorage.setItem(key,JSON.stringify(hits));}catch(e){}
+  if(hits.length>3){
+    try{sessionStorage.removeItem(key);}catch(e){}
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;font-family:sans-serif;color:#f4f4f5;background:#0a0a0b"><div style="max-width:480px"><div style="font-size:40px;margin-bottom:12px">⚠️</div><h2 style="margin-bottom:12px">Loop de redirección detenido</h2><p style="color:#a1a1aa;font-size:14px;line-height:1.6">La app se estaba redirigiendo repetidamente y se detuvo para evitarlo.</p><p style="color:#71717a;font-size:12px;margin-top:12px">Última razón detectada: <code>${reason||'desconocida'}</code></p><p style="color:#71717a;font-size:12px;margin-top:8px">Abre la consola (F12) y copia los mensajes [REDIRECT-DEBUG].</p><button onclick="sessionStorage.clear();location.href='/index.html'" style="margin-top:20px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px">Volver al inicio</button></div></div>`;
+    return;
+  }
+  window.location.href=url;
+}
+
 async function init(){
   console.warn('[REDIRECT-DEBUG] app.html init() started, url=',window.location.href);
+  try{
   if(typeof supabase==='undefined'){document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:var(--text-secondary)"><p>Error loading application. Please reload.</p></div>';return;}
   supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
   const session=await waitForInitialSession(supabaseClient);
   console.warn('[REDIRECT-DEBUG] app.html waitForInitialSession resolved, session=',session?('yes, user='+session.user.email):'null');
-  if(!session){console.warn('[REDIRECT-DEBUG] app.html -> index.html: NO SESSION');window.location.href='/index.html';return;}
+  if(!session){console.warn('[REDIRECT-DEBUG] app.html -> index.html: NO SESSION');guardedRedirect('/index.html','no session');return;}
   const{data:aal}=await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
   console.warn('[REDIRECT-DEBUG] app.html AAL check, current=',aal?.currentLevel,'next=',aal?.nextLevel);
   if(aal&&aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){
     // Signed in with password but hasn't completed the 2FA challenge yet —
     // bounce back to index.html, which handles the code prompt.
     console.warn('[REDIRECT-DEBUG] app.html -> index.html: AAL2 INCOMPLETE');
-    window.location.href='/index.html';return;
+    guardedRedirect('/index.html','AAL2 incomplete');return;
   }
   currentUser=session.user;
-  supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||!session){console.warn('[REDIRECT-DEBUG] app.html -> index.html: onAuthStateChange event=',event,'session=',!!session);window.location.href='/index.html';}});
+  supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||!session){console.warn('[REDIRECT-DEBUG] app.html -> index.html: onAuthStateChange event=',event,'session=',!!session);guardedRedirect('/index.html','auth state changed: '+event);}});
   await loadCompany();
   console.warn('[REDIRECT-DEBUG] app.html loadCompany done, currentCompany=',currentCompany?currentCompany.company_name:'NONE');
-  if(!currentCompany){console.warn('[REDIRECT-DEBUG] app.html -> index.html: NO COMPANY');window.location.href='/index.html';return;}
+  if(!currentCompany){console.warn('[REDIRECT-DEBUG] app.html -> index.html: NO COMPANY');guardedRedirect('/index.html','no company found');return;}
   console.warn('[REDIRECT-DEBUG] app.html init() completed successfully, staying on app.html');
+  // A successful init means we're past whatever was causing trouble — clear
+  // the redirect counter so a real, later problem isn't reported as if it
+  // were a continuation of an old one.
+  try{sessionStorage.removeItem('complylog_redirect_guard');}catch(e){}
   await checkPendingInvites();
   applyLang();setupNavigation();setupKeyboardShortcuts();setupColorPicker();populateSelects();
   if(!localStorage.getItem('complylog_onboarded'))showOnboarding();
   loadDashboard();loadNotifications();checkMFAStatus();checkPlatformAdmin();
   setInterval(loadNotifications,60000);
+  }catch(err){
+    // This is the catch that was missing this whole time: any thrown error
+    // anywhere above (e.g. a network-level fetch failure like
+    // net::ERR_NAME_NOT_RESOLVED hitting the Supabase API — different from
+    // a normal Postgrest {data,error} response — throws instead of
+    // returning an error object) used to kill init() silently with nothing
+    // in the console and no redirect either, which looked like "nothing
+    // happens" or got misread as looping depending on what state the page
+    // was already in. Now it's shown on screen instead of disappearing.
+    console.error('[REDIRECT-DEBUG] app.html init() threw an uncaught error:',err);
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;font-family:sans-serif;color:#f4f4f5;background:#0a0a0b"><div style="max-width:520px"><div style="font-size:40px;margin-bottom:12px">🔌</div><h2 style="margin-bottom:12px">No se pudo cargar la app</h2><p style="color:#a1a1aa;font-size:14px;line-height:1.6">Hubo un error de conexión al intentar cargar tus datos — probablemente no se pudo alcanzar el servidor (revisa tu red/VPN).</p><p style="color:#71717a;font-size:12px;margin-top:12px;word-break:break-all">${(err&&err.message)?err.message:String(err)}</p><button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px">Reintentar</button></div></div>`;
+  }
 }
 
 let allUserCompanies=[];
