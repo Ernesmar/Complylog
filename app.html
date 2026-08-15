@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <title>ComplyLog Pro — Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 <meta name="theme-color" content="#0a0a0b">
@@ -625,7 +625,7 @@ th.admin-cb-cell{padding:8px 12px!important}
     </div>
   </div>
 </div>
-<button id="aiAdvisorFab" onclick="openAIAdvisorModal()" title="Ask AI" style="position:fixed;bottom:24px;right:24px;z-index:500;width:56px;height:56px;border-radius:50%;background:var(--accent);color:white;border:none;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;transition:var(--transition)" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">🧠</button>
+<button id="aiAdvisorFab" onclick="openAIAdvisorModal()" title="Ask AI" style="position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));right:calc(24px + env(safe-area-inset-right));z-index:500;width:56px;height:56px;border-radius:50%;background:var(--accent);color:white;border:none;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;transition:var(--transition)" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">🧠</button>
 <div class="modal" id="aiAdvisorModal">
   <div class="modal-content" style="max-width:520px">
     <h2 data-i18n="aiAdvisorTitle">🧠 Ask AI</h2>
