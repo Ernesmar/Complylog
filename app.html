@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>ComplyLog Pro — Dashboard</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 <meta name="theme-color" content="#0a0a0b">
@@ -102,7 +102,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .pagination button:disabled{opacity:.4;cursor:not-allowed}
 .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
 .modal.active{display:flex;opacity:1}
-.modal-content{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:520px;width:90%;max-height:85vh;overflow-y:auto;transform:scale(.95);transition:transform .2s;box-shadow:var(--shadow-lg)}
+.modal-content{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:520px;width:90%;max-height:85vh;overflow-x:hidden;overflow-y:auto;transform:scale(.95);transition:transform .2s;box-shadow:var(--shadow-lg)}
 .modal.active .modal-content{transform:scale(1)}
 .modal-content h2{font-size:20px;margin-bottom:6px}
 .modal-subtitle{color:var(--text-secondary);font-size:13px;margin-bottom:20px}
@@ -187,11 +187,12 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
 .payment-step-num{width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
 @media(max-width:1024px){.stats-grid{grid-template-columns:repeat(2,1fr)}.chart-grid{grid-template-columns:1fr}.settings-grid{grid-template-columns:1fr}}
 @media(max-width:768px){
-  .sidebar{width:var(--sidebar-collapsed)}.sidebar-logo span,.sidebar-nav a span:not(:first-child),.sidebar-footer button span{display:none}
+  .sidebar{width:var(--sidebar-collapsed)}.sidebar-logo span,.sidebar-nav a span:not(:first-child),.sidebar-footer button span:not(:first-child){display:none}
   .sidebar-logo{justify-content:center;padding:16px;font-size:0}.sidebar-nav a{justify-content:center;padding:12px}.main{margin-left:var(--sidebar-collapsed);padding:16px}
   .stats-grid{grid-template-columns:1fr}.page-header{flex-direction:column;align-items:flex-start}
   .toolbar{flex-direction:column;align-items:stretch}.search-box{max-width:none}.notif-dropdown{width:calc(100vw - 80px);right:-40px}
   .page-header-actions{flex-wrap:wrap}
+  .modal-content{width:calc(100vw - 32px);max-width:calc(100vw - 32px);padding:20px;max-height:90vh}
 }
 /* Admin panel tables: horizontal swipe-to-scroll shouldn't accidentally
    toggle the row checkboxes it passes over. A bigger tap target (via the
@@ -628,7 +629,7 @@ th.admin-cb-cell{padding:8px 12px!important}
 <div class="modal" id="aiAdvisorModal">
   <div class="modal-content" style="max-width:520px">
     <h2 data-i18n="aiAdvisorTitle">🧠 Ask AI</h2>
-    <p class="modal-subtitle" data-i18n="aiAdvisorSubtitle">Ask a compliance question — our AI answers with your country's regulations in mind. Not a substitute for professional advice.</p>
+    <p class="modal-subtitle" data-i18n="aiAdvisorSubtitle">Ask a compliance question — our AI considers your country's regulations and your account's real tasks/HACCP status. Not a substitute for professional advice.</p>
     <div class="form-group"><textarea class="form-textarea" id="aiAdvisorPrompt" style="min-height:100px" placeholder="e.g., What temperature should I keep dairy storage at?" data-i18n-placeholder="aiAdvisorPlaceholder"></textarea></div>
     <div id="aiAdvisorAnswer" style="display:none;background:var(--bg-tertiary);border-radius:8px;padding:14px;font-size:13px;line-height:1.6;margin-bottom:8px;max-height:280px;overflow-y:auto;white-space:pre-wrap"></div>
     <div class="modal-actions"><button class="btn btn-outline" onclick="closeAIAdvisorModal()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="aiAdvisorSendBtn" onclick="askAI()" data-i18n="aiAdvisorSendBtn">💬 Ask</button></div>
@@ -677,7 +678,7 @@ const translations={
     upgradePlanTitle:'💎 Upgrade Your Plan',upgradeChooseText:'Choose how you want to pay. All plans include a 14-day money-back guarantee.',payWithCardBtn:'Pay with Crypto — Instant (USDT, BTC & more)',payCryptoBotBtn:'Pay via CryptoBot (Telegram)',payP2PBtn:'Pay via P2P USDT Transfer',paymentDisclaimer:'🔒 This option activates instantly via NOWPayments — no card or Apple/Google Pay support yet, crypto only. CryptoBot/P2P payments are reviewed manually and usually activate within a few hours.',paymentHistoryTitle:'📜 Payment History',loadingText:'Loading...',
     tasksOverview:'Tasks Overview (Last 30 Days)',complianceByCategory:'Compliance by Category',recentTasks:'Recent Tasks',skipBtn:'Skip',
     optFood:'🍽️ Food',optCannabis:'🌿 Cannabis',optPharma:'💊 Pharma',optLaboratory:'🧪 Laboratory',optConstruction:'🏗️ Construction',optUSA:'🇺🇸 USA',optSpain:'🇪🇸 Spain',optMexico:'🇲🇽 Mexico',optBrazil:'🇧🇷 Brazil',
-    aiAdvisorTitle:'🧠 Ask AI',aiAdvisorSubtitle:"Ask a compliance question — our AI answers with your country's regulations in mind. Not a substitute for professional advice.",aiAdvisorPlaceholder:'e.g., What temperature should I keep dairy storage at?',aiAdvisorSendBtn:'💬 Ask',aiAdvisorAsking:'⏳ Thinking...',aiAdvisorEmptyError:'Please type a question first',aiAdvisorError:'Could not get an answer. Please try again.',aiAdvisorNoAnswer:'No answer returned.',
+    aiAdvisorTitle:'🧠 Ask AI',aiAdvisorSubtitle:"Ask a compliance question — our AI considers your country's regulations and your account's real tasks/HACCP status. Not a substitute for professional advice.",aiAdvisorPlaceholder:'e.g., What temperature should I keep dairy storage at?',aiAdvisorSendBtn:'💬 Ask',aiAdvisorAsking:'⏳ Thinking...',aiAdvisorEmptyError:'Please type a question first',aiAdvisorError:'Could not get an answer. Please try again.',aiAdvisorNoAnswer:'No answer returned.',
     statTotalTasks:'Total Tasks',chartCreated:'Created',emptyNoTasksYetTitle:'No tasks yet',emptyNoTasksYetSub:'Create your first compliance task to get started.',
     errLoadingTasks:'Error loading tasks',emptyNoTasksFoundTitle:'No tasks found',emptyNoTasksFoundSub:'Try adjusting your filters or create a new task.',editBtn:'Edit',completeBtn:'Complete',
     moreLabel:'more',
@@ -728,7 +729,7 @@ const translations={
     upgradePlanTitle:'💎 Actualiza Tu Plan',upgradeChooseText:'Elige cómo quieres pagar. Todos los planes incluyen garantía de devolución de 14 días.',payWithCardBtn:'Pagar con Cripto — Instantáneo (USDT, BTC y más)',payCryptoBotBtn:'Pagar vía CryptoBot (Telegram)',payP2PBtn:'Pagar vía Transferencia P2P USDT',paymentDisclaimer:'🔒 Esta opción activa tu plan al instante vía NOWPayments — aún no soporta tarjeta ni Apple/Google Pay, solo cripto. Los pagos por CryptoBot/P2P se revisan manualmente y suelen activarse en unas horas.',paymentHistoryTitle:'📜 Historial de Pagos',loadingText:'Cargando...',
     tasksOverview:'Resumen de Tareas (Últimos 30 Días)',complianceByCategory:'Cumplimiento por Categoría',recentTasks:'Tareas Recientes',skipBtn:'Omitir',
     optFood:'🍽️ Alimentos',optCannabis:'🌿 Cannabis',optPharma:'💊 Farmacia',optLaboratory:'🧪 Laboratorio',optConstruction:'🏗️ Construcción',optUSA:'🇺🇸 EE.UU.',optSpain:'🇪🇸 España',optMexico:'🇲🇽 México',optBrazil:'🇧🇷 Brasil',
-    aiAdvisorTitle:'🧠 Preguntar a la IA',aiAdvisorSubtitle:'Haz una pregunta de cumplimiento — nuestra IA responde considerando la normativa de tu país. No sustituye la asesoría profesional.',aiAdvisorPlaceholder:'ej., ¿A qué temperatura debo mantener el almacenamiento de lácteos?',aiAdvisorSendBtn:'💬 Preguntar',aiAdvisorAsking:'⏳ Pensando...',aiAdvisorEmptyError:'Escribe una pregunta primero',aiAdvisorError:'No se pudo obtener respuesta. Intenta de nuevo.',aiAdvisorNoAnswer:'No se recibió respuesta.',
+    aiAdvisorTitle:'🧠 Preguntar a la IA',aiAdvisorSubtitle:'Haz una pregunta de cumplimiento — nuestra IA considera la normativa de tu país y el estado real de tus tareas/HACCP. No sustituye la asesoría profesional.',aiAdvisorPlaceholder:'ej., ¿A qué temperatura debo mantener el almacenamiento de lácteos?',aiAdvisorSendBtn:'💬 Preguntar',aiAdvisorAsking:'⏳ Pensando...',aiAdvisorEmptyError:'Escribe una pregunta primero',aiAdvisorError:'No se pudo obtener respuesta. Intenta de nuevo.',aiAdvisorNoAnswer:'No se recibió respuesta.',
     statTotalTasks:'Tareas Totales',chartCreated:'Creadas',emptyNoTasksYetTitle:'Aún no hay tareas',emptyNoTasksYetSub:'Crea tu primera tarea de cumplimiento para empezar.',
     errLoadingTasks:'Error al cargar tareas',emptyNoTasksFoundTitle:'No se encontraron tareas',emptyNoTasksFoundSub:'Ajusta tus filtros o crea una tarea nueva.',editBtn:'Editar',completeBtn:'Completar',
     moreLabel:'más',
