@@ -627,12 +627,19 @@ th.admin-cb-cell{padding:8px 12px!important}
 </div>
 <button id="aiAdvisorFab" onclick="openAIAdvisorModal()" title="Ask AI" style="position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));right:calc(24px + env(safe-area-inset-right));z-index:500;width:56px;height:56px;border-radius:50%;background:var(--accent);color:white;border:none;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;transition:var(--transition)" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">🧠</button>
 <div class="modal" id="aiAdvisorModal">
-  <div class="modal-content" style="max-width:520px">
-    <h2 data-i18n="aiAdvisorTitle">🧠 Ask AI</h2>
-    <p class="modal-subtitle" data-i18n="aiAdvisorSubtitle">Ask a compliance question — our AI considers your country's regulations and your account's real tasks/HACCP status. Not a substitute for professional advice.</p>
-    <div class="form-group"><textarea class="form-textarea" id="aiAdvisorPrompt" style="min-height:100px" placeholder="e.g., What temperature should I keep dairy storage at?" data-i18n-placeholder="aiAdvisorPlaceholder"></textarea></div>
-    <div id="aiAdvisorAnswer" style="display:none;background:var(--bg-tertiary);border-radius:8px;padding:14px;font-size:13px;line-height:1.6;margin-bottom:8px;max-height:280px;overflow-y:auto;white-space:pre-wrap"></div>
-    <div class="modal-actions"><button class="btn btn-outline" onclick="closeAIAdvisorModal()" data-i18n="cancelBtn">Cancel</button><button class="btn btn-primary" id="aiAdvisorSendBtn" onclick="askAI()" data-i18n="aiAdvisorSendBtn">💬 Ask</button></div>
+  <div class="modal-content" style="max-width:760px;width:92vw;height:82vh;max-height:82vh;display:flex;flex-direction:column;padding:20px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-shrink:0">
+      <div style="min-width:0">
+        <h2 style="margin-bottom:4px" data-i18n="aiAdvisorTitle">🧠 Ask AI</h2>
+        <p class="modal-subtitle" style="margin-bottom:0" data-i18n="aiAdvisorSubtitle">Ask a compliance question — our AI considers your country's regulations and your account's real tasks/HACCP status. Not a substitute for professional advice.</p>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="closeAIAdvisorModal()" style="flex-shrink:0" data-i18n="closeBtn">Close</button>
+    </div>
+    <div id="aiAdvisorMessages" style="flex:1;overflow-y:auto;margin:16px 0;display:flex;flex-direction:column;gap:12px"></div>
+    <div style="display:flex;gap:8px;align-items:flex-end;flex-shrink:0">
+      <textarea class="form-textarea" id="aiAdvisorPrompt" style="min-height:48px;max-height:140px;flex:1;resize:vertical" placeholder="e.g., What temperature should I keep dairy storage at?" data-i18n-placeholder="aiAdvisorPlaceholder"></textarea>
+      <button class="btn btn-primary" id="aiAdvisorSendBtn" onclick="askAI()" style="flex-shrink:0" data-i18n="aiAdvisorSendBtn">💬 Ask</button>
+    </div>
   </div>
 </div>
 <script>
@@ -654,7 +661,7 @@ let supabaseClient,currentUser,currentCompany,currentSettings;
 const translations={
   en:{navDashboard:'Dashboard',navCalendar:'Calendar',navTasks:'Tasks',navHaccp:'HACCP',navTemplates:'Templates',navChecklists:'Checklists',navDocuments:'Documents',navActivity:'Activity',navTeam:'Team',navSettings:'Settings',navBilling:'Billing',signOut:'Sign Out',
     hdrDashboard:'Dashboard',hdrCalendar:'Regulatory Calendar',hdrTasks:'Tasks',hdrHaccp:'HACCP / GMP Monitoring',hdrTemplates:'Template Marketplace',hdrChecklists:'Custom Checklists',hdrDocuments:'Documents',hdrActivity:'Activity Log',hdrTeam:'Team',hdrSettings:'Settings',hdrBilling:'Billing',
-    newTask:'+ New Task',exportCsv:'📊 Export CSV',newEntry:'+ New Entry',generateAuditPdf:'📄 Generate Audit PDF',viewHistory:'📈 View History',newChecklist:'+ New Checklist',uploadDocument:'+ Upload Document',inviteMember:'+ Invite Member',saveSettingsBtn:'💾 Save Settings',today:'Today',backBtn:'← Back',editFields:'✏️ Edit Fields',generatePdf:'📄 Generate PDF',deleteBtn:'🗑️ Delete',cancelBtn:'Cancel',
+    newTask:'+ New Task',exportCsv:'📊 Export CSV',newEntry:'+ New Entry',generateAuditPdf:'📄 Generate Audit PDF',viewHistory:'📈 View History',newChecklist:'+ New Checklist',uploadDocument:'+ Upload Document',inviteMember:'+ Invite Member',saveSettingsBtn:'💾 Save Settings',today:'Today',backBtn:'← Back',editFields:'✏️ Edit Fields',generatePdf:'📄 Generate PDF',deleteBtn:'🗑️ Delete',cancelBtn:'Cancel',closeBtn:'Close',
     checklistsSubtitle:'Build your own report with whatever fields you need — not limited to HACCP.',documentsSubtitle:'Permits, supplier certificates, insurance policies — anything you want on hand for an audit.',activitySubtitle:'Every change and deletion to your compliance records, for audit purposes.',
     searchTasks:'Search tasks...',searchEquipment:'Search equipment or area...',searchTemplates:'Search templates...',searchDocuments:'Search documents...',
     allStatus:'All Status',statusPending:'Pending',statusInProgress:'In Progress',statusCompleted:'Completed',statusOverdue:'Overdue',
@@ -705,7 +712,7 @@ const translations={
     onbWelcomeTitle:'Welcome to ComplyLog Pro',onbWelcomeText:"Your all-in-one compliance management platform. Let's get you set up in 3 steps.",onbGetStarted:'Get Started',onbProfileTitle:'Set Your Profile',onbProfileText:'Tell us about your company so we can personalize your experience.',onbContinue:'Continue',onbAllSetTitle:"You're All Set!",onbAllSetText:'Start tracking your compliance tasks and HACCP logs. Use the sidebar to navigate.',onbGoToDashboard:'Go to Dashboard',welcomeAboardToast:'Welcome aboard! 🚀'},
   es:{navDashboard:'Dashboard',navCalendar:'Calendario',navTasks:'Tareas',navHaccp:'HACCP',navTemplates:'Templates',navChecklists:'Checklists',navDocuments:'Documentos',navActivity:'Actividad',navTeam:'Equipo',navSettings:'Configuración',navBilling:'Facturación',signOut:'Cerrar Sesión',
     hdrDashboard:'Dashboard',hdrCalendar:'Calendario Regulatorio',hdrTasks:'Tareas',hdrHaccp:'Monitoreo HACCP / GMP',hdrTemplates:'Marketplace de Templates',hdrChecklists:'Checklists Personalizados',hdrDocuments:'Documentos',hdrActivity:'Registro de Actividad',hdrTeam:'Equipo',hdrSettings:'Configuración',hdrBilling:'Facturación',
-    newTask:'+ Nueva Tarea',exportCsv:'📊 Exportar CSV',newEntry:'+ Nuevo Registro',generateAuditPdf:'📄 Generar PDF de Auditoría',viewHistory:'📈 Ver Historial',newChecklist:'+ Nuevo Checklist',uploadDocument:'+ Subir Documento',inviteMember:'+ Invitar Miembro',saveSettingsBtn:'💾 Guardar Configuración',today:'Hoy',backBtn:'← Volver',editFields:'✏️ Editar Campos',generatePdf:'📄 Generar PDF',deleteBtn:'🗑️ Eliminar',cancelBtn:'Cancelar',
+    newTask:'+ Nueva Tarea',exportCsv:'📊 Exportar CSV',newEntry:'+ Nuevo Registro',generateAuditPdf:'📄 Generar PDF de Auditoría',viewHistory:'📈 Ver Historial',newChecklist:'+ Nuevo Checklist',uploadDocument:'+ Subir Documento',inviteMember:'+ Invitar Miembro',saveSettingsBtn:'💾 Guardar Configuración',today:'Hoy',backBtn:'← Volver',editFields:'✏️ Editar Campos',generatePdf:'📄 Generar PDF',deleteBtn:'🗑️ Eliminar',cancelBtn:'Cancelar',closeBtn:'Cerrar',
     checklistsSubtitle:'Crea tu propio reporte con los campos que necesites — no limitado a HACCP.',documentsSubtitle:'Permisos, certificados de proveedores, pólizas de seguro — todo lo que quieras tener a mano para una auditoría.',activitySubtitle:'Cada cambio y eliminación en tus registros de cumplimiento, para fines de auditoría.',
     searchTasks:'Buscar tareas...',searchEquipment:'Buscar equipo o área...',searchTemplates:'Buscar templates...',searchDocuments:'Buscar documentos...',
     allStatus:'Todos los Estados',statusPending:'Pendiente',statusInProgress:'En Progreso',statusCompleted:'Completado',statusOverdue:'Vencido',
@@ -2049,27 +2056,46 @@ window.copyWallet=copyWallet;
 
 /* ========== AI ADVISOR (general-purpose "Ask AI", not tied to HACCP
    deviations — closes the gap where the landing page markets AI Suggestions
-   but the dashboard only ever surfaced it inside a HACCP deviation alert) */
+   but the dashboard only ever surfaced it inside a HACCP deviation alert).
+   Built as a real back-and-forth chat (with conversation memory sent to the
+   backend each turn) instead of a single-shot Q&A box — a user-reported gap
+   vs. DeepSeek's own web chat, which remembers prior turns in the thread. */
+let aiAdvisorHistory=[];
 function openAIAdvisorModal(){
   document.getElementById('aiAdvisorPrompt').value='';
-  document.getElementById('aiAdvisorAnswer').style.display='none';
+  document.getElementById('aiAdvisorMessages').innerHTML='';
+  aiAdvisorHistory=[];
   document.getElementById('aiAdvisorModal').classList.add('active');
 }
 function closeAIAdvisorModal(){document.getElementById('aiAdvisorModal').classList.remove('active');}
+function renderAIMessage(role,text){
+  const list=document.getElementById('aiAdvisorMessages');
+  const bubble=document.createElement('div');
+  const isUser=role==='user';
+  bubble.style.cssText=`max-width:85%;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.6;white-space:pre-wrap;align-self:${isUser?'flex-end':'flex-start'};background:${isUser?'var(--accent-soft)':'var(--bg-tertiary)'};color:${isUser?'var(--accent)':'var(--text-primary)'}`;
+  bubble.textContent=text;
+  list.appendChild(bubble);
+  list.scrollTop=list.scrollHeight;
+  return bubble;
+}
 async function askAI(){
-  const prompt=document.getElementById('aiAdvisorPrompt').value.trim();
+  const promptEl=document.getElementById('aiAdvisorPrompt');
+  const prompt=promptEl.value.trim();
   if(!prompt){toast(t('aiAdvisorEmptyError'),'error');return;}
   const btn=document.getElementById('aiAdvisorSendBtn');
   btn.disabled=true;btn.textContent=t('aiAdvisorAsking');
-  const answerBox=document.getElementById('aiAdvisorAnswer');
+  renderAIMessage('user',prompt);
+  promptEl.value='';
+  const thinkingBubble=renderAIMessage('assistant',t('aiAdvisorAsking'));
   try{
     const{data:{session}}=await supabaseClient.auth.getSession();
-    const res=await fetch(`${EDGE_BASE}/deepseek`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({prompt,company_id:currentCompany.id,context:'compliance'})});
+    const res=await fetch(`${EDGE_BASE}/deepseek`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({prompt,company_id:currentCompany.id,context:'compliance',history:aiAdvisorHistory})});
     const data=await res.json();
-    if(!res.ok){toast(data.error||t('aiAdvisorError'),'error');return;}
-    answerBox.textContent=data.answer||data.suggestion||t('aiAdvisorNoAnswer');
-    answerBox.style.display='block';
-  }catch(err){toast(t('aiAdvisorError'),'error');}
+    if(!res.ok){thinkingBubble.remove();toast(data.error||t('aiAdvisorError'),'error');return;}
+    const answer=data.answer||data.suggestion||t('aiAdvisorNoAnswer');
+    thinkingBubble.textContent=answer;
+    aiAdvisorHistory.push({role:'user',content:prompt},{role:'assistant',content:answer});
+  }catch(err){thinkingBubble.remove();toast(t('aiAdvisorError'),'error');}
   finally{btn.disabled=false;btn.textContent=t('aiAdvisorSendBtn');}
 }
 window.openAIAdvisorModal=openAIAdvisorModal;
