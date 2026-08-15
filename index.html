@@ -330,7 +330,7 @@ function guardedRedirect(url,reason){
   try{sessionStorage.setItem(key,JSON.stringify(hits));}catch(e){}
   if(hits.length>3){
     try{sessionStorage.removeItem(key);}catch(e){}
-    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;font-family:sans-serif;color:#f4f4f5;background:#0a0a0b"><div style="max-width:480px"><div style="font-size:40px;margin-bottom:12px">⚠️</div><h2 style="margin-bottom:12px">Loop de redirección detenido</h2><p style="color:#a1a1aa;font-size:14px;line-height:1.6">La app se estaba redirigiendo repetidamente y se detuvo para evitarlo.</p><p style="color:#71717a;font-size:12px;margin-top:12px">Última razón detectada: <code>${reason||'desconocida'}</code></p><p style="color:#71717a;font-size:12px;margin-top:8px">Abre la consola (F12) y copia los mensajes [REDIRECT-DEBUG].</p><button onclick="sessionStorage.clear();location.reload()" style="margin-top:20px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px">Recargar</button></div></div>`;
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;font-family:sans-serif;color:#f4f4f5;background:#0a0a0b"><div style="max-width:480px"><div style="font-size:40px;margin-bottom:12px">⚠️</div><h2 style="margin-bottom:12px">Loop de redirección detenido</h2><p style="color:#a1a1aa;font-size:14px;line-height:1.6">La app se estaba redirigiendo repetidamente y se detuvo para evitarlo.</p><p style="color:#71717a;font-size:12px;margin-top:12px">Última razón detectada: <code>${reason||'desconocida'}</code></p><p style="color:#71717a;font-size:12px;margin-top:8px">Si el problema persiste, abre la consola (F12) y copia cualquier mensaje de error en rojo.</p><button onclick="sessionStorage.clear();location.reload()" style="margin-top:20px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px">Recargar</button></div></div>`;
     return;
   }
   window.location.href=url;
@@ -338,9 +338,7 @@ function guardedRedirect(url,reason){
 
 async function checkSession(){
   try{
-    console.warn('[REDIRECT-DEBUG] index.html checkSession() started, url=',window.location.href);
     const session=await waitForInitialSession(supabaseClient);
-    console.warn('[REDIRECT-DEBUG] index.html waitForInitialSession resolved, session=',session?('yes, user='+session.user.email):'null');
     if(!session)return;
     // This was the actual redirect-loop bug: checkSession() used to jump to
     // /app.html for ANY session, with no AAL2 check. app.html's own init()
@@ -351,12 +349,10 @@ async function checkSession(){
     // either one. Same fix as login() below: show the MFA challenge here
     // instead of redirecting when AAL2 isn't satisfied yet.
     const{data:aal}=await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
-    console.warn('[REDIRECT-DEBUG] index.html AAL check, current=',aal?.currentLevel,'next=',aal?.nextLevel);
-    if(aal&&aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){console.warn('[REDIRECT-DEBUG] index.html showing MFA challenge instead of redirecting');showMFAChallenge();return;}
-    console.warn('[REDIRECT-DEBUG] index.html -> app.html: session+AAL2 OK');
+    if(aal&&aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){showMFAChallenge();return;}
     guardedRedirect('/app.html','session+AAL2 OK on index.html');
   }catch(e){
-    console.error('[REDIRECT-DEBUG] index.html checkSession() threw:',e);
+    console.error('[ComplyLog] checkSession() failed:',e);
     // Previously this error just vanished — the user'd see a normal-looking
     // landing page with no clue anything failed. A visible (dismissable)
     // banner at least tells them a background check broke instead of

@@ -191,6 +191,21 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:
   .sidebar-logo{justify-content:center;padding:16px;font-size:0}.sidebar-nav a{justify-content:center;padding:12px}.main{margin-left:var(--sidebar-collapsed);padding:16px}
   .stats-grid{grid-template-columns:1fr}.page-header{flex-direction:column;align-items:flex-start}
   .toolbar{flex-direction:column;align-items:stretch}.search-box{max-width:none}.notif-dropdown{width:calc(100vw - 80px);right:-40px}
+  .page-header-actions{flex-wrap:wrap}
+}
+/* Admin panel tables: horizontal swipe-to-scroll shouldn't accidentally
+   toggle the row checkboxes it passes over. A bigger tap target (via the
+   wrapping <label>, not the tiny native box itself) plus touch-action gives
+   the browser a clear "this is a scroll, not a tap" signal on mobile. */
+#adminCompanies{-webkit-overflow-scrolling:touch;touch-action:pan-x}
+.admin-cb-cell{padding:0!important;text-align:center}
+.admin-cb-hit{display:flex;align-items:center;justify-content:center;padding:14px 12px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#adminSelectAllCb{touch-action:manipulation}
+th.admin-cb-cell{padding:8px 12px!important}
+.admin-company-cb,#adminSelectAllCb{width:18px;height:18px;cursor:pointer}
+@media(max-width:768px){
+  .admin-cb-hit{padding:16px 14px}
+  .admin-company-cb,#adminSelectAllCb{width:20px;height:20px}
 }
 </style>
 <base target="_blank">
@@ -683,7 +698,7 @@ const translations={
     statusFinished:'Paid',statusPendingPay:'Pending',statusAwaitingPayment:'Awaiting payment',statusConfirming:'Confirming on blockchain',statusSending:'Sending',statusPartiallyPaid:'Partially paid',statusPendingReview:'Pending manual review — not active yet',statusFailed:'Failed',statusRejected:'Rejected',
     planTaskLimitReached:"You've reached your plan's limit of {max} tasks. Upgrade in Billing to add more.",planTaskLimitReachedShort:"You've reached your plan's task limit. Upgrade in Billing to add more.",taskUpdatedToast:'Task updated!',taskCreatedToast:'Task created!',taskCompletedRecurErr:'Task completed! (Could not schedule the next occurrence — check your plan limits.)',taskCompletedNextOccurrence:'Task completed! 🎉 Next occurrence scheduled for {date}.',taskCompletedRecurLimit:"Task completed! 🎉 (Recurring task limit reached — next occurrence wasn't created. Upgrade to keep recurrence going.)",taskCompletedToast:'Task completed! 🎉',deleteTaskConfirm:'Delete this task? This action can be undone later.',taskDeletedToast:'Task deleted',
     nothingToExport:'Nothing to export yet',csvExportedToast:'CSV exported!',deleteHaccpConfirm:'Delete this HACCP entry? This cannot be undone.',haccpDeletedToast:'HACCP entry deleted',
-    navAdmin:'Admin',hdrAdmin:'Admin',adminPendingPaymentsTitle:'Pending Manual Payments',adminCompaniesTitle:'All Companies',adminCompaniesLabel:'Companies',adminUsersLabel:'Users',adminRevenueLabel:'Revenue (confirmed)',adminPendingLabel:'Pending Review',adminNewThisWeekLabel:'New This Week',adminNoPendingPayments:'No payments waiting for review.',approveBtn:'Approve',rejectBtn:'Reject',adminApproveConfirm:"Approve this payment? This activates the company's plan immediately — only do this after confirming the funds actually arrived.",adminPaymentApprovedToast:'Payment approved — plan activated!',adminRejectConfirm:'Reject this payment? The company will need to submit a new one.',adminPaymentRejectedToast:'Payment rejected',adminColCompany:'Company',adminColTasks:'Tasks',adminColCreated:'Created',adminDeleteCompanyPrompt:'This permanently deletes "{name}" and ALL its data (tasks, HACCP logs, documents, everything). This cannot be undone.\n\nType the company name exactly to confirm:',adminCompanyDeletedToast:'Company deleted',
+    navAdmin:'Admin',hdrAdmin:'Admin',adminPendingPaymentsTitle:'Pending Manual Payments',adminCompaniesTitle:'All Companies',adminCompaniesLabel:'Companies',adminUsersLabel:'Users',adminRevenueLabel:'Revenue (confirmed)',adminPendingLabel:'Pending Review',adminNewThisWeekLabel:'New This Week',adminNoPendingPayments:'No payments waiting for review.',approveBtn:'Approve',rejectBtn:'Reject',adminApproveConfirm:"Approve this payment? This activates the company's plan immediately — only do this after confirming the funds actually arrived.",adminPaymentApprovedToast:'Payment approved — plan activated!',adminRejectConfirm:'Reject this payment? The company will need to submit a new one.',adminPaymentRejectedToast:'Payment rejected',adminColCompany:'Company',adminColTasks:'Tasks',adminColCreated:'Created',adminDeleteCompanyPrompt:'This permanently deletes "{name}" and ALL its data (tasks, HACCP logs, documents, everything). This cannot be undone.\n\nType the company name exactly to confirm:',adminCompanyDeletedToast:'Company deleted',adminDeleteOwnCompanyWarning:'⚠️ "{name}" is the company you are CURRENTLY VIEWING — very likely your own workspace, not a test one. Deleting it will lock you out until you manually recreate it in the database.\n\nType ENTIENDO or UNDERSTAND to proceed anyway:',
     granDay:'Day',granMonth:'Month',granYear:'Year',adminRevenueChartTitle:'Revenue Over Time',adminSignupsChartTitle:'New Companies Over Time',adminDeleteSelectedBtn:'Delete Selected ({n})',adminBulkDeleteConfirm:'Permanently delete {n} companies and ALL their data? This cannot be undone.\n\n{names}',adminCompaniesDeletedToast:'{n} companies deleted',
     switchedToCompany:'Switched to {company}',
     onbWelcomeTitle:'Welcome to ComplyLog Pro',onbWelcomeText:"Your all-in-one compliance management platform. Let's get you set up in 3 steps.",onbGetStarted:'Get Started',onbProfileTitle:'Set Your Profile',onbProfileText:'Tell us about your company so we can personalize your experience.',onbContinue:'Continue',onbAllSetTitle:"You're All Set!",onbAllSetText:'Start tracking your compliance tasks and HACCP logs. Use the sidebar to navigate.',onbGoToDashboard:'Go to Dashboard',welcomeAboardToast:'Welcome aboard! 🚀'},
@@ -734,7 +749,7 @@ const translations={
     statusFinished:'Pagado',statusPendingPay:'Pendiente',statusAwaitingPayment:'Esperando pago',statusConfirming:'Confirmando en blockchain',statusSending:'Enviando',statusPartiallyPaid:'Pago parcial',statusPendingReview:'Pendiente de revisión manual — aún no activo',statusFailed:'Fallido',statusRejected:'Rechazado',
     planTaskLimitReached:'Alcanzaste el límite de tu plan de {max} tareas. Actualiza en Facturación para agregar más.',planTaskLimitReachedShort:'Alcanzaste el límite de tareas de tu plan. Actualiza en Facturación para agregar más.',taskUpdatedToast:'¡Tarea actualizada!',taskCreatedToast:'¡Tarea creada!',taskCompletedRecurErr:'¡Tarea completada! (No se pudo programar la siguiente ocurrencia — revisa los límites de tu plan.)',taskCompletedNextOccurrence:'¡Tarea completada! 🎉 Siguiente ocurrencia programada para {date}.',taskCompletedRecurLimit:'¡Tarea completada! 🎉 (Límite de tareas recurrentes alcanzado — no se creó la siguiente ocurrencia. Actualiza tu plan para mantener la recurrencia.)',taskCompletedToast:'¡Tarea completada! 🎉',deleteTaskConfirm:'¿Eliminar esta tarea? Esta acción se puede deshacer después.',taskDeletedToast:'Tarea eliminada',
     nothingToExport:'Aún no hay nada para exportar',csvExportedToast:'¡CSV exportado!',deleteHaccpConfirm:'¿Eliminar este registro HACCP? Esto no se puede deshacer.',haccpDeletedToast:'Registro HACCP eliminado',
-    navAdmin:'Admin',hdrAdmin:'Administración',adminPendingPaymentsTitle:'Pagos Manuales Pendientes',adminCompaniesTitle:'Todas las Empresas',adminCompaniesLabel:'Empresas',adminUsersLabel:'Usuarios',adminRevenueLabel:'Ingresos (confirmados)',adminPendingLabel:'Pendientes de Revisión',adminNewThisWeekLabel:'Nuevas Esta Semana',adminNoPendingPayments:'No hay pagos esperando revisión.',approveBtn:'Aprobar',rejectBtn:'Rechazar',adminApproveConfirm:'¿Aprobar este pago? Esto activa el plan de la empresa de inmediato — solo hazlo después de confirmar que el dinero realmente llegó.',adminPaymentApprovedToast:'¡Pago aprobado — plan activado!',adminRejectConfirm:'¿Rechazar este pago? La empresa tendrá que enviar uno nuevo.',adminPaymentRejectedToast:'Pago rechazado',adminColCompany:'Empresa',adminColTasks:'Tareas',adminColCreated:'Creada',adminDeleteCompanyPrompt:'Esto elimina permanentemente "{name}" y TODOS sus datos (tareas, registros HACCP, documentos, todo). Esto no se puede deshacer.\n\nEscribe el nombre exacto de la empresa para confirmar:',adminCompanyDeletedToast:'Empresa eliminada',
+    navAdmin:'Admin',hdrAdmin:'Administración',adminPendingPaymentsTitle:'Pagos Manuales Pendientes',adminCompaniesTitle:'Todas las Empresas',adminCompaniesLabel:'Empresas',adminUsersLabel:'Usuarios',adminRevenueLabel:'Ingresos (confirmados)',adminPendingLabel:'Pendientes de Revisión',adminNewThisWeekLabel:'Nuevas Esta Semana',adminNoPendingPayments:'No hay pagos esperando revisión.',approveBtn:'Aprobar',rejectBtn:'Rechazar',adminApproveConfirm:'¿Aprobar este pago? Esto activa el plan de la empresa de inmediato — solo hazlo después de confirmar que el dinero realmente llegó.',adminPaymentApprovedToast:'¡Pago aprobado — plan activado!',adminRejectConfirm:'¿Rechazar este pago? La empresa tendrá que enviar uno nuevo.',adminPaymentRejectedToast:'Pago rechazado',adminColCompany:'Empresa',adminColTasks:'Tareas',adminColCreated:'Creada',adminDeleteCompanyPrompt:'Esto elimina permanentemente "{name}" y TODOS sus datos (tareas, registros HACCP, documentos, todo). Esto no se puede deshacer.\n\nEscribe el nombre exacto de la empresa para confirmar:',adminCompanyDeletedToast:'Empresa eliminada',adminDeleteOwnCompanyWarning:'⚠️ "{name}" es la empresa que estás VIENDO AHORA MISMO — muy probablemente tu propio espacio de trabajo, no uno de prueba. Si la borras, quedarás bloqueado hasta recrearla manualmente en la base de datos.\n\nEscribe ENTIENDO o UNDERSTAND para continuar de todas formas:',
     granDay:'Día',granMonth:'Mes',granYear:'Año',adminRevenueChartTitle:'Ingresos en el Tiempo',adminSignupsChartTitle:'Empresas Nuevas en el Tiempo',adminDeleteSelectedBtn:'Eliminar Seleccionadas ({n})',adminBulkDeleteConfirm:'¿Eliminar permanentemente {n} empresas y TODOS sus datos? Esto no se puede deshacer.\n\n{names}',adminCompaniesDeletedToast:'{n} empresas eliminadas',
     switchedToCompany:'Cambiado a {company}',
     onbWelcomeTitle:'Bienvenido a ComplyLog Pro',onbWelcomeText:'Tu plataforma todo-en-uno de gestión de cumplimiento. Vamos a configurarte en 3 pasos.',onbGetStarted:'Comenzar',onbProfileTitle:'Configura tu Perfil',onbProfileText:'Cuéntanos sobre tu empresa para personalizar tu experiencia.',onbContinue:'Continuar',onbAllSetTitle:'¡Todo Listo!',onbAllSetText:'Empieza a rastrear tus tareas de cumplimiento y registros HACCP. Usa el sidebar para navegar.',onbGoToDashboard:'Ir al Dashboard',welcomeAboardToast:'¡Bienvenido a bordo! 🚀'}
@@ -827,34 +842,28 @@ function guardedRedirect(url,reason){
   try{sessionStorage.setItem(key,JSON.stringify(hits));}catch(e){}
   if(hits.length>3){
     try{sessionStorage.removeItem(key);}catch(e){}
-    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;font-family:sans-serif;color:#f4f4f5;background:#0a0a0b"><div style="max-width:480px"><div style="font-size:40px;margin-bottom:12px">⚠️</div><h2 style="margin-bottom:12px">Loop de redirección detenido</h2><p style="color:#a1a1aa;font-size:14px;line-height:1.6">La app se estaba redirigiendo repetidamente y se detuvo para evitarlo.</p><p style="color:#71717a;font-size:12px;margin-top:12px">Última razón detectada: <code>${reason||'desconocida'}</code></p><p style="color:#71717a;font-size:12px;margin-top:8px">Abre la consola (F12) y copia los mensajes [REDIRECT-DEBUG].</p><button onclick="sessionStorage.clear();location.href='/index.html'" style="margin-top:20px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px">Volver al inicio</button></div></div>`;
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;font-family:sans-serif;color:#f4f4f5;background:#0a0a0b"><div style="max-width:480px"><div style="font-size:40px;margin-bottom:12px">⚠️</div><h2 style="margin-bottom:12px">Loop de redirección detenido</h2><p style="color:#a1a1aa;font-size:14px;line-height:1.6">La app se estaba redirigiendo repetidamente y se detuvo para evitarlo.</p><p style="color:#71717a;font-size:12px;margin-top:12px">Última razón detectada: <code>${reason||'desconocida'}</code></p><p style="color:#71717a;font-size:12px;margin-top:8px">Si el problema persiste, abre la consola (F12) y copia cualquier mensaje de error en rojo.</p><button onclick="sessionStorage.clear();location.href='/index.html'" style="margin-top:20px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px">Volver al inicio</button></div></div>`;
     return;
   }
   window.location.href=url;
 }
 
 async function init(){
-  console.warn('[REDIRECT-DEBUG] app.html init() started, url=',window.location.href);
   try{
   if(typeof supabase==='undefined'){document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:var(--text-secondary)"><p>Error loading application. Please reload.</p></div>';return;}
   supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
   const session=await waitForInitialSession(supabaseClient);
-  console.warn('[REDIRECT-DEBUG] app.html waitForInitialSession resolved, session=',session?('yes, user='+session.user.email):'null');
-  if(!session){console.warn('[REDIRECT-DEBUG] app.html -> index.html: NO SESSION');guardedRedirect('/index.html','no session');return;}
+  if(!session){guardedRedirect('/index.html','no session');return;}
   const{data:aal}=await supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
-  console.warn('[REDIRECT-DEBUG] app.html AAL check, current=',aal?.currentLevel,'next=',aal?.nextLevel);
   if(aal&&aal.nextLevel==='aal2'&&aal.currentLevel!=='aal2'){
     // Signed in with password but hasn't completed the 2FA challenge yet —
     // bounce back to index.html, which handles the code prompt.
-    console.warn('[REDIRECT-DEBUG] app.html -> index.html: AAL2 INCOMPLETE');
     guardedRedirect('/index.html','AAL2 incomplete');return;
   }
   currentUser=session.user;
-  supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||!session){console.warn('[REDIRECT-DEBUG] app.html -> index.html: onAuthStateChange event=',event,'session=',!!session);guardedRedirect('/index.html','auth state changed: '+event);}});
+  supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||!session)guardedRedirect('/index.html','auth state changed: '+event);});
   await loadCompany();
-  console.warn('[REDIRECT-DEBUG] app.html loadCompany done, currentCompany=',currentCompany?currentCompany.company_name:'NONE');
-  if(!currentCompany){console.warn('[REDIRECT-DEBUG] app.html -> index.html: NO COMPANY');guardedRedirect('/index.html','no company found');return;}
-  console.warn('[REDIRECT-DEBUG] app.html init() completed successfully, staying on app.html');
+  if(!currentCompany){guardedRedirect('/index.html','no company found');return;}
   // A successful init means we're past whatever was causing trouble — clear
   // the redirect counter so a real, later problem isn't reported as if it
   // were a continuation of an old one.
@@ -865,15 +874,15 @@ async function init(){
   loadDashboard();loadNotifications();checkMFAStatus();checkPlatformAdmin();
   setInterval(loadNotifications,60000);
   }catch(err){
-    // This is the catch that was missing this whole time: any thrown error
-    // anywhere above (e.g. a network-level fetch failure like
-    // net::ERR_NAME_NOT_RESOLVED hitting the Supabase API — different from
-    // a normal Postgrest {data,error} response — throws instead of
-    // returning an error object) used to kill init() silently with nothing
-    // in the console and no redirect either, which looked like "nothing
-    // happens" or got misread as looping depending on what state the page
-    // was already in. Now it's shown on screen instead of disappearing.
-    console.error('[REDIRECT-DEBUG] app.html init() threw an uncaught error:',err);
+    // Any thrown error anywhere above (e.g. a network-level fetch failure
+    // like net::ERR_NAME_NOT_RESOLVED hitting the Supabase API — different
+    // from a normal Postgrest {data,error} response, which throws instead
+    // of returning an error object) used to kill init() silently: no
+    // console output, no redirect, nothing — which looked like a hang or
+    // got misread as a loop depending on what state the page was already
+    // in. That silent failure was the real cause of a long, hard-to-diagnose
+    // outage — keep this catch and the on-screen message permanently.
+    console.error('[ComplyLog] init() failed:',err);
     document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;text-align:center;font-family:sans-serif;color:#f4f4f5;background:#0a0a0b"><div style="max-width:520px"><div style="font-size:40px;margin-bottom:12px">🔌</div><h2 style="margin-bottom:12px">No se pudo cargar la app</h2><p style="color:#a1a1aa;font-size:14px;line-height:1.6">Hubo un error de conexión al intentar cargar tus datos — probablemente no se pudo alcanzar el servidor (revisa tu red/VPN).</p><p style="color:#71717a;font-size:12px;margin-top:12px;word-break:break-all">${(err&&err.message)?err.message:String(err)}</p><button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#3b82f6;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px">Reintentar</button></div></div>`;
   }
 }
@@ -889,14 +898,13 @@ async function loadCompany(){
   // companies" with no trace of why, which is exactly what made the
   // index.html/app.html redirect loop look like a phantom "no company" case
   // even when a real, non-deleted company row existed for that user.
-  if(ownedErr)console.error('[REDIRECT-DEBUG] loadCompany companies query error:',ownedErr);
-  if(memErr)console.error('[REDIRECT-DEBUG] loadCompany company_members query error:',memErr);
+  if(ownedErr)console.error('[ComplyLog] loadCompany companies query error:',ownedErr);
+  if(memErr)console.error('[ComplyLog] loadCompany company_members query error:',memErr);
 
   allUserCompanies=[
     ...(owned||[]).map(c=>({...c,_role:'owner'})),
     ...(memberships||[]).filter(m=>m.companies&&!m.companies.deleted_at).map(m=>({...m.companies,_role:m.role})),
   ];
-  console.warn('[REDIRECT-DEBUG] loadCompany found',allUserCompanies.length,'companies for user',currentUser.id);
   if(!allUserCompanies.length)return;
 
   const savedId=localStorage.getItem('complylog_active_company');
@@ -2197,9 +2205,9 @@ async function loadAdminCompanies(){
   adminSelectedCompanies.clear();updateAdminBulkDeleteBtn();
   try{
     const{companies}=await callAdminPanel({action:'list_companies'});
-    let html=`<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="color:var(--text-tertiary);text-align:left;border-bottom:1px solid var(--border)"><th style="padding:8px"><input type="checkbox" id="adminSelectAllCb"></th><th style="padding:8px">${t('adminColCompany')}</th><th style="padding:8px">${t('colPlan')}</th><th style="padding:8px">${t('adminColTasks')}</th><th style="padding:8px">${t('adminColCreated')}</th><th style="padding:8px"></th></tr></thead><tbody>`;
+    let html=`<table style="width:100%;font-size:13px;border-collapse:collapse"><thead><tr style="color:var(--text-tertiary);text-align:left;border-bottom:1px solid var(--border)"><th class="admin-cb-cell"><input type="checkbox" id="adminSelectAllCb"></th><th style="padding:8px">${t('adminColCompany')}</th><th style="padding:8px">${t('colPlan')}</th><th style="padding:8px">${t('adminColTasks')}</th><th style="padding:8px">${t('adminColCreated')}</th><th style="padding:8px"></th></tr></thead><tbody>`;
     companies.forEach(c=>{
-      html+=`<tr style="border-bottom:1px solid var(--border)" data-id="${c.id}" data-name="${escapeAttr(c.company_name)}"><td style="padding:8px"><input type="checkbox" class="admin-company-cb"></td><td style="padding:8px">${escapeAttr(c.company_name)}</td><td style="padding:8px;text-transform:capitalize">${c.plan||'free'}</td><td style="padding:8px">${c.task_count}</td><td style="padding:8px">${new Date(c.created_at).toLocaleDateString()}</td><td style="padding:8px"><button class="btn btn-danger btn-sm admin-delete-company-btn">🗑️</button></td></tr>`;
+      html+=`<tr style="border-bottom:1px solid var(--border)" data-id="${c.id}" data-name="${escapeAttr(c.company_name)}"><td class="admin-cb-cell"><label class="admin-cb-hit"><input type="checkbox" class="admin-company-cb"></label></td><td style="padding:8px">${escapeAttr(c.company_name)}</td><td style="padding:8px;text-transform:capitalize">${c.plan||'free'}</td><td style="padding:8px">${c.task_count}</td><td style="padding:8px">${new Date(c.created_at).toLocaleDateString()}</td><td style="padding:8px"><button class="btn btn-danger btn-sm admin-delete-company-btn">🗑️</button></td></tr>`;
     });
     html+='</tbody></table>';
     container.innerHTML=html;
@@ -2252,6 +2260,18 @@ document.getElementById('adminBulkDeleteBtn')?.addEventListener('click',()=>{
 // confirmation is a count + list instead of re-typing every name.
 async function adminDeleteCompanies(ids,names){
   if(!ids.length)return;
+  // The exact accident that caused a real, painful outage this session:
+  // an admin testing this feature deleted their OWN company along with test
+  // ones, got silently locked out (loadCompany() found zero rows, bounced
+  // to index.html on every login, looking like an unrelated auth bug for
+  // hours). currentCompany is whichever workspace the admin is currently
+  // viewing in the sidebar switcher — if it's in the selection, stop and
+  // make them type a specific extra word, on top of whatever confirmation
+  // follows below.
+  if(currentCompany&&ids.includes(currentCompany.id)){
+    const typed=prompt(t('adminDeleteOwnCompanyWarning').replace('{name}',currentCompany.company_name));
+    if(typed!=='ENTIENDO'&&typed!=='UNDERSTAND'){if(typed!==null)toast(t('confirmationMismatch'),'info');return;}
+  }
   let confirmed;
   if(ids.length===1){
     const typed=prompt(t('adminDeleteCompanyPrompt').replace('{name}',names[0]));
